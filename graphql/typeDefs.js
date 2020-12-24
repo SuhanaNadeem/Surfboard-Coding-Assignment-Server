@@ -60,6 +60,17 @@ module.exports = gql`
     getAdmin: Admin!
     getMentor: Mentor!
     getStudent: Student!
+    # for dashboard
+    getCompletedModulesByStudent: [Module]!
+    getInProgressModulesByStudent: [Module]!
+    getBadgesByStudent: [Badge]!
+    # for student's learn page
+    getModulesByCategory(category: String!): [Module]!
+    getStudentsByMentor: [Student]!
+    getMentorsByStudent: [Mentor]!
+    # like dif form fields to create questions
+    getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
+    getQuestionsByModule(module: String!): [Question]!
   }
 
   type Mutation {
