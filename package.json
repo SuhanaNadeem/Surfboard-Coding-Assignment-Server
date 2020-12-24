@@ -1,0 +1,46 @@
+{
+  "name": "chainrxn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "12.16.2",
+    "npm": "6.13.0"
+  },
+  "scripts": {
+    "serve": "node index",
+    "start": "node index",
+    "test": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SufiyaanNadeem/HackUMass-Server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SufiyaanNadeem/HackUMass-Server/issues"
+  },
+  "homepage": "https://github.com/SufiyaanNadeem/HackUMass-Server#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^7.2.1",
+    "amazon-s3-uri": "^0.0.3",
+    "apollo-server": "^2.16.1",
+    "apollo-upload-client": "^13.0.0",
+    "aws-sdk": "^2.713.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "graphql-iso-date": "^3.6.1",
+    "heroku": "^7.42.4",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
+    "moment": "^2.29.1",
+    "mongoose": "^5.9.14",
+    "nanoid": "^3.1.12",
+    "utf8": "^3.0.0",
+    "validator": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
