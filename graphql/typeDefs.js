@@ -60,17 +60,29 @@ module.exports = gql`
     getAdmin: Admin!
     getMentor: Mentor!
     getStudent: Student!
+
     # for dashboard
     getCompletedModulesByStudent: [Module]!
     getInProgressModulesByStudent: [Module]!
     getBadgesByStudent: [Badge]!
+    
     # for student's learn page
     getModulesByCategory(category: String!): [Module]!
+
     getStudentsByMentor: [Student]!
     getMentorsByStudent: [Mentor]!
-    # like dif form fields to create questions
+    
+     like dif form fields to create questions
     getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
+    
+    # can be of any of the types
     getQuestionsByModule(module: String!): [Question]!
+    
+    # will either be ytvid link or gdoc hosted article link
+    getLearnLinkByModule(module: String!): String!
+    # TODO finish queries, add missing types, and add mutations
+    
+    
   }
 
   type Mutation {
