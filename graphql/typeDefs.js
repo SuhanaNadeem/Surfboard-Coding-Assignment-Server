@@ -33,8 +33,8 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [String]!
-    completedModules: [String]!
+    inProgressModules: [String]
+    completedModules: [String]
     badges: [String]
 
     createdAt: DateTime!

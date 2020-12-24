@@ -1,5 +1,5 @@
 {
-  "name": "chainrxn",
+  "name": "lynx-institute",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SufiyaanNadeem/HackUMass-Server.git"
+    "url": "git+https://github.com/SuhanaNadeem/LYNX-Institute-Server.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SufiyaanNadeem/HackUMass-Server/issues"
+    "url": "https://github.com/SuhanaNadeem/LYNX-Institute-Server/issues"
   },
-  "homepage": "https://github.com/SufiyaanNadeem/HackUMass-Server#readme",
+  "homepage": "https://github.com/SuhanaNadeem/LYNX-Institute-Server#readme",
   "dependencies": {
     "@sendgrid/mail": "^7.2.1",
     "amazon-s3-uri": "^0.0.3",
@@ -41,6 +41,6 @@
     "validator": "^13.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.6"
   }
 }
