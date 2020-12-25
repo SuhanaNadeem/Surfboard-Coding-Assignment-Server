@@ -44,17 +44,36 @@ module.exports = gql`
   type Module {
     id: String!
     type: String! # learn or practice
-    category: String! # CAD, electrical, programming
+    categoryId: String!
     format: String # video or article | question type
     mentorComments: [String]
     studentComments: [String]
     createdAt: DateTime!
   }
 
+  type Category {
+    id: String!
+    name: String! # CAD, elec, prog
+    createdAt: DateTime!
+    modulesAssociated: [Module]!
+    challengesAssociated: [Challenge]!
+  }
+
   type Badge {
     id: String!
     name: String!
     description: String
+    createdAt: DateTime!
+    criteria: String!
+  }
+
+  #TODO add answer type and hint type
+
+  type Hint {
+    hintId: String!
+    questionId: String!
+    categoryId: String!
+    moduleId: String!
     createdAt: DateTime!
   }
 
@@ -72,6 +91,15 @@ module.exports = gql`
     infoProvided: String!
     expectedAnswer: String
     createdAt: DateTime!
+    hint: String
+  }
+
+  type Challenge {
+    id: String!
+    image: String
+    infoProvided: String!
+    createdAt: DateTime!
+    categoryId: String!
   }
 
   # retrieve information
@@ -101,6 +129,10 @@ module.exports = gql`
     getLearnLinkByModule(moduleId: String!): String!
 
     getCommentsByModule(moduleId: String!): [String]!
+    getModulesForSearch(search: String!): [Module]!
+
+    getChallengesByCategory(categoryId: String!): [Challenge]!
+    getHintByQuestion(questionId: String!): Hint!
   }
 
   # actions
@@ -152,6 +184,39 @@ module.exports = gql`
     deleteModule(moduleId: String!): Module!
     deleteQuestion(questionId: String!): Question!
     deleteQuestionTemplate(questionTemplateId: String!): QuestionTemplate!
+    createNewChallenge(
+      categoryId: String!
+      infoProvided: String!
+      image: String
+    ): Challenge!
+    editChallenge(
+      categoryId: String!
+      infoProvided: String!
+      image: String
+    ): Challenge!
+    deleteChallenge(
+      categoryId: String!
+      infoProvided: String!
+      image: String
+    ): Challenge!
+    addModuleHint(
+      moduleId: String!
+      categoryId: String!
+      questionId: String!
+      hintDescription: String!
+    ): Hint!
+    editModuleHint(
+      moduleId: String!
+      categoryId: String!
+      questionId: String!
+      hintDescription: String!
+    ): Hint!
+    removeModuleHint(
+      moduleId: String!
+      categoryId: String!
+      questionId: String!
+      hintDescription: String!
+    ): Hint!
 
     # for learn/practice experience
     verifyAnswer(answer: String!): Boolean!
