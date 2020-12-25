@@ -33,9 +33,9 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [String]
-    completedModules: [String]
-    badges: [String]
+    inProgressModules: [Module]
+    completedModules: [Module]
+    badges: [Badge]
 
     createdAt: DateTime!
     token: String
@@ -46,6 +46,7 @@ module.exports = gql`
     type: String! # learn or practice
     category: String! # CAD, electrical, programming
     format: String # video or article | question type
+    comments: [String]
     createdAt: DateTime!
   }
 
@@ -55,6 +56,7 @@ module.exports = gql`
     description: String
     createdAt: DateTime!
   }
+
   # not the card itself, just available templates
   type QuestionTemplate {
     id: String!
@@ -92,10 +94,12 @@ module.exports = gql`
     getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
 
     # can be of any of the types
-    getQuestionsByModule(module: String!): [Question]!
+    getQuestionsByModule(moduleId: String!): [Question]!
 
     # will either be ytvid link or gdoc hosted article link
-    getLearnLinkByModule(module: String!): String!
+    getLearnLinkByModule(moduleId: String!): String!
+
+    getCommentsByModule(moduleId: String!): [String]!
   }
 
   # actions
@@ -133,13 +137,28 @@ module.exports = gql`
       format: String
     ): Question!
     createNewQuestionTemplate(category: String!): QuestionTemplate!
+    editModule(moduleId: String!, category: String!, format: String): Module!
+    editQuestion(
+      questionId: String!
+      category: String!
+      format: String
+    ): Question!
+    editQuestionTemplate(
+      questionTemplateId: String!
+      category: String!
+      format: String
+    ): QuestionTemplate!
+    deleteModule(moduleId: String!): Module!
+    deleteQuestion(questionId: String!): Question!
+    deleteQuestionTemplate(questionTemplateId: String!): QuestionTemplate!
 
+    # for learn/practice experience
     verifyAnswer(answer: String!): Boolean!
     starModule(moduleId: String!): Module!
     unstarModule(moduleId: String!): Module!
     starQuestion(questionId: String!): Question!
     unstarQuestion(questionId: String!): Question!
-
-    incrementModulePoints(answerCorrect: Boolean!): Int!
+    commentOnModule(moduleId: String!, comment: String): Module
+    incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
   }
 `;
