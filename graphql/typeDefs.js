@@ -46,7 +46,8 @@ module.exports = gql`
     type: String! # learn or practice
     category: String! # CAD, electrical, programming
     format: String # video or article | question type
-    comments: [String]
+    mentorComments: [String]
+    studentComments: [String]
     createdAt: DateTime!
   }
 
