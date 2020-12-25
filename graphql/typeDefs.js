@@ -41,18 +41,33 @@ module.exports = gql`
     token: String
   }
 
-  type PracticeModule {
+  type Module {
     id: String!
+    type: String! # learn or practice
+    category: String! # CAD, electrical, programming
+    format: String # video or article | question type
+    createdAt: DateTime!
+  }
 
+  type Badge {
+    id: String!
+    name: String!
+    description: String
+    createdAt: DateTime!
+  }
+  # not the card itself, just available templates
+  type QuestionTemplate {
+    id: String!
+    type: String! # learn or practice
     category: String! # CAD, electrical, programming
     createdAt: DateTime!
   }
 
-  type LearnModule {
+  type Question {
     id: String!
-
-    category: String! # CAD, electrical, programming
-    type: String! # video or article
+    image: String
+    infoProvided: String!
+    expectedAnswer: String
     createdAt: DateTime!
   }
 
@@ -65,24 +80,22 @@ module.exports = gql`
     getCompletedModulesByStudent: [Module]!
     getInProgressModulesByStudent: [Module]!
     getBadgesByStudent: [Badge]!
-    
+
     # for student's learn page
     getModulesByCategory(category: String!): [Module]!
 
     getStudentsByMentor: [Student]!
     getMentorsByStudent: [Mentor]!
-    
-     like dif form fields to create questions
+
+    #  like dif form fields to create questions
     getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
-    
+
     # can be of any of the types
     getQuestionsByModule(module: String!): [Question]!
-    
+
     # will either be ytvid link or gdoc hosted article link
     getLearnLinkByModule(module: String!): String!
-    # TODO finish queries, add missing types, and add mutations
-    
-    
+    # TODO add mutations
   }
 
   type Mutation {
