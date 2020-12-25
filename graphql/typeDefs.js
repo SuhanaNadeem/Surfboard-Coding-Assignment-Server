@@ -71,6 +71,7 @@ module.exports = gql`
     createdAt: DateTime!
   }
 
+  # retrieve information
   type Query {
     getAdmin: Admin!
     getMentor: Mentor!
@@ -95,9 +96,9 @@ module.exports = gql`
 
     # will either be ytvid link or gdoc hosted article link
     getLearnLinkByModule(module: String!): String!
-    # TODO add mutations
   }
 
+  # actions
   type Mutation {
     signupAdmin(
       email: String!
@@ -105,17 +106,40 @@ module.exports = gql`
       confirmPassword: String!
     ): Admin!
     loginAdmin(email: String!, password: String!): Admin!
+
     signupMentor(
       email: String!
       password: String!
       confirmPassword: String!
     ): Mentor!
     loginMentor(email: String!, password: String!): Mentor!
+
     signupStudent(
       email: String!
       password: String!
       confirmPassword: String!
     ): Student!
     loginStudent(email: String!, password: String!): Student!
+
+    addCompletedModule(moduleId: String!): [Module]
+    addInProgressModule(moduleId: String!): [Module]
+    addBadge(badgeId: String!): [Badge]
+
+    # For admin
+    createNewModule(category: String!): Module!
+    createNewQuestion(
+      moduleId: String!
+      category: String!
+      format: String
+    ): Question!
+    createNewQuestionTemplate(category: String!): QuestionTemplate!
+
+    verifyAnswer(answer: String!): Boolean!
+    starModule(moduleId: String!): Module!
+    unstarModule(moduleId: String!): Module!
+    starQuestion(questionId: String!): Question!
+    unstarQuestion(questionId: String!): Question!
+
+    incrementModulePoints(answerCorrect: Boolean!): Int!
   }
 `;
