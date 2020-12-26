@@ -10,6 +10,7 @@ module.exports = gql`
     password: String!
     email: String!
 
+    modules: [Module]
     createdAt: DateTime!
     token: String
   }
@@ -51,8 +52,8 @@ module.exports = gql`
     type: String! # learn or practice
     categoryId: String!
     format: String # video or article | question type
-    mentorComments: [String]
-    studentComments: [String]
+    comments: [Comment]
+    questions: [Question]
     createdAt: DateTime!
   }
 
@@ -60,8 +61,8 @@ module.exports = gql`
     id: String!
     name: String! # CAD, elec, prog
     createdAt: DateTime!
-    modulesAssociated: [Module]!
-    challengesAssociated: [Challenge]!
+    modules: [Module]!
+    challenges: [Challenge]!
   }
 
   type Badge {
@@ -117,7 +118,6 @@ module.exports = gql`
   type Comment {
     id: String!
     personId: String!
-    moduleId: String!
     comment: String!
     createdAt: DateTime!
   }
@@ -180,11 +180,12 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [Module] # done
     addBadge(badgeId: String!): [Badge] # done
     # For admin
-    createNewModule(category: String!): Module!
+    createNewModule(category: String!): Module! # done
     createNewQuestion(
-      moduleId: String!
-      category: String!
-      format: String
+      image: String
+      infoProvided: String!
+      expectedAnswers: [Answer]
+      hint: String
     ): Question!
     createNewQuestionTemplate(category: String!): QuestionTemplate!
     editModule(moduleId: String!, category: String!, format: String): Module!
@@ -252,16 +253,8 @@ module.exports = gql`
     unstarModule(moduleId: String!): [Module]! # done
     starQuestion(questionId: String!): [Question]! # done
     unstarQuestion(questionId: String!): [Question]! # done
-    commentOnModule(
-      moduleId: String!
-      comment: String
-      personId: String!
-    ): Comment
-    deleteCommentOnModule(
-      moduleId: String!
-      comment: String
-      personId: String!
-    ): Module
+    commentOnModule(comment: String, personId: String!): Module
+    deleteCommentOnModule(comment: String, personId: String!): Module
     incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
   }
 `;

@@ -23,14 +23,12 @@ function generateToken(admin) {
 module.exports = {
   Query: {
     async getAdmin(_, {}, context) {
-      const admin = checkAdminAuth(context);
-
       try {
+        const admin = checkAdminAuth(context);
         const targetAdmin = await Admin.findById(admin.id);
-
         return targetAdmin;
-      } catch (err) {
-        throw new Error(err);
+      } catch (error) {
+        throw new Error(error);
       }
     },
   },
@@ -93,6 +91,62 @@ module.exports = {
 
       const token = generateToken(admin);
       return { ...admin._doc, id: admin._id, token };
+    },
+
+    async createNewQuestion(
+      _,
+      { image, infoProvided, expectedAnswers, hint },
+      context
+    ) {
+      try {
+        const admin = checkAdminAuth(context);
+        const targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+
+      targetQuestion = Admin.findOne(infoProvided);
+
+      // TODO where will the id come from
+      if (!targetAdmin.modules.questions.includes(targetQuestion.id)) {
+        const newQuestion = new Question({
+          image,
+          infoProvided,
+          expectedAnswers,
+          hint,
+          createdAt: new Date(),
+        });
+        targetAdmin.modules.questions.push(newQuestion.id);
+        return newQuestion;
+      }
+
+      // make the question and add to the modules list
+
+      // const res = await newModule.save();
+
+      // TODO whats the point of the following line
+      // return { ...res._doc, id: res._id };
+    },
+
+    async createNewModule(_, { type, categoryId, format }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        const targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const newModule = new Module({
+        type,
+        categoryId,
+        format,
+        createdAt: new Date(),
+      });
+      return newModule;
+
+      // const res = await newModule.save();
+
+      // TODO whats the point of the following line
+      // return { ...res._doc, id: res._id };
     },
   },
 };
