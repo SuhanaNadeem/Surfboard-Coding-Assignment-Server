@@ -1,16 +1,18 @@
 const { model, Schema } = require("mongoose");
 const { customAlphabet } = require("nanoid");
-
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
-const learnModuleSchema = new Schema({
+const moduleSchema = new Schema({
   _id: {
     type: String,
     default: () => nanoid(),
   },
-  category: String,
-  type: String,
+  image: String,
+  infoProvided: String,
+  expectedAnswers: [Answer],
   createdAt: Date,
+  hint: String,
+  questionTemplateId: String,
 });
 
-module.exports = model("LearnModule", learnModuleSchema);
+module.exports = model("Question", questionSchema);
