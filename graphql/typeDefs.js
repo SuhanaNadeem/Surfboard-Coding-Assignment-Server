@@ -77,7 +77,7 @@ module.exports = gql`
   }
 
   type Answer {
-    answerId: String!
+    id: String!
     studentId: String!
     questionId: String!
     categoryId: String!

@@ -1,20 +1,18 @@
 const { model, Schema } = require("mongoose");
 const { customAlphabet } = require("nanoid");
-const Question = require("models/Question");
-const Comment = require("models/Comment");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
-const moduleSchema = new Schema({
+const answerSchema = new Schema({
   _id: {
     type: String,
     default: () => nanoid(),
   },
+  studentId: String,
+  questionId: String,
   categoryId: String,
-  format: String,
-  comments: [Comment],
-  questions: [Question],
+  moduleId: String,
   createdAt: Date,
 });
 
-module.exports = model("Module", moduleSchema);
+module.exports = model("Answer", answerSchema);
