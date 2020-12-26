@@ -128,7 +128,7 @@ module.exports = {
 
     async createNewQuestionTemplate(
       _,
-      { category, type, inputFields },
+      { categoryId, type, inputFields },
       context
     ) {
       try {
@@ -143,7 +143,7 @@ module.exports = {
       // TODO where will the id come from
       if (!targetAdmin.questionTemplates.includes(targetQuestionTemplate.id)) {
         const newQuestionTemplate = new QuestionTemplate({
-          category,
+          categoryId,
           type,
           inputFields,
           createdAt: new Date(),
@@ -287,7 +287,7 @@ module.exports = {
       );
 
       // TODO replacing existing properties
-      targetQuestionTemplate.category = newCategory;
+      targetQuestionTemplate.categoryId = newCategory;
       targetQuestionTemplate.inputFields = newInputFields;
       targetQuestionTemplate.type = newType;
       await targetQuestionTemplate.save();

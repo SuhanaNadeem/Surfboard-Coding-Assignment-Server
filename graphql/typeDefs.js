@@ -98,7 +98,7 @@ module.exports = gql`
   type QuestionTemplate {
     id: String!
     type: String! # learn or practice
-    category: String! # CAD, electrical, programming
+    categoryId: String! # CAD, electrical, programming
     inputFields: [String]! # diff things you can enter
     createdAt: DateTime!
   }
@@ -143,7 +143,7 @@ module.exports = gql`
     getStudentsByMentor: [Student]!
     getMentorsByStudent: [Mentor]! # done
     #  like dif form fields to create questions
-    getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
+    getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]!
 
     # can be of any of the types
     getQuestionsByModule(moduleId: String!): [Question]!
@@ -195,7 +195,7 @@ module.exports = gql`
       questionTemplateId: String!
     ): [Question]! # done
     createNewQuestionTemplate(
-      category: String!
+      categoryId: String!
       inputFields: [String]!
       type: String!
     ): [QuestionTemplate]! # done
@@ -215,7 +215,7 @@ module.exports = gql`
     ): Question! # done
     editQuestionTemplate(
       questionTemplateId: String!
-      newCategory: String!
+      newCategoryId: String!
       newInputFields: [String]!
       newType: String!
     ): QuestionTemplate! # done
