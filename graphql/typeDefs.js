@@ -10,9 +10,9 @@ module.exports = gql`
     password: String!
     email: String!
 
-    modules: [Module]
-    questionTemplates: [QuestionTemplate]
-    challenges: [Challenge]
+    modules: [String]
+    questionTemplates: [String]
+    challenges: [String]
 
     createdAt: DateTime!
     token: String
@@ -37,15 +37,15 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [Module]
-    completedModules: [Module]
-    badges: [Badge]
-    starredModules: [Module]
-    starredQuestions: [Question]
+    inProgressModules: [String]
+    completedModules: [String]
+    badges: [String]
+    starredModules: [String]
+    starredQuestions: [String]
 
-    mentors: [Mentor]!
+    mentors: [String]!
 
-    submittedAnswers: [Answer]
+    submittedAnswers: [String]
     createdAt: DateTime!
     token: String
   }
@@ -55,8 +55,8 @@ module.exports = gql`
     type: String! # learn or practice
     categoryId: String!
     format: String # video or article | question type
-    comments: [Comment]
-    questions: [Question]
+    comments: [String]
+    questions: [String]
     createdAt: DateTime!
   }
 
@@ -64,8 +64,8 @@ module.exports = gql`
     id: String!
     name: String! # CAD, elec, prog
     createdAt: DateTime!
-    modules: [Module]!
-    challenges: [Challenge]!
+    modules: [String]!
+    challenges: [String]!
   }
 
   type Badge {
@@ -107,7 +107,7 @@ module.exports = gql`
     id: String!
     image: String
     infoProvided: String!
-    expectedAnswers: [Answer]
+    expectedAnswers: [String]
     createdAt: DateTime!
     hint: String
     questionTemplateId: String!
@@ -134,27 +134,27 @@ module.exports = gql`
     getMentor: Mentor! # done
     getStudent: Student! # done
     # for dashboard
-    getCompletedModulesByStudent: [Module]! # done
-    getInProgressModulesByStudent: [Module]! # done
-    getBadgesByStudent: [Badge]! # done
+    getCompletedModulesByStudent: [String]! # done
+    getInProgressModulesByStudent: [String]! # done
+    getBadgesByStudent: [String]! # done
     # for student's learn page
-    getModulesByCategory(category: String!): [Module]!
+    getModulesByCategory(category: String!): [String]!
 
     getStudentsByMentor: [Student]!
-    getMentorsByStudent: [Mentor]! # done
+    getMentorsByStudent: [String]! # done
     #  like dif form fields to create questions
-    getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]!
+    getQuestionTemplatesByCategory(categoryId: String!): [String]!
 
     # can be of any of the types
-    getQuestionsByModule(moduleId: String!): [Question]!
+    getQuestionsByModule(moduleId: String!): [String]!
 
     # will either be ytvid link or gdoc hosted article link
     getLearnLinkByModule(moduleId: String!): String!
 
     getCommentsByModule(moduleId: String!): [String]!
-    getModulesForSearch(search: String!): [Module]!
+    getModulesForSearch(search: String!): [String]!
 
-    getChallengesByCategory(categoryId: String!): [Challenge]!
+    getChallengesByCategory(categoryId: String!): [String]!
     getHintByQuestion(questionId: String!): Hint!
 
     getSavedAnswerByQuestion(studentId: String!, questionId: String!): Answer!
@@ -182,23 +182,23 @@ module.exports = gql`
       confirmPassword: String!
     ): Student! # done
     loginStudent(email: String!, password: String!): Student! # done
-    addCompletedModule(moduleId: String!): [Module] # done
-    addInProgressModule(moduleId: String!): [Module] # done
-    addBadge(badgeId: String!): [Badge] # done
+    addCompletedModule(moduleId: String!): [String] # done
+    addInProgressModule(moduleId: String!): [String] # done
+    addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(category: String!, type: String!, format: String): [Module]! # done
+    createNewModule(category: String!, type: String!, format: String): [String]! # done
     createNewQuestion(
       image: String
       infoProvided: String!
-      expectedAnswers: [Answer]
+      expectedAnswers: [String]
       hint: String
       questionTemplateId: String!
-    ): [Question]! # done
+    ): [String]! # done
     createNewQuestionTemplate(
       categoryId: String!
       inputFields: [String]!
       type: String!
-    ): [QuestionTemplate]! # done
+    ): [String]! # done
     editModule(
       moduleId: String!
       newCategoryId: String!
@@ -209,7 +209,7 @@ module.exports = gql`
       questionId: String!
       newImage: String
       newInfoProvided: String!
-      newExpectedAnswers: [Answer]
+      newExpectedAnswers: [String]
       newHint: String
       newQuestionTemplateId: String!
     ): Question! # done
@@ -219,9 +219,9 @@ module.exports = gql`
       newInputFields: [String]!
       newType: String!
     ): QuestionTemplate! # done
-    deleteModule(moduleId: String!): [Module]! # done
-    deleteQuestion(questionId: String!): [Question]! # done
-    deleteQuestionTemplate(questionTemplateId: String!): [QuestionTemplate]! # done
+    deleteModule(moduleId: String!): [String]! # done
+    deleteQuestion(questionId: String!): [String]! # done
+    deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
     createNewChallenge(
       categoryId: String!
       infoProvided: String!
@@ -270,10 +270,10 @@ module.exports = gql`
       questionId: String!
       moduleId: String!
     ): Boolean! # done
-    starModule(moduleId: String!): [Module]! # done
-    unstarModule(moduleId: String!): [Module]! # done
-    starQuestion(questionId: String!): [Question]! # done
-    unstarQuestion(questionId: String!): [Question]! # done
+    starModule(moduleId: String!): [String]! # done
+    unstarModule(moduleId: String!): [String]! # done
+    starQuestion(questionId: String!): [String]! # done
+    unstarQuestion(questionId: String!): [String]! # done
     # for modules.js
     commentOnModule(comment: String, personId: String!): Module
     deleteCommentOnModule(comment: String, personId: String!): Module

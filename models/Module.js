@@ -1,7 +1,5 @@
 const { model, Schema } = require("mongoose");
 const { customAlphabet } = require("nanoid");
-const Question = require("models/Question");
-const Comment = require("models/Comment");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
@@ -12,8 +10,8 @@ const moduleSchema = new Schema({
   },
   categoryId: String,
   format: String,
-  comments: [Comment],
-  questions: [Question],
+  comments: [String],
+  questions: [String],
   createdAt: Date,
 });
 

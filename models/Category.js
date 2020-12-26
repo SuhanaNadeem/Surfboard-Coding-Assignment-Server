@@ -9,8 +9,8 @@ const categorySchema = new Schema({
     default: () => nanoid(),
   },
   name: String,
-  modules: [Module], // TODO have to be ids?
-  challenges: [Challenge], // TODO have to be ids?
+  modules: [String], // TODO have to be ids?
+  challenges: [String], // TODO have to be ids?
   createdAt: Date,
 });
 

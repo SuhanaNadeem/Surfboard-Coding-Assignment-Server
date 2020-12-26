@@ -9,7 +9,7 @@ const questionTemplateSchema = new Schema({
   },
   type: String,
   categoryId: String,
-  inputFields: [String], // TODO is this allowed
+  inputFields: [String], // TODO is this allowed -- have to change anything?
   createdAt: Date,
 });
 
