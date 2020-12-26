@@ -11,6 +11,8 @@ module.exports = gql`
     email: String!
 
     modules: [Module]
+    questionTemplates: [QuestionTemplate]
+
     createdAt: DateTime!
     token: String
   }
@@ -95,6 +97,7 @@ module.exports = gql`
     id: String!
     type: String! # learn or practice
     category: String! # CAD, electrical, programming
+    inputFields: [String]! # diff things you can enter
     createdAt: DateTime!
   }
 
@@ -105,6 +108,7 @@ module.exports = gql`
     expectedAnswers: [Answer]
     createdAt: DateTime!
     hint: String
+    questionTemplateId: String!
   }
 
   type Challenge {
@@ -180,26 +184,40 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [Module] # done
     addBadge(badgeId: String!): [Badge] # done
     # For admin
-    createNewModule(category: String!): Module! # done
+    createNewModule(category: String!, type: String!, format: String): [Module]! # done
     createNewQuestion(
       image: String
       infoProvided: String!
       expectedAnswers: [Answer]
       hint: String
-    ): Question!
-    createNewQuestionTemplate(category: String!): QuestionTemplate!
-    editModule(moduleId: String!, category: String!, format: String): Module!
+      questionTemplateId: String!
+    ): [Question]! # done
+    createNewQuestionTemplate(
+      category: String!
+      inputFields: [String]!
+      type: String!
+    ): [QuestionTemplate]! # done
+    editModule(
+      moduleId: String!
+      newCategoryId: String!
+      newType: String!
+      newFormat: String
+    ): Module! # done
     editQuestion(
       questionId: String!
-      category: String!
-      format: String
-    ): Question!
+      newImage: String
+      newInfoProvided: String!
+      newExpectedAnswers: [Answer]
+      newHint: String
+      newQuestionTemplateId: String!
+    ): Question! # done
     editQuestionTemplate(
       questionTemplateId: String!
-      category: String!
-      format: String
-    ): QuestionTemplate!
-    deleteModule(moduleId: String!): Module!
+      newCategory: String!
+      newInputFields: [String]!
+      newType: String!
+    ): QuestionTemplate! # done
+    deleteModule(moduleId: String!): [Module]! # done
     deleteQuestion(questionId: String!): Question!
     deleteQuestionTemplate(questionTemplateId: String!): QuestionTemplate!
     createNewChallenge(
