@@ -156,7 +156,7 @@ module.exports = {
         console.log(error);
         return [];
       }
-      targetModule = Student.findOne(moduleId);
+      targetModule = Student.findOne(moduleId); // TODO think i have to do .modules here
 
       if (!targetStudent.completedModules.includes(targetModule.id)) {
         targetStudent.completedModules.push(targetModule.id);
@@ -245,6 +245,7 @@ module.exports = {
       const updatedStarredModules = await targetStudent.starredModules;
       return updatedStarredModules;
     },
+
     async unstarModule(_, { moduleId }, context) {
       try {
         const student = checkStudentAuth(context);

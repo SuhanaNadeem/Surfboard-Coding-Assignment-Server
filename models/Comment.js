@@ -8,8 +8,8 @@ const commentSchema = new Schema({
     type: String,
     default: () => nanoid(),
   },
-  personId: String,
   comment: String,
+  personId: String,
   createdAt: Date,
 });
 

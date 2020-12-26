@@ -123,9 +123,10 @@ module.exports = gql`
 
   type Comment {
     id: String!
-    personId: String!
     comment: String!
+    moduleId: String!
     createdAt: DateTime!
+    personId: String!
   }
 
   # retrieve information
@@ -137,24 +138,18 @@ module.exports = gql`
     getCompletedModulesByStudent: [String]! # done
     getInProgressModulesByStudent: [String]! # done
     getBadgesByStudent: [String]! # done
-    # for student's learn page
-    getModulesByCategory(category: String!): [String]!
-
     getStudentsByMentor: [Student]!
     getMentorsByStudent: [String]! # done
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [String]!
+    getChallengesByCategory(categoryId: String!): [String]!
+    # for student's learn page (categories.js)
+    getModulesByCategory(categoryId: String!): [String]!
 
     # can be of any of the types
-    getQuestionsByModule(moduleId: String!): [String]!
-
-    # will either be ytvid link or gdoc hosted article link
-    getLearnLinkByModule(moduleId: String!): String!
-
-    getCommentsByModule(moduleId: String!): [String]!
-    getModulesForSearch(search: String!): [String]!
-
-    getChallengesByCategory(categoryId: String!): [String]!
+    getQuestionsByModule(moduleId: String!): [String]! # done
+    getCommentsByModule(moduleId: String!): [String]! # done
+    getModulesBySearch(search: String!): [String]! # started
     getHintByQuestion(questionId: String!): Hint!
 
     getSavedAnswerByQuestion(studentId: String!, questionId: String!): Answer!
@@ -274,9 +269,8 @@ module.exports = gql`
     unstarModule(moduleId: String!): [String]! # done
     starQuestion(questionId: String!): [String]! # done
     unstarQuestion(questionId: String!): [String]! # done
-    # for modules.js
-    commentOnModule(comment: String, personId: String!): Module
-    deleteCommentOnModule(comment: String, personId: String!): Module
+    createComment(moduleId: String!, comment: String): Module # done
+    deleteComment(moduleId: String!, commentId: String): Module # done
     incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
   }
 `;
