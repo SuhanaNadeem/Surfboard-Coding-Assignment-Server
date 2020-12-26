@@ -146,5 +146,152 @@ module.exports = {
       const token = generateToken(student);
       return { ...student._doc, id: student._id, token };
     },
+
+    async addCompletedModule(_, { moduleId }, context) {
+      // add to students module list
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+      targetModule = Student.findOne(moduleId);
+
+      if (!targetStudent.completedModules.includes(targetModule.id)) {
+        targetStudent.completedModules.push(targetModule.id);
+      }
+      const updatedCompletedModules = await targetStudent.completedModules;
+      return updatedCompletedModules;
+    },
+
+    async addInProgressModule(_, { moduleId }, context) {
+      // add to students module list
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+      targetModule = Student.findOne(moduleId);
+
+      if (!targetStudent.inProgressModules.includes(targetModule.id)) {
+        targetStudent.inProgressModules.push(targetModule.id);
+      }
+      const updatedInProgressModules = await targetStudent.inProgressModules;
+      return updatedInProgressModules;
+    },
+
+    async addBadge(_, { badgeId }, context) {
+      // add to students module list
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+      targetBadge = Student.findOne(badgeId);
+      if (!targetStudent.badges.includes(targetBadge.id)) {
+        targetStudent.badges.push(targetBadge.id);
+      }
+      const updatedBadges = await targetStudent.badges;
+      return updatedBadges;
+    },
+
+    async submitAnswer(
+      _,
+      { answerId, studentId, categoryId, questionId, moduleId },
+      context
+    ) {
+      // add to students module list
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      const targetAnswer = Student.findById(answerId);
+      // instead of the above, why cant i just do answerId below?
+
+      if (!targetStudent.submittedAnswers.includes(targetAnswer.id)) {
+        const newAnswer = new Answer({
+          answerId,
+          studentId,
+          categoryId,
+          questionId,
+          moduleId,
+          createdAt: new Date(),
+        });
+        targetStudent.submittedAnswers.push(newAnswer.id);
+        return newAnswer;
+      }
+    }, // TODO check the other comment here
+
+    async starModule(_, { moduleId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      targetModule = Student.findOne(moduleId);
+      if (!targetStudent.starredModules.includes(targetModule.id)) {
+        targetStudent.starredModules.push(targetModule.id);
+      }
+      const updatedStarredModules = await targetStudent.starredModules;
+      return updatedStarredModules;
+    },
+    async unstarModule(_, { moduleId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      targetModule = Student.findOne(moduleId);
+      if (targetStudent.starredModules.includes(targetModule.id)) {
+        const index = targetStudent.starredModules.indexOf(moduleId);
+        targetStudent.starredModules.splice(index, 1);
+      }
+      const updatedStarredModules = await targetStudent.starredModules;
+      return updatedStarredModules;
+    },
+
+    async starQuestion(_, { questionId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      targetQuestion = Student.findOne(questionId);
+      if (!targetStudent.starredQuestions.includes(targetQuestion.id)) {
+        targetStudent.starredQuestions.push(targetQuestion.id);
+      }
+      const updatedStarredQuestions = await targetStudent.starredQuestions;
+      return updatedStarredQuestions;
+    },
+    async unstarQuestion(_, { questionId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      targetQuestion = Student.findOne(questionId);
+      if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
+        const index = targetStudent.starredQuestions.indexOf(questionId);
+        targetStudent.starredQuestions.splice(index, 1);
+      }
+      const updatedStarredQuestions = await targetStudent.starredQuestions;
+      return updatedStarredQuestions;
+    },
   },
 };

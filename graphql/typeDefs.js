@@ -33,12 +33,15 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [Module]!
-    completedModules: [Module]!
-    badges: [Badge]!
+    inProgressModules: [Module]
+    completedModules: [Module]
+    badges: [Badge]
+    starredModules: [Module]
+    starredQuestions: [Question]
 
     mentors: [Mentor]!
 
+    submittedAnswers: [Answer]
     createdAt: DateTime!
     token: String
   }
@@ -98,7 +101,7 @@ module.exports = gql`
     id: String!
     image: String
     infoProvided: String!
-    expectedAnswer: String
+    expectedAnswers: [Answer]
     createdAt: DateTime!
     hint: String
   }
@@ -109,6 +112,14 @@ module.exports = gql`
     infoProvided: String!
     createdAt: DateTime!
     categoryId: String!
+  }
+
+  type Comment {
+    id: String!
+    personId: String!
+    moduleId: String!
+    comment: String!
+    createdAt: DateTime!
   }
 
   # retrieve information
@@ -165,10 +176,9 @@ module.exports = gql`
       confirmPassword: String!
     ): Student! # done
     loginStudent(email: String!, password: String!): Student! # done
-    addCompletedModule(moduleId: String!): [Module]
-    addInProgressModule(moduleId: String!): [Module]
-    addBadge(badgeId: String!): [Badge]
-
+    addCompletedModule(moduleId: String!): [Module] # done
+    addInProgressModule(moduleId: String!): [Module] # done
+    addBadge(badgeId: String!): [Badge] # done
     # For admin
     createNewModule(category: String!): Module!
     createNewQuestion(
@@ -231,13 +241,27 @@ module.exports = gql`
       categoryId: String!
       questionId: String!
       moduleId: String!
-    ): String
-    verifyAnswer(answer: String!): Boolean!
-    starModule(moduleId: String!): Module!
-    unstarModule(moduleId: String!): Module!
-    starQuestion(questionId: String!): Question!
-    unstarQuestion(questionId: String!): Question!
-    commentOnModule(moduleId: String!, comment: String): Module
+      studentId: String!
+    ): Answer! # done
+    verifyAnswer(
+      categoryId: String!
+      questionId: String!
+      moduleId: String!
+    ): Boolean! # done
+    starModule(moduleId: String!): [Module]! # done
+    unstarModule(moduleId: String!): [Module]! # done
+    starQuestion(questionId: String!): [Question]! # done
+    unstarQuestion(questionId: String!): [Question]! # done
+    commentOnModule(
+      moduleId: String!
+      comment: String
+      personId: String!
+    ): Comment
+    deleteCommentOnModule(
+      moduleId: String!
+      comment: String
+      personId: String!
+    ): Module
     incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
   }
 `;
