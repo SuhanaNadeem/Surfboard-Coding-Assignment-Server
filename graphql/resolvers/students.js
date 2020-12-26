@@ -23,14 +23,67 @@ function generateToken(student) {
 module.exports = {
   Query: {
     async getStudent(_, {}, context) {
-      const student = checkStudentAuth(context);
-
       try {
+        const student = checkStudentAuth(context);
         const targetStudent = await Student.findById(student.id);
-
         return targetStudent;
-      } catch (err) {
-        throw new Error(err);
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getCompletedModulesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        const targetStudent = await Student.findById(student.id);
+        const completedModules = await User.find({
+          id: targetStudent.completedModules,
+        });
+        return completedModules;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    },
+
+    async getInProgressModulesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        const targetStudent = await Student.findById(student.id);
+        const inProgressModules = await Student.find({
+          id: targetStudent.inProgressModules,
+        });
+        return inProgressModules;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    },
+
+    async getBadgesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        const targetStudent = await Student.findById(student.id);
+        const badges = await Student.find({
+          id: targetStudent.badges,
+        });
+        return badges;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    },
+
+    async getMentorsByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        const targetStudent = await Student.findById(student.id);
+        const mentors = await Student.find({
+          id: targetStudent.mentors,
+        });
+        return mentors;
+      } catch (error) {
+        console.log(error);
+        return [];
       }
     },
   },

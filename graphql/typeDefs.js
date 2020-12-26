@@ -33,9 +33,11 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [Module]
-    completedModules: [Module]
-    badges: [Badge]
+    inProgressModules: [Module]!
+    completedModules: [Module]!
+    badges: [Badge]!
+
+    mentors: [Mentor]!
 
     createdAt: DateTime!
     token: String
@@ -67,7 +69,14 @@ module.exports = gql`
     criteria: String!
   }
 
-  #TODO add answer type and hint type
+  type Answer {
+    answerId: String!
+    studentId: String!
+    questionId: String!
+    categoryId: String!
+    moduleId: String!
+    createdAt: DateTime!
+  }
 
   type Hint {
     hintId: String!
@@ -104,21 +113,18 @@ module.exports = gql`
 
   # retrieve information
   type Query {
-    getAdmin: Admin!
-    getMentor: Mentor!
-    getStudent: Student!
-
+    getAdmin: Admin! # done
+    getMentor: Mentor! # done
+    getStudent: Student! # done
     # for dashboard
-    getCompletedModulesByStudent: [Module]!
-    getInProgressModulesByStudent: [Module]!
-    getBadgesByStudent: [Badge]!
-
+    getCompletedModulesByStudent: [Module]! # done
+    getInProgressModulesByStudent: [Module]! # done
+    getBadgesByStudent: [Badge]! # done
     # for student's learn page
     getModulesByCategory(category: String!): [Module]!
 
     getStudentsByMentor: [Student]!
-    getMentorsByStudent: [Mentor]!
-
+    getMentorsByStudent: [Mentor]! # done
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(category: String!): [QuestionTemplate]!
 
@@ -133,6 +139,8 @@ module.exports = gql`
 
     getChallengesByCategory(categoryId: String!): [Challenge]!
     getHintByQuestion(questionId: String!): Hint!
+
+    getSavedAnswerByQuestion(studentId: String!, questionId: String!): Answer!
   }
 
   # actions
@@ -155,9 +163,8 @@ module.exports = gql`
       email: String!
       password: String!
       confirmPassword: String!
-    ): Student!
-    loginStudent(email: String!, password: String!): Student!
-
+    ): Student! # done
+    loginStudent(email: String!, password: String!): Student! # done
     addCompletedModule(moduleId: String!): [Module]
     addInProgressModule(moduleId: String!): [Module]
     addBadge(badgeId: String!): [Badge]
@@ -219,6 +226,12 @@ module.exports = gql`
     ): Hint!
 
     # for learn/practice experience
+    submitAnswer(
+      answerId: String!
+      categoryId: String!
+      questionId: String!
+      moduleId: String!
+    ): String
     verifyAnswer(answer: String!): Boolean!
     starModule(moduleId: String!): Module!
     unstarModule(moduleId: String!): Module!
