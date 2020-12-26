@@ -181,6 +181,31 @@ module.exports = {
       // return { ...res._doc, id: res._id };
     },
 
+    async createNewChallenge(_, { infoProvided, categoryId, image }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const newChallenge = new Challenge({
+        infoProvided,
+        categoryId,
+        image,
+        createdAt: new Date(),
+      });
+
+      targetAdmin.challenges.push(newChallenge);
+      await targetAdmin.challenges.save();
+      const updatedChallenges = await targetAdmin.challenges;
+      return updatedChallenges;
+
+      // const res = await newModule.save();
+
+      // TODO whats the point of the following line
+      // return { ...res._doc, id: res._id };
+    },
+
     async editModule(
       _,
       { moduleId, newType, newCategoryId, newFormat },
@@ -275,6 +300,33 @@ module.exports = {
       // return { ...res._doc, id: res._id };
     },
 
+    async editChallenge(
+      _,
+      { challengeId, newInfoProvided, newImage },
+      context
+    ) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      var targetChallenge = await targetAdmin.challenges.findById(challengeId);
+
+      // TODO replacing existing properties
+      targetChallenge.categoryId = newCategoryId;
+      targetChallenge.infoProvided = newInfoProvided;
+      targetChallenge.image = newImage;
+
+      await targetChallenge.save();
+      return targetChallenge;
+
+      // const res = await newModule.save();
+
+      // TODO whats the point of the following line
+      // return { ...res._doc, id: res._id };
+    },
+
     async deleteModule(_, { moduleId }, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -287,6 +339,53 @@ module.exports = {
 
       const updatedModules = await targetAdmin.modules;
       return updatedModules;
+    },
+
+    async deleteQuestion(_, { questionId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const targetQuestion = await targetAdmin.modules.questions.findById(
+        questionId
+      );
+      await targetQuestion.delete();
+
+      const updatedQuestions = await targetAdmin.modules.questions;
+      return updatedQuestions;
+    },
+
+    async deleteQuestionTemplate(_, { questionTemplateId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
+        questionTemplateId
+      );
+      await targetQuestionTemplate.delete();
+
+      const updatedQuestionTemplates = await targetAdmin.questionTemplates;
+      return updatedQuestionTemplates;
+    },
+    async deleteChallenge(_, { challengeId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const targetChallenge = await targetAdmin.Challenges.findById(
+        challengeId
+      );
+      await targetChallenge.delete();
+
+      const updatedChallenges = await targetAdmin.challenges;
+      return updatedChallenges;
     },
   },
 };

@@ -12,6 +12,7 @@ module.exports = gql`
 
     modules: [Module]
     questionTemplates: [QuestionTemplate]
+    challenges: [Challenge]
 
     createdAt: DateTime!
     token: String
@@ -85,10 +86,11 @@ module.exports = gql`
   }
 
   type Hint {
-    hintId: String!
+    id: String!
     questionId: String!
     categoryId: String!
     moduleId: String!
+    hintDescription: String!
     createdAt: DateTime!
   }
 
@@ -218,39 +220,40 @@ module.exports = gql`
       newType: String!
     ): QuestionTemplate! # done
     deleteModule(moduleId: String!): [Module]! # done
-    deleteQuestion(questionId: String!): Question!
-    deleteQuestionTemplate(questionTemplateId: String!): QuestionTemplate!
+    deleteQuestion(questionId: String!): [Question]! # done
+    deleteQuestionTemplate(questionTemplateId: String!): [QuestionTemplate]! # done
     createNewChallenge(
       categoryId: String!
       infoProvided: String!
       image: String
-    ): Challenge!
+    ): Challenge! # done
     editChallenge(
-      categoryId: String!
-      infoProvided: String!
-      image: String
-    ): Challenge!
+      newCategoryId: String!
+      newInfoProvided: String!
+      newImage: String
+    ): Challenge! # done
     deleteChallenge(
       categoryId: String!
       infoProvided: String!
       image: String
-    ): Challenge!
-    addModuleHint(
-      moduleId: String!
-      categoryId: String!
+    ): Challenge! # done
+    # for questions.js
+    createHint(
       questionId: String!
+      categoryId: String!
+      moduleId: String!
       hintDescription: String!
     ): Hint!
-    editModuleHint(
-      moduleId: String!
-      categoryId: String!
+    editHint(
       questionId: String!
+      categoryId: String!
+      moduleId: String!
       hintDescription: String!
     ): Hint!
-    removeModuleHint(
-      moduleId: String!
-      categoryId: String!
+    deleteHint(
       questionId: String!
+      categoryId: String!
+      moduleId: String!
       hintDescription: String!
     ): Hint!
 
@@ -271,6 +274,7 @@ module.exports = gql`
     unstarModule(moduleId: String!): [Module]! # done
     starQuestion(questionId: String!): [Question]! # done
     unstarQuestion(questionId: String!): [Question]! # done
+    # for modules.js
     commentOnModule(comment: String, personId: String!): Module
     deleteCommentOnModule(comment: String, personId: String!): Module
     incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
