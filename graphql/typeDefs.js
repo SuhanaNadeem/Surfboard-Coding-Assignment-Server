@@ -159,11 +159,10 @@ module.exports = gql`
     getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
     #  like dif form fields to create questions
-    getQuestionTemplatesByCategory(categoryId: String!): [String]!
-    getChallengesByCategory(categoryId: String!): [String]!
+    getQuestionTemplatesByCategory(categoryId: String!): [String]! # done
+    getChallengesByCategory(categoryId: String!): [String]! # done
     # for student's learn page (categories.js)
-    getModulesByCategory(categoryId: String!): [String]!
-
+    getModulesByCategory(categoryId: String!): [String]! # done
     # can be of any of the types
     getQuestionsByModule(moduleId: String!): [String]! # done
     getCommentsByModule(moduleId: String!): [String]! # done
