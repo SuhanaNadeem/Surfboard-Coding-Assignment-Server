@@ -19,16 +19,28 @@ module.exports = {
       //     }
       //   }
       // TODO multiple item search
-      const targetModule = await Module.findOne(search);
-      return targetModule;
+      const targetModule = await Module.findOne({ name: search });
+      if (targetModule === null) {
+        return null;
+      } else {
+        return targetModule;
+      }
     },
     async getQuestionsByModule(_, { moduleId }, context) {
       const targetQuestions = await Module.findById(moduleId).questions;
-      return targetQuestions;
+      if (targetQuestions === null) {
+        return [];
+      } else {
+        return targetQuestions;
+      }
     },
     async getCommentsByModule(_, { moduleId }, context) {
       const targetComments = await Module.findById(moduleId).comments;
-      return targetComments;
+      if (targetComments === null) {
+        return [];
+      } else {
+        return targetComments;
+      }
     },
   },
 

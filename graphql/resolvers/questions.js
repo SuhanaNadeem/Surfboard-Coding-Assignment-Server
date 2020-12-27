@@ -1,17 +1,21 @@
-// async verifyAnswer(_, { categoryId, questionId, moduleId }, context) {
-//     try {
-//       const student = checkStudentAuth(context);
-//       var targetStudent = await Student.findById(student.id);
-//     } catch (error) {
-//       console.log(error);
-//       return None;
-//     }
+const checkMentorAuth = require("../../util/checkMentorAuth");
+const checkStudentAuth = require("../../util/checkStudentAuth");
+const { UserInputError, AuthenticationError } = require("apollo-server");
 
-//     const targetQuestion = await Question.findById(questionId);
+const Question = require("../../models/Question");
 
-//     if (targetQuestion.expectedAnswers.contains(answerId)) {
-//       return True;
-//     } else {
-//       return False;
-//     }
-//   },
+module.exports = {
+  Query: {
+    async getHintByQuestion(_, { questionId }, context) {
+      const targetQuestion = Question.findById(questionId);
+      if (targetQuestion === null) {
+        throw UserInputError;
+      } else {
+        const targetHint = await targetQuestion.hint;
+        return targetHint;
+      }
+    },
+  },
+
+  Mutation: {},
+};
