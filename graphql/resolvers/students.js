@@ -143,6 +143,25 @@ module.exports = {
       return { ...student._doc, id: student._id, token };
     },
 
+    async deleteStudent(_, { studentId }, context) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetStudent = Student.findById(studentId);
+      if (targetStudent !== null) {
+        await targetStudent.delete();
+        return "Delete Successful";
+      } else {
+        throw UserInputError;
+      }
+    },
+
     async addCompletedModule(_, { moduleId }, context) {
       // add to students module list
       try {
