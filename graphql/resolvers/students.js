@@ -215,7 +215,12 @@ module.exports = {
         console.log(error);
         return None;
       }
-      if (!targetStudent.submittedAnswers.includes(answerId)) {
+      const quesAnsPair = targetStudent.quesAnsDict.findOne({
+        key: questionId,
+      });
+      if (quesAnsPair === null) {
+        throw UserInputError;
+      } else {
         const newAnswer = new Answer({
           answerId,
           studentId,
@@ -225,7 +230,7 @@ module.exports = {
           createdAt: new Date(),
         });
         await newAnswer.save();
-        await targetStudent.submittedAnswers.push(newAnswer.id);
+        await quesAnsPair.push(newAnswer.id);
         return newAnswer;
       }
     },

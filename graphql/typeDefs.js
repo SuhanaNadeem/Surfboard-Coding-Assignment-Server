@@ -45,9 +45,17 @@ module.exports = gql`
 
     mentors: [String]!
 
-    submittedAnswers: [String]
+    quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
     createdAt: DateTime!
     token: String
+    # need a dict of {module: points} and
+  }
+
+  type StringStringDict {
+    id: String!
+    key: String! # ques id
+    value: String! # ans id
+    createdAt: DateTime!
   }
 
   type Module {
@@ -151,9 +159,8 @@ module.exports = gql`
     getQuestionsByModule(moduleId: String!): [String]! # done
     getCommentsByModule(moduleId: String!): [String]! # done
     getModulesBySearch(search: String!): [String]! # started
-    getHintByQuestion(questionId: String!): Hint!
-
-    getSavedAnswerByQuestion(studentId: String!, questionId: String!): Answer!
+    getHintByQuestion(questionId: String!): Hint! # done
+    getSavedAnswerByQuestion(questionId: String!): [String]! # done
   }
 
   # actions
@@ -238,26 +245,19 @@ module.exports = gql`
       questionDescription: String!
       image: String
     ): Challenge! # done
-    # for questions.js
     createHint(
       questionId: String!
       categoryId: String!
       moduleId: String!
       hintDescription: String!
-    ): Hint!
+    ): Hint! # done
     editHint(
       questionId: String!
-      categoryId: String!
-      moduleId: String!
-      hintDescription: String!
-    ): Hint!
-    deleteHint(
-      questionId: String!
-      categoryId: String!
-      moduleId: String!
-      hintDescription: String!
-    ): Hint!
-
+      newCategoryId: String!
+      newModuleId: String!
+      newHintDescription: String!
+    ): Hint! # done
+    deleteHint(questionId: String!): Question! # done
     # for learn/practice experience
     submitAnswer(
       answerId: String!
