@@ -54,14 +54,12 @@ module.exports = gql`
   }
 
   type StringStringDict {
-    id: String!
     key: String! # ques id
     value: String! # ans id
     createdAt: DateTime!
   }
 
   type StringIntDict {
-    id: String!
     key: String! # module id
     value: Int! # points
     createdAt: DateTime!

@@ -2,8 +2,6 @@ const { model, Schema } = require("mongoose");
 const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
-const StringStringDict = require("../../models/StringStringDict");
-const StringIntDict = require("../../models/StringIntDict");
 
 const studentSchema = new Schema({
   _id: {
@@ -18,8 +16,8 @@ const studentSchema = new Schema({
   inProgressModules: [String],
   completedModules: [String],
   badges: [String],
-  quesAnsDict: [StringStringDict],
-  modulePointsDict: [StringIntDict], // TODO setting this and the above up
+  quesAnsDict: [{ key: String, value: String }],
+  modulePointsDict: [{ key: String, value: Number }],
 
   createdAt: Date,
 });
