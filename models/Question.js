@@ -8,7 +8,7 @@ const questionSchema = new Schema({
     default: () => nanoid(),
   },
   image: String,
-  infoProvided: String,
+  questionDescription: String,
   expectedAnswers: [String], // TODO is this allowed
   createdAt: Date,
   hint: String,

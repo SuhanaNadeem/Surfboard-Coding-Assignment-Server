@@ -8,6 +8,7 @@ const moduleSchema = new Schema({
     type: String,
     default: () => nanoid(),
   },
+  name: String,
   categoryId: String,
   format: String,
   comments: [String],

@@ -52,6 +52,7 @@ module.exports = gql`
 
   type Module {
     id: String!
+    name: String! # ASSUMING THIS IS UNIQUE
     type: String! # learn or practice
     categoryId: String!
     format: String # video or article | question type
@@ -106,7 +107,7 @@ module.exports = gql`
   type Question {
     id: String!
     image: String
-    infoProvided: String!
+    questionDescription: String! # ASSUMING THIS IS UNIQUE
     expectedAnswers: [String]
     createdAt: DateTime!
     hint: String
@@ -116,7 +117,7 @@ module.exports = gql`
   type Challenge {
     id: String!
     image: String
-    infoProvided: String!
+    questionDescription: String!
     createdAt: DateTime!
     categoryId: String!
   }
@@ -181,10 +182,14 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(category: String!, type: String!, format: String): [String]! # done
+    createNewModule(
+      categoryId: String!
+      type: String!
+      format: String
+    ): [String]! # done
     createNewQuestion(
       image: String
-      infoProvided: String!
+      questionDescription: String!
       expectedAnswers: [String]
       hint: String
       questionTemplateId: String!
@@ -196,6 +201,7 @@ module.exports = gql`
     ): [String]! # done
     editModule(
       moduleId: String!
+      newName: String!
       newCategoryId: String!
       newType: String!
       newFormat: String
@@ -203,7 +209,7 @@ module.exports = gql`
     editQuestion(
       questionId: String!
       newImage: String
-      newInfoProvided: String!
+      newquestionDescription: String!
       newExpectedAnswers: [String]
       newHint: String
       newQuestionTemplateId: String!
@@ -219,17 +225,17 @@ module.exports = gql`
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
     createNewChallenge(
       categoryId: String!
-      infoProvided: String!
+      questionDescription: String!
       image: String
     ): Challenge! # done
     editChallenge(
       newCategoryId: String!
-      newInfoProvided: String!
+      newquestionDescription: String!
       newImage: String
     ): Challenge! # done
     deleteChallenge(
       categoryId: String!
-      infoProvided: String!
+      questionDescription: String!
       image: String
     ): Challenge! # done
     # for questions.js
@@ -271,6 +277,7 @@ module.exports = gql`
     unstarQuestion(questionId: String!): [String]! # done
     createComment(moduleId: String!, comment: String): Module # done
     deleteComment(moduleId: String!, commentId: String): Module # done
+    # TODO figure this out, finish remaining resolvers
     incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
   }
 `;

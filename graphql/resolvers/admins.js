@@ -8,6 +8,10 @@ const {
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_ADMIN_KEY;
 const Admin = require("../../models/Admin");
+const Question = require("../../models/Question");
+const QuestionTemplate = require("../../models/QuestionTemplate");
+const Module = require("../../models/Module");
+
 const checkAdminAuth = require("../../util/checkAdminAuth");
 function generateToken(admin) {
   return jwt.sign(
@@ -28,7 +32,7 @@ module.exports = {
         const targetAdmin = await Admin.findById(admin.id);
         return targetAdmin;
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
     },
   },
@@ -95,23 +99,24 @@ module.exports = {
 
     async createNewQuestion(
       _,
-      { image, infoProvided, expectedAnswers, hint, questionTemplateId },
+      { image, questionDescription, expectedAnswers, hint, questionTemplateId },
       context
     ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
 
-      targetQuestion = Admin.findOne(infoProvided);
+      targetQuestion = Question.findOne({
+        questionDescription: questionDescription,
+      });
 
-      // TODO where will the id come from
-      if (!targetAdmin.modules.questions.includes(targetQuestion.id)) {
+      if (targetQuestion === null) {
         const newQuestion = new Question({
           image,
-          infoProvided,
+          questionDescription,
           expectedAnswers,
           hint,
           questionTemplateId,
@@ -123,6 +128,9 @@ module.exports = {
 
         const updatedQuestions = await targetAdmin.modules.questions;
         return updatedQuestions;
+      } else {
+        const unchangedQuestions = await targetAdmin.modules.questions;
+        return unchangedQuestions;
       }
     },
 
@@ -135,13 +143,15 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
 
-      targetQuestionTemplate = Admin.findOne(inputFields);
+      targetQuestionTemplate = QuestionTemplate.findOne({
+        inputFields: inputFields,
+      });
 
-      // TODO where will the id come from
-      if (!targetAdmin.questionTemplates.includes(targetQuestionTemplate.id)) {
+      // TODOchange how all the targets are queried
+      if (targetQuestionTemplate === null) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
           type,
@@ -153,43 +163,57 @@ module.exports = {
 
         const updatedQuestionTemplates = await targetAdmin.questionTemplates;
         return updatedQuestionTemplates;
+      } else {
+        const unchangedQuestionTemplates = await targetAdmin.questionTemplates;
+        return unchangedQuestionTemplates;
       }
     },
 
-    async createNewModule(_, { type, categoryId, format }, context) {
+    async createNewModule(_, { name, type, categoryId, format }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
-      const newModule = new Module({
-        type,
-        categoryId,
-        format,
-        createdAt: new Date(),
+
+      targetModule = Module.findOne({
+        name: name,
       });
 
-      targetAdmin.modules.push(newModule);
-      await targetAdmin.modules.save();
-      const updatedModules = await targetAdmin.modules;
-      return updatedModules;
+      // TODOchange how all the targets are queried
+      if (targetModule !== null) {
+        const newModule = new Module({
+          name,
+          type,
+          categoryId,
+          format,
+          createdAt: new Date(),
+        });
 
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
+        targetAdmin.modules.push(newModule);
+        await targetAdmin.modules.save();
+        const updatedModules = await targetAdmin.modules;
+        return updatedModules;
+      } else {
+        const unchangedModules = await targetAdmin.modules;
+        return unchangedModules;
+      }
     },
 
-    async createNewChallenge(_, { infoProvided, categoryId, image }, context) {
+    async createNewChallenge(
+      _,
+      { questionDescription, categoryId, image },
+      context
+    ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       const newChallenge = new Challenge({
-        infoProvided,
+        questionDescription,
         categoryId,
         image,
         createdAt: new Date(),
@@ -199,38 +223,28 @@ module.exports = {
       await targetAdmin.challenges.save();
       const updatedChallenges = await targetAdmin.challenges;
       return updatedChallenges;
-
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
     },
 
     async editModule(
       _,
-      { moduleId, newType, newCategoryId, newFormat },
+      { moduleId, newName, newType, newCategoryId, newFormat },
       context
     ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       var targetModule = await targetAdmin.modules.findById(moduleId);
 
-      // TODO replacing existing properties
+      targetModule.name = newName;
       targetModule.categoryId = newCategoryId;
       targetModule.format = newFormat;
       targetModule.type = newType;
 
       await targetModule.save();
       return targetModule;
-
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
     },
 
     async editQuestion(
@@ -238,7 +252,7 @@ module.exports = {
       {
         questionId,
         newImage,
-        newInfoProvided,
+        newquestionDescription,
         newExpectedAnswers,
         newHint,
         newQuestionTemplateId,
@@ -249,26 +263,20 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       var targetQuestion = await targetAdmin.modules.questions.findById(
         questionId
       );
 
-      // TODO replacing existing properties
       targetQuestion.image = newImage;
-      targetQuestion.infoProvided = newInfoProvided;
+      targetQuestion.questionDescription = newquestionDescription;
       targetQuestion.expectedAnswers = newExpectedAnswers;
       targetQuestion.hint = newHint;
       targetQuestion.questionTemplateId = newQuestionTemplateId;
 
       await targetQuestion.save();
       return targetQuestion;
-
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
     },
 
     async editQuestionTemplate(
@@ -280,51 +288,39 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       var targetQuestionTemplate = await targetAdmin.modules.questions.findById(
         questionTemplateId
       );
 
-      // TODO replacing existing properties
       targetQuestionTemplate.categoryId = newCategory;
       targetQuestionTemplate.inputFields = newInputFields;
       targetQuestionTemplate.type = newType;
       await targetQuestionTemplate.save();
 
       return targetQuestionTemplate;
-
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
     },
 
     async editChallenge(
       _,
-      { challengeId, newInfoProvided, newImage },
+      { challengeId, newquestionDescription, newImage },
       context
     ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       var targetChallenge = await targetAdmin.challenges.findById(challengeId);
 
-      // TODO replacing existing properties
       targetChallenge.categoryId = newCategoryId;
-      targetChallenge.infoProvided = newInfoProvided;
+      targetChallenge.questionDescription = newquestionDescription;
       targetChallenge.image = newImage;
 
       await targetChallenge.save();
       return targetChallenge;
-
-      // const res = await newModule.save();
-
-      // TODO whats the point of the following line
-      // return { ...res._doc, id: res._id };
     },
 
     async deleteModule(_, { moduleId }, context) {
@@ -332,7 +328,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       const targetModule = await targetAdmin.modules.findById(moduleId);
       await targetModule.delete();
@@ -346,7 +342,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       const targetQuestion = await targetAdmin.modules.questions.findById(
         questionId
@@ -362,7 +358,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
         questionTemplateId
@@ -377,7 +373,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new Error(error);
+        throw AuthenticationError;
       }
       const targetChallenge = await targetAdmin.Challenges.findById(
         challengeId

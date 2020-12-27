@@ -8,6 +8,8 @@ const {
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_STUDENT_KEY;
 const Student = require("../../models/Student");
+const Module = require("../../models/Module");
+
 const checkStudentAuth = require("../../util/checkStudentAuth");
 function generateToken(student) {
   return jwt.sign(
@@ -156,7 +158,7 @@ module.exports = {
         console.log(error);
         return [];
       }
-      targetModule = Student.findOne(moduleId); // TODO think i have to do .modules here
+      targetModule = Module.findById(moduleId);
 
       if (!targetStudent.completedModules.includes(targetModule.id)) {
         targetStudent.completedModules.push(targetModule.id);
@@ -174,9 +176,12 @@ module.exports = {
         console.log(error);
         return [];
       }
-      targetModule = Student.findOne(moduleId);
+      const targetModule = Module.findById(moduleId);
 
-      if (!targetStudent.inProgressModules.includes(targetModule.id)) {
+      if (!targetModule) {
+        throw UserInputError;
+      }
+      else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
         targetStudent.inProgressModules.push(targetModule.id);
       }
       const updatedInProgressModules = await targetStudent.inProgressModules;
@@ -228,7 +233,7 @@ module.exports = {
         targetStudent.submittedAnswers.push(newAnswer.id);
         return newAnswer;
       }
-    }, // TODO check the other comment here
+    },
 
     async starModule(_, { moduleId }, context) {
       try {
