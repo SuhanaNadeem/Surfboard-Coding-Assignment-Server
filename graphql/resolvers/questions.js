@@ -1,10 +1,10 @@
-const checkMentorAuth = require("../../util/checkMentorAuth");
 const checkStudentAuth = require("../../util/checkStudentAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
 
 const { UserInputError, AuthenticationError } = require("apollo-server");
 
 const Question = require("../../models/Question");
+const Admin = require("../../models/Admin");
 
 module.exports = {
   Query: {

@@ -2,6 +2,7 @@ const checkMentorAuth = require("../../util/checkMentorAuth");
 const checkStudentAuth = require("../../util/checkStudentAuth");
 
 const Module = require("../../models/Module");
+const Student = require("../../models/Student");
 
 module.exports = {
   Query: {
@@ -83,6 +84,32 @@ module.exports = {
       await targetComment.delete();
       await targetModule.save();
       return targetModule;
+    },
+
+    async changeModulePoints(
+      _,
+      { moduleId, answerCorrect, numToIncrement },
+      context
+    ) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+      const targetModule = Module.findById(moduleId);
+      if (targetModule !== null) {
+        const studentModule = targetStudent.modulePointsDict.findOne({
+          key: moduleId,
+        });
+        if (answerCorrect) {
+          studentModule.value = studentModule.value + numToIncrement;
+          await studentModule.save();
+        }
+        return studentModule.value;
+      }
+      throw UserInputError;
     },
   },
 };

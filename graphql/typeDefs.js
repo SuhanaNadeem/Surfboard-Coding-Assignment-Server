@@ -46,6 +46,8 @@ module.exports = gql`
     mentors: [String]!
 
     quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
+    modulePointsDict: [StringIntDict]
+
     createdAt: DateTime!
     token: String
     # need a dict of {module: points} and
@@ -55,6 +57,13 @@ module.exports = gql`
     id: String!
     key: String! # ques id
     value: String! # ans id
+    createdAt: DateTime!
+  }
+
+  type StringIntDict {
+    id: String!
+    key: String! # module id
+    value: Int! # points
     createdAt: DateTime!
   }
 
@@ -278,6 +287,10 @@ module.exports = gql`
     createComment(moduleId: String!, comment: String): Module # done
     deleteComment(moduleId: String!, commentId: String): Module # done
     # TODO figure this out, finish remaining resolvers
-    incrementModulePoints(moduleId: String!, answerCorrect: Boolean!): Int!
+    incrementModulePoints(
+      moduleId: String!
+      answerCorrect: Boolean!
+      numToIncrement: Int!
+    ): Int! # done
   }
 `;
