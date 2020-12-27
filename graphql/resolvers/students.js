@@ -9,6 +9,7 @@ const {
 const SECRET_KEY = process.env.SECRET_STUDENT_KEY;
 const Student = require("../../models/Student");
 const Module = require("../../models/Module");
+const Badge = require("../../models/Badge");
 
 const checkStudentAuth = require("../../util/checkStudentAuth");
 function generateToken(student) {
@@ -37,9 +38,7 @@ module.exports = {
       try {
         const student = checkStudentAuth(context);
         const targetStudent = await Student.findById(student.id);
-        const completedModules = await User.find({
-          id: targetStudent.completedModules,
-        });
+        const completedModules = await targetStudent.completedModules;
         return completedModules;
       } catch (error) {
         console.log(error);
@@ -51,9 +50,7 @@ module.exports = {
       try {
         const student = checkStudentAuth(context);
         const targetStudent = await Student.findById(student.id);
-        const inProgressModules = await Student.find({
-          id: targetStudent.inProgressModules,
-        });
+        const inProgressModules = await targetStudent.inProgressModules;
         return inProgressModules;
       } catch (error) {
         console.log(error);
@@ -65,9 +62,7 @@ module.exports = {
       try {
         const student = checkStudentAuth(context);
         const targetStudent = await Student.findById(student.id);
-        const badges = await Student.find({
-          id: targetStudent.badges,
-        });
+        const badges = await targetStudent.badges;
         return badges;
       } catch (error) {
         console.log(error);
@@ -79,9 +74,7 @@ module.exports = {
       try {
         const student = checkStudentAuth(context);
         const targetStudent = await Student.findById(student.id);
-        const mentors = await Student.find({
-          id: targetStudent.mentors,
-        });
+        const mentors = await targetStudent.mentors;
         return mentors;
       } catch (error) {
         console.log(error);
@@ -158,13 +151,14 @@ module.exports = {
         console.log(error);
         return [];
       }
-      targetModule = Module.findById(moduleId);
-
-      if (!targetStudent.completedModules.includes(targetModule.id)) {
-        targetStudent.completedModules.push(targetModule.id);
+      const targetModule = Module.findById(moduleId);
+      if (targetModule === null) {
+        throw UserInputError;
+      } else if (!targetStudent.completedModules.includes(moduleId)) {
+        targetStudent.completedModules.push(moduleId);
+        const updatedCompletedModules = await targetStudent.completedModules;
+        return updatedCompletedModules;
       }
-      const updatedCompletedModules = await targetStudent.completedModules;
-      return updatedCompletedModules;
     },
 
     async addInProgressModule(_, { moduleId }, context) {
@@ -178,14 +172,13 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
 
-      if (!targetModule) {
+      if (targetModule === null) {
         throw UserInputError;
-      }
-      else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
+      } else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
         targetStudent.inProgressModules.push(targetModule.id);
+        const updatedInProgressModules = await targetStudent.inProgressModules;
+        return updatedInProgressModules;
       }
-      const updatedInProgressModules = await targetStudent.inProgressModules;
-      return updatedInProgressModules;
     },
 
     async addBadge(_, { badgeId }, context) {
@@ -197,12 +190,15 @@ module.exports = {
         console.log(error);
         return [];
       }
-      targetBadge = Student.findOne(badgeId);
-      if (!targetStudent.badges.includes(targetBadge.id)) {
-        targetStudent.badges.push(targetBadge.id);
+
+      const targetBadge = Badge.findById(badgeId);
+      if (targetBadge === null) {
+        throw UserInputError;
+      } else if (!targetStudent.badges.includes(badgeId)) {
+        targetStudent.badges.push(badgeId);
+        const updatedBadges = await targetStudent.badges;
+        return updatedBadges;
       }
-      const updatedBadges = await targetStudent.badges;
-      return updatedBadges;
     },
 
     async submitAnswer(
@@ -218,10 +214,7 @@ module.exports = {
         console.log(error);
         return None;
       }
-      const targetAnswer = Student.findById(answerId);
-      // instead of the above, why cant i just do answerId below?
-
-      if (!targetStudent.submittedAnswers.includes(targetAnswer.id)) {
+      if (!targetStudent.submittedAnswers.includes(answerId)) {
         const newAnswer = new Answer({
           answerId,
           studentId,
@@ -230,7 +223,8 @@ module.exports = {
           moduleId,
           createdAt: new Date(),
         });
-        targetStudent.submittedAnswers.push(newAnswer.id);
+        await newAnswer.save();
+        await targetStudent.submittedAnswers.push(newAnswer.id);
         return newAnswer;
       }
     },
@@ -243,12 +237,15 @@ module.exports = {
         console.log(error);
         return None;
       }
-      targetModule = Student.findOne(moduleId);
-      if (!targetStudent.starredModules.includes(targetModule.id)) {
-        targetStudent.starredModules.push(targetModule.id);
+      const targetModule = Module.findById(moduleId);
+
+      if (targetModule === null) {
+        throw UserInputError;
+      } else if (!targetStudent.starredModules.includes(moduleId)) {
+        targetStudent.starredModules.push(moduleId);
+        const updatedStarredModules = await targetStudent.starredModules;
+        return updatedStarredModules;
       }
-      const updatedStarredModules = await targetStudent.starredModules;
-      return updatedStarredModules;
     },
 
     async unstarModule(_, { moduleId }, context) {
@@ -259,13 +256,16 @@ module.exports = {
         console.log(error);
         return None;
       }
-      targetModule = Student.findOne(moduleId);
-      if (targetStudent.starredModules.includes(targetModule.id)) {
+      const targetModule = Module.findById(moduleId);
+
+      if (targetModule === null) {
+        throw UserInputError;
+      } else if (targetStudent.starredModules.includes(moduleId)) {
         const index = targetStudent.starredModules.indexOf(moduleId);
         targetStudent.starredModules.splice(index, 1);
+        const updatedStarredModules = await targetStudent.starredModules;
+        return updatedStarredModules;
       }
-      const updatedStarredModules = await targetStudent.starredModules;
-      return updatedStarredModules;
     },
 
     async starQuestion(_, { questionId }, context) {
@@ -276,12 +276,14 @@ module.exports = {
         console.log(error);
         return None;
       }
-      targetQuestion = Student.findOne(questionId);
-      if (!targetStudent.starredQuestions.includes(targetQuestion.id)) {
-        targetStudent.starredQuestions.push(targetQuestion.id);
+      const targetQuestion = Question.findOne(questionId);
+      if (targetQuestion === null) {
+        throw UserInputError;
+      } else if (!targetStudent.starredQuestions.includes(questionId)) {
+        targetStudent.starredQuestions.push(questionId);
+        const updatedStarredQuestions = await targetStudent.starredQuestions;
+        return updatedStarredQuestions;
       }
-      const updatedStarredQuestions = await targetStudent.starredQuestions;
-      return updatedStarredQuestions;
     },
     async unstarQuestion(_, { questionId }, context) {
       try {
@@ -291,13 +293,15 @@ module.exports = {
         console.log(error);
         return None;
       }
-      targetQuestion = Student.findOne(questionId);
-      if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
+      const targetQuestion = Question.findOne(questionId);
+      if (targetQuestion === null) {
+        throw UserInputError;
+      } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
         const index = targetStudent.starredQuestions.indexOf(questionId);
         targetStudent.starredQuestions.splice(index, 1);
+        const updatedStarredQuestions = await targetStudent.starredQuestions;
+        return updatedStarredQuestions;
       }
-      const updatedStarredQuestions = await targetStudent.starredQuestions;
-      return updatedStarredQuestions;
     },
   },
 };
