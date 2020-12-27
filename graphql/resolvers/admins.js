@@ -45,12 +45,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const checkAdmin = await Admin.findOne({ email });
       if (checkAdmin) {
-        throw new UserInputError("Email already exists", {
+        throw new UserInputError("Invalid input")("Email already exists", {
           errors: {
             email: "An admin with this email already exists",
           },
@@ -76,21 +76,25 @@ module.exports = {
       const { errors, valid } = validateUserLoginInput(email, password);
 
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const admin = await Admin.findOne({ email });
 
       if (!admin) {
         errors.email = "Admin not found";
-        throw new UserInputError("Admin not found", { errors });
+        throw new UserInputError("Invalid input")("Admin not found", {
+          errors,
+        });
       }
 
       const match = await bcrypt.compare(password, admin.password);
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Wrong credentials", { errors });
+        throw new UserInputError("Invalid input")("Wrong credentials", {
+          errors,
+        });
       }
 
       const token = generateToken(admin);
@@ -112,7 +116,7 @@ module.exports = {
         await targetAdmin.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
 

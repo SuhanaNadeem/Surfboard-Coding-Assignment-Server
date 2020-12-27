@@ -8,6 +8,7 @@ const answerSchema = new Schema({
     type: String,
     default: () => nanoid(),
   },
+  answer: String,
   studentId: String,
   questionId: String,
   categoryId: String,

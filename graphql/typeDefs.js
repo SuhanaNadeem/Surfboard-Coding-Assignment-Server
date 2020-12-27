@@ -46,11 +46,9 @@ module.exports = gql`
     mentors: [String]!
 
     quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
-    modulePointsDict: [StringIntDict]
-
+    modulePointsDict: [StringIntDict] # {module: points}
     createdAt: DateTime!
     token: String
-    # need a dict of {module: points} and
   }
 
   type StringStringDict {
@@ -94,6 +92,7 @@ module.exports = gql`
 
   type Answer {
     id: String!
+    answer: String!
     studentId: String!
     questionId: String!
     categoryId: String!
@@ -267,7 +266,7 @@ module.exports = gql`
     deleteHint(questionId: String!): Question! # done
     # for learn/practice experience
     submitAnswer(
-      answerId: String!
+      answer: String!
       categoryId: String!
       questionId: String!
       moduleId: String!
@@ -284,7 +283,6 @@ module.exports = gql`
     unstarQuestion(questionId: String!): [String]! # done
     createComment(moduleId: String!, comment: String): Module # done
     deleteComment(moduleId: String!, commentId: String): Module # done
-    # TODO figure this out, finish remaining resolvers
     incrementModulePoints(
       moduleId: String!
       answerCorrect: Boolean!

@@ -11,7 +11,7 @@ module.exports = {
     async getHintByQuestion(_, { questionId }, context) {
       const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else {
         const targetHint = await targetQuestion.hint;
         return targetHint;
@@ -29,7 +29,7 @@ module.exports = {
         key: questionId,
       });
       if (quesAnsPair === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else {
         const savedAnswer = quesAnsPair.value;
         return savedAnswer;
@@ -62,7 +62,7 @@ module.exports = {
         targetQuestion.hint = newHint.id;
         return newHint;
       }
-      return UserInputError;
+      return UserInputError("Invalid input");
     },
     async editHint(
       _,
@@ -84,7 +84,7 @@ module.exports = {
         const updatedHint = targetQuestion.hint;
         return updatedHint;
       }
-      return UserInputError;
+      return UserInputError("Invalid input");
     },
     async deleteHint(_, { questionId }, context) {
       try {
@@ -99,7 +99,7 @@ module.exports = {
         await targetQuestion.save();
         return targetQuestion;
       }
-      return UserInputError;
+      return UserInputError("Invalid input");
     },
   },
 };

@@ -21,7 +21,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
     async getChallengesByCategory(_, { categoryId }, context) {
@@ -40,7 +40,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
     async getModulesByCategory(_, { categoryId }, context) {
@@ -59,7 +59,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
   },

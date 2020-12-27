@@ -56,12 +56,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const checkMentor = await Mentor.findOne({ email });
       if (checkMentor) {
-        throw new UserInputError("Email already exists", {
+        throw new UserInputError("Invalid input")("Email already exists", {
           errors: {
             email: "An mentor with this email already exists",
           },
@@ -87,21 +87,25 @@ module.exports = {
       const { errors, valid } = validateUserLoginInput(email, password);
 
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const mentor = await Mentor.findOne({ email });
 
       if (!mentor) {
         errors.email = "Mentor not found";
-        throw new UserInputError("Mentor not found", { errors });
+        throw new UserInputError("Invalid input")("Mentor not found", {
+          errors,
+        });
       }
 
       const match = await bcrypt.compare(password, mentor.password);
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Wrong credentials", { errors });
+        throw new UserInputError("Invalid input")("Wrong credentials", {
+          errors,
+        });
       }
 
       const token = generateToken(mentor);
@@ -122,7 +126,7 @@ module.exports = {
         await targetMentor.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
   },

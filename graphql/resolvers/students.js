@@ -92,12 +92,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const checkStudent = await Student.findOne({ email });
       if (checkStudent) {
-        throw new UserInputError("Email already exists", {
+        throw new UserInputError("Invalid input")("Email already exists", {
           errors: {
             email: "An student with this email already exists",
           },
@@ -122,21 +122,25 @@ module.exports = {
     async loginStudent(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Invalid input")("Errors", { errors });
       }
 
       const student = await Student.findOne({ email });
 
       if (!student) {
         errors.email = "Student not found";
-        throw new UserInputError("Student not found", { errors });
+        throw new UserInputError("Invalid input")("Student not found", {
+          errors,
+        });
       }
 
       const match = await bcrypt.compare(password, student.password);
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Wrong credentials", { errors });
+        throw new UserInputError("Invalid input")("Wrong credentials", {
+          errors,
+        });
       }
 
       const token = generateToken(student);
@@ -158,7 +162,7 @@ module.exports = {
         await targetStudent.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
     },
 
@@ -173,7 +177,7 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
       if (targetModule === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (!targetStudent.completedModules.includes(moduleId)) {
         targetStudent.completedModules.push(moduleId);
         const updatedCompletedModules = await targetStudent.completedModules;
@@ -193,7 +197,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
         targetStudent.inProgressModules.push(targetModule.id);
         const updatedInProgressModules = await targetStudent.inProgressModules;
@@ -213,7 +217,7 @@ module.exports = {
 
       const targetBadge = Badge.findById(badgeId);
       if (targetBadge === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (!targetStudent.badges.includes(badgeId)) {
         targetStudent.badges.push(badgeId);
         const updatedBadges = await targetStudent.badges;
@@ -223,10 +227,9 @@ module.exports = {
 
     async submitAnswer(
       _,
-      { answerId, studentId, categoryId, questionId, moduleId },
+      { answer, studentId, categoryId, questionId, moduleId },
       context
     ) {
-      // add to students module list
       try {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
@@ -237,21 +240,26 @@ module.exports = {
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
       });
+      const newAnswer = new Answer({
+        answer,
+        studentId,
+        categoryId,
+        questionId,
+        moduleId,
+        createdAt: new Date(),
+      });
+      await newAnswer.save();
       if (quesAnsPair === null) {
-        throw UserInputError;
-      } else {
-        const newAnswer = new Answer({
-          answerId,
-          studentId,
-          categoryId,
-          questionId,
-          moduleId,
-          createdAt: new Date(),
+        // throw UserInputError("Invalid input");
+
+        await targetStudent.quesAnsDict.push({
+          key: questionId,
+          value: newAnswer.id,
         });
-        await newAnswer.save();
-        await quesAnsPair.push(newAnswer.id);
-        return newAnswer;
+      } else {
+        await targetStudent.quesAnsDict.push({ value: newAnswer.id });
       }
+      return newAnswer;
     },
 
     async starModule(_, { moduleId }, context) {
@@ -265,7 +273,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (!targetStudent.starredModules.includes(moduleId)) {
         targetStudent.starredModules.push(moduleId);
         const updatedStarredModules = await targetStudent.starredModules;
@@ -284,7 +292,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (targetStudent.starredModules.includes(moduleId)) {
         const index = targetStudent.starredModules.indexOf(moduleId);
         targetStudent.starredModules.splice(index, 1);
@@ -303,7 +311,7 @@ module.exports = {
       }
       const targetQuestion = Question.findOne(questionId);
       if (targetQuestion === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (!targetStudent.starredQuestions.includes(questionId)) {
         targetStudent.starredQuestions.push(questionId);
         const updatedStarredQuestions = await targetStudent.starredQuestions;
@@ -320,7 +328,7 @@ module.exports = {
       }
       const targetQuestion = Question.findOne(questionId);
       if (targetQuestion === null) {
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
         const index = targetStudent.starredQuestions.indexOf(questionId);
         targetStudent.starredQuestions.splice(index, 1);

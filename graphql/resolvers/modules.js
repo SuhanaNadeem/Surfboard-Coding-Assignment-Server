@@ -19,7 +19,7 @@ module.exports = {
       //       var targetUser = await Mentor.findById(mentor.id);
       //     }
       //   }
-      // TODO multiple item search
+      // TODO regex
       const targetModule = await Module.findOne({ name: search });
       if (targetModule === null) {
         return null;
@@ -109,7 +109,7 @@ module.exports = {
         }
         return studentModule.value;
       }
-      throw UserInputError;
+      throw UserInputError("Invalid input");
     },
   },
 };
