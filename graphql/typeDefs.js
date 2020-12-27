@@ -139,7 +139,7 @@ module.exports = gql`
     getCompletedModulesByStudent: [String]! # done
     getInProgressModulesByStudent: [String]! # done
     getBadgesByStudent: [String]! # done
-    getStudentsByMentor: [Student]!
+    getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [String]!

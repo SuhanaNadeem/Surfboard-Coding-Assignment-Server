@@ -10,6 +10,7 @@ const SECRET_KEY = process.env.SECRET_STUDENT_KEY;
 const Student = require("../../models/Student");
 const Module = require("../../models/Module");
 const Badge = require("../../models/Badge");
+const Question = require("../../models/Question");
 
 const checkStudentAuth = require("../../util/checkStudentAuth");
 function generateToken(student) {

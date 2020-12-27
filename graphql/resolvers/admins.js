@@ -150,7 +150,6 @@ module.exports = {
         inputFields: inputFields,
       });
 
-      // TODOchange how all the targets are queried
       if (targetQuestionTemplate === null) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
@@ -181,7 +180,6 @@ module.exports = {
         name: name,
       });
 
-      // TODOchange how all the targets are queried
       if (targetModule !== null) {
         const newModule = new Module({
           name,

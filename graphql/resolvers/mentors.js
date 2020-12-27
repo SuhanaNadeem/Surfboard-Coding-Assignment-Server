@@ -16,7 +16,6 @@ function generateToken(mentor) {
       email: mentor.email,
     },
     SECRET_KEY
-    //{ expiresIn: "3h" }
   );
 }
 
@@ -31,6 +30,17 @@ module.exports = {
         return targetMentor;
       } catch (err) {
         throw new Error(err);
+      }
+    },
+    async getStudentsByMentor(_, {}, context) {
+      try {
+        const mentor = checkMentorAuth(context);
+        const targetMentor = await Mentor.findById(mentor.id);
+        const students = await targetMentor.students;
+        return students;
+      } catch (error) {
+        console.log(error);
+        return [];
       }
     },
   },
