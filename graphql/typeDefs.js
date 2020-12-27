@@ -179,16 +179,14 @@ module.exports = gql`
       confirmPassword: String!
     ): Admin!
     loginAdmin(email: String!, password: String!): Admin!
-    deleteAdmin(adminId: String!): String
-
+    deleteAdmin(adminId: String!): String # done
     signupMentor(
       email: String!
       password: String!
       confirmPassword: String!
     ): Mentor!
     loginMentor(email: String!, password: String!): Mentor!
-    deleteMentor(mentorId: String!): String
-
+    deleteMentor(mentorId: String!): String # done
     signupStudent(
       email: String!
       password: String!

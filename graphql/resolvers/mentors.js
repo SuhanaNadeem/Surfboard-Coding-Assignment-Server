@@ -8,7 +8,10 @@ const {
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_MENTOR_KEY;
 const Mentor = require("../../models/Mentor");
+
 const checkMentorAuth = require("../../util/checkMentorAuth");
+const checkAdminAuth = require("../../util/checkAdminAuth");
+
 function generateToken(mentor) {
   return jwt.sign(
     {
@@ -103,6 +106,24 @@ module.exports = {
 
       const token = generateToken(mentor);
       return { ...mentor._doc, id: mentor._id, token };
+    },
+    async deleteMentor(_, { mentorId }, context) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetMentor = Mentor.findById(mentorId);
+      if (targetMentor !== null) {
+        await targetMentor.delete();
+        return "Delete Successful";
+      } else {
+        throw UserInputError;
+      }
     },
   },
 };

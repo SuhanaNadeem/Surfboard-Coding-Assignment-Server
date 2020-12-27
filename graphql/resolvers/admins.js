@@ -97,6 +97,25 @@ module.exports = {
       return { ...admin._doc, id: admin._id, token };
     },
 
+    async deleteAdmin(_, { adminId }, context) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetAdmin = Admin.findById(adminId);
+      if (targetAdmin !== null) {
+        await targetAdmin.delete();
+        return "Delete Successful";
+      } else {
+        throw UserInputError;
+      }
+    },
+
     async createNewQuestion(
       _,
       { image, questionDescription, expectedAnswers, hint, questionTemplateId },
