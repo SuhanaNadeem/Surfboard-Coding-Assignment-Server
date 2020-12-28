@@ -250,8 +250,6 @@ module.exports = {
       });
       await newAnswer.save();
       if (quesAnsPair === null) {
-        // throw UserInputError("Invalid input");
-
         await targetStudent.quesAnsDict.push({
           key: questionId,
           value: newAnswer.id,
@@ -336,5 +334,6 @@ module.exports = {
         return updatedStarredQuestions;
       }
     },
+    async verifyAnswer(_, { categoryId, questionId, moduleId }, context) {},
   },
 };

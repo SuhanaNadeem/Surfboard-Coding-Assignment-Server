@@ -222,10 +222,9 @@ module.exports = gql`
     editQuestion(
       questionId: String!
       newImage: String
-      newquestionDescription: String!
+      newQuestionDescription: String!
       newExpectedAnswers: [String]
       newHint: String
-      newQuestionTemplateId: String!
     ): Question! # done
     editQuestionTemplate(
       questionTemplateId: String!
@@ -276,7 +275,7 @@ module.exports = gql`
       categoryId: String!
       questionId: String!
       moduleId: String!
-    ): Boolean! # done
+    ): Boolean!
     starModule(moduleId: String!): [String]! # done
     unstarModule(moduleId: String!): [String]! # done
     starQuestion(questionId: String!): [String]! # done

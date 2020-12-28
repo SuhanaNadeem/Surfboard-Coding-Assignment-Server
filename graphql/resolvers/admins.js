@@ -11,6 +11,7 @@ const Admin = require("../../models/Admin");
 const Question = require("../../models/Question");
 const QuestionTemplate = require("../../models/QuestionTemplate");
 const Module = require("../../models/Module");
+const Challenge = require("../../models/Challenge");
 
 const checkAdminAuth = require("../../util/checkAdminAuth");
 function generateToken(admin) {
@@ -273,10 +274,9 @@ module.exports = {
       {
         questionId,
         newImage,
-        newquestionDescription,
+        newQuestionDescription,
         newExpectedAnswers,
         newHint,
-        newQuestionTemplateId,
       },
       context
     ) {
@@ -286,18 +286,18 @@ module.exports = {
       } catch (error) {
         throw AuthenticationError;
       }
-      var targetQuestion = await targetAdmin.modules.questions.findById(
-        questionId
-      );
+      var targetQuestion = await Question.findById(questionId);
+      if (targetQuestion === null) {
+        throw UserInputError("Invalid input");
+      } else {
+        targetQuestion.image = newImage;
+        targetQuestion.questionDescription = newQuestionDescription;
+        targetQuestion.expectedAnswers = newExpectedAnswers;
+        targetQuestion.hint = newHint;
 
-      targetQuestion.image = newImage;
-      targetQuestion.questionDescription = newquestionDescription;
-      targetQuestion.expectedAnswers = newExpectedAnswers;
-      targetQuestion.hint = newHint;
-      targetQuestion.questionTemplateId = newQuestionTemplateId;
-
-      await targetQuestion.save();
-      return targetQuestion;
+        await targetQuestion.save();
+        return targetQuestion;
+      }
     },
 
     async editQuestionTemplate(
@@ -334,7 +334,7 @@ module.exports = {
       } catch (error) {
         throw AuthenticationError;
       }
-      var targetChallenge = await targetAdmin.challenges.findById(challengeId);
+      var targetChallenge = await Challenge.findById(challengeId);
 
       targetChallenge.categoryId = newCategoryId;
       targetChallenge.questionDescription = newquestionDescription;
