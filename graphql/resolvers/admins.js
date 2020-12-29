@@ -123,8 +123,9 @@ module.exports = {
         }
       }
       const targetAdmin = Admin.findById(adminId);
-      if (targetAdmin !== null) {
+      if (targetAdmin) {
         await targetAdmin.delete();
+        await targetAdmin.save();
         return "Delete Successful";
       } else {
         throw new UserInputError("Invalid input");
@@ -147,7 +148,7 @@ module.exports = {
         questionDescription,
       });
 
-      if (targetQuestion == null) {
+      if (!targetQuestion) {
         const newQuestion = new Question({
           image,
           questionDescription,
@@ -158,14 +159,10 @@ module.exports = {
         });
         await newQuestion.save();
         targetAdmin.modules.questions.push(newQuestion.id);
-        await targetAdmin.modules.questions.save();
         await targetAdmin.save();
-
-        const updatedQuestions = await targetAdmin.modules.questions;
-        return updatedQuestions;
+        return newQuestion;
       } else {
-        const unchangedQuestions = await targetAdmin.modules.questions;
-        return unchangedQuestions;
+        return targetQuestion;
       }
     },
 
@@ -185,22 +182,19 @@ module.exports = {
         inputFields,
       });
 
-      if (targetQuestionTemplate == null) {
+      if (!targetQuestionTemplate) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
           type,
           inputFields,
           createdAt: new Date(),
         });
+        await newQuestionTemplate.save();
         targetAdmin.questionTemplates.push(newQuestionTemplate.id);
-        await targetAdmin.questionTemplates.save();
         await targetAdmin.save();
-
-        const updatedQuestionTemplates = await targetAdmin.questionTemplates;
-        return updatedQuestionTemplates;
+        return newQuestionTemplate;
       } else {
-        const unchangedQuestionTemplates = await targetAdmin.questionTemplates;
-        return unchangedQuestionTemplates;
+        return targetQuestionTemplate;
       }
     },
 
@@ -216,7 +210,7 @@ module.exports = {
         name,
       });
 
-      if (targetModule == null) {
+      if (!targetModule) {
         const newModule = new Module({
           name,
           type,
@@ -225,15 +219,12 @@ module.exports = {
           createdAt: new Date(),
         });
 
-        await targetAdmin.modules.push(newModule.id);
-        await targetAdmin.modules.save();
+        await newModule.save();
+        targetAdmin.modules.push(newModule.id);
         await targetAdmin.save();
-
-        const updatedModules = await targetAdmin.modules;
-        return updatedModules;
+        return newModule;
       } else {
-        const unchangedModules = await targetAdmin.modules;
-        return unchangedModules;
+        return targetModule;
       }
     },
 
@@ -249,7 +240,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetChallenge = Challenge.findOne({ questionDescription });
-      if (targetChallenge == null) {
+      if (!targetChallenge) {
         const newChallenge = new Challenge({
           questionDescription,
           categoryId,
@@ -257,14 +248,12 @@ module.exports = {
           createdAt: new Date(),
         });
 
-        await targetAdmin.challenges.push(newChallenge.id);
-        await targetAdmin.challenges.save();
+        await newChallenge.save();
+        targetAdmin.challenges.push(newChallenge.id);
         await targetAdmin.save();
-        const updatedChallenges = await targetAdmin.challenges;
-        return updatedChallenges;
+        return newChallenge;
       } else {
-        const unchangedChallenges = await targetAdmin.challenges;
-        return unchangedChallenges;
+        return targetChallenge;
       }
     },
 
@@ -278,11 +267,7 @@ module.exports = {
       }
 
       const targetCategory = await Category.findOne({ name });
-      if (targetCategory) {
-        console.log(targetCategory);
-
-        return targetCategory;
-      } else {
+      if (!targetCategory) {
         const newCategory = new Category({
           name,
           createdAt: new Date(),
@@ -291,6 +276,8 @@ module.exports = {
         targetAdmin.categories.push(newCategory.id);
         await targetAdmin.save();
         return newCategory;
+      } else {
+        return targetCategory;
       }
     },
     async editModule(
@@ -305,7 +292,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetModule = await targetAdmin.modules.findById(moduleId);
-      if (targetModule == null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
         targetModule.name = newName;
@@ -336,7 +323,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetQuestion = await Question.findById(questionId);
-      if (targetQuestion == null) {
+      if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
         targetQuestion.image = newImage;
@@ -363,7 +350,7 @@ module.exports = {
       var targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
-      if (targetQuestionTemplate == null) {
+      if (!targetQuestionTemplate) {
         throw new UserInputError("Invalid input");
       } else {
         targetQuestionTemplate.categoryId = newCategory;
@@ -386,7 +373,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetChallenge = await Challenge.findById(challengeId);
-      if (targetChallenge == null) {
+      if (!targetChallenge) {
         throw new UserInputError("Invalid input");
       } else {
         targetChallenge.categoryId = newCategoryId;
@@ -404,11 +391,10 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetCategory = await Category.findById(categoryId);
-      if (targetCategory == null) {
+      if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else {
         targetCategory.name = newName;
-
         await targetCategory.save();
         return targetCategory;
       }
@@ -421,11 +407,13 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetModule = await Module.findById(moduleId);
-      if (targetModule == null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
+        const index = targetAdmin.modules.indexOf(questionTemplateId);
+        targetAdmin.modules.splice(index, 1);
+        await targetAdmin.save();
         await targetModule.delete();
-
         const updatedModules = targetAdmin.modules;
         return updatedModules;
       }
@@ -441,12 +429,14 @@ module.exports = {
       const targetQuestion = await targetAdmin.modules.questions.findById(
         questionId
       );
-      if (targetQuestion == null) {
+      if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
-        await targetQuestion.delete();
+        const index = targetAdmin.modules.questions.indexOf(questionTemplateId);
+        targetAdmin.modules.questions.splice(index, 1);
         await targetAdmin.save();
-        const updatedQuestions = await targetAdmin.modules.questions;
+        await targetQuestion.delete();
+        const updatedQuestions = targetAdmin.modules.questions;
         return updatedQuestions;
       }
     },
@@ -461,12 +451,14 @@ module.exports = {
       const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
         questionTemplateId
       );
-      if (targetQuestionTemplate == null) {
+      if (!targetQuestionTemplate) {
         throw new UserInputError("Invalid input");
       } else {
+        const index = targetAdmin.questionTemplates.indexOf(questionTemplateId);
+        targetAdmin.questionTemplates.splice(index, 1);
+        await targetAdmin.save();
         await targetQuestionTemplate.delete();
-
-        const updatedQuestionTemplates = await targetAdmin.questionTemplates;
+        const updatedQuestionTemplates = targetAdmin.questionTemplates;
         return updatedQuestionTemplates;
       }
     },
@@ -480,11 +472,14 @@ module.exports = {
       const targetChallenge = await targetAdmin.challenges.findById(
         challengeId
       );
-      if (targetChallenge == null) {
+      if (!targetChallenge) {
         throw new UserInputError("Invalid input");
       } else {
+        const index = targetAdmin.challenges.indexOf(challengeId);
+        targetAdmin.challenges.splice(index, 1);
+        await targetAdmin.save();
         await targetChallenge.delete();
-        const updatedChallenges = await targetAdmin.challenges;
+        const updatedChallenges = targetAdmin.challenges;
         return updatedChallenges;
       }
     },
@@ -503,10 +498,12 @@ module.exports = {
         const index = targetAdmin.categories.indexOf(categoryId);
         targetAdmin.categories.splice(index, 1);
         await targetAdmin.save();
-        await targetCategory.delete(); // TODO delete AFTER
-        //TODO Splice from admin  getcategories query and new = save
+        await targetCategory.delete();
         const updatedCategories = targetAdmin.categories;
         return updatedCategories;
+
+        // TODO delete AFTER
+        //TODO Splice from admin  getcategories query and new = save
       }
     },
   },

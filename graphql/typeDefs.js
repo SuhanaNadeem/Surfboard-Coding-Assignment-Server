@@ -196,23 +196,19 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(
-      categoryId: String!
-      type: String!
-      format: String
-    ): [String]! # done
+    createNewModule(categoryId: String!, type: String!, format: String): Module! # done
     createNewQuestion(
       image: String
       questionDescription: String!
       expectedAnswers: [String]
       hint: String
       questionTemplateId: String!
-    ): [String]! # done
+    ): Question! # done
     createNewQuestionTemplate(
       categoryId: String!
       inputFields: [String]!
       type: String!
-    ): [String]! # done
+    ): QuestionTemplate! # done
     editModule(
       moduleId: String!
       newName: String!
@@ -236,9 +232,9 @@ module.exports = gql`
     deleteModule(moduleId: String!): [String]! # done
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
-    createNewCategory(name: String!): Category! # done
-    editCategory(categoryId: String!, newName: String!): Category! # done
-    deleteCategory(categoryId: String!): [String]! # done
+    createNewCategory(name: String!): Category! # done checked
+    editCategory(categoryId: String!, newName: String!): Category! # done checked
+    deleteCategory(categoryId: String!): [String]! # done checked
     createNewChallenge(
       categoryId: String!
       questionDescription: String!
