@@ -1,11 +1,34 @@
 const checkMentorAuth = require("../../util/checkMentorAuth");
 const checkStudentAuth = require("../../util/checkStudentAuth");
+const checkAdminAuth = require("../../util/checkAdminAuth");
 
 const Module = require("../../models/Module");
 const Student = require("../../models/Student");
 
 module.exports = {
   Query: {
+    async getModules(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const modules = await Module.find();
+
+      if (!modules) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return modules;
+      }
+    },
     async getModulesBySearch(_, { search }, context) {
       //   try {
       //     const student = checkStudentAuth(context);

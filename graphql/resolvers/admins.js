@@ -206,9 +206,7 @@ module.exports = {
         throw new AuthenticationError();
       }
 
-      const targetModule = Module.findOne({
-        name,
-      });
+      const targetModule = await Module.findOne({ name });
 
       const questions = [];
       const comments = [];
@@ -243,7 +241,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetChallenge = Challenge.findOne({ questionDescription });
+      const targetChallenge = await Challenge.findOne({ questionDescription });
       if (!targetChallenge) {
         const newChallenge = new Challenge({
           questionDescription,
@@ -451,7 +449,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
+      const targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
       if (!targetQuestionTemplate) {

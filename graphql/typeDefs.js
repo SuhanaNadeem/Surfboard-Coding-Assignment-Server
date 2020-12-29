@@ -154,6 +154,8 @@ module.exports = gql`
     getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
     getCategories: [Category]!
+    getModules: [Module]!
+
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [String]! # done
     getChallengesByCategory(categoryId: String!): [String]! # done
@@ -195,7 +197,7 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(categoryId: String!, format: String): Module! # done
+    createNewModule(name: String!, categoryId: String!, format: String): Module! # done
     createNewQuestion(
       image: String
       questionDescription: String!
