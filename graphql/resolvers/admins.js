@@ -362,7 +362,7 @@ module.exports = {
 
     async editChallenge(
       _,
-      { challengeId, newquestionDescription, newImage },
+      { challengeId, newQuestionDescription, newImage },
       context
     ) {
       try {
@@ -376,7 +376,7 @@ module.exports = {
         throw UserInputError("Invalid input");
       } else {
         targetChallenge.categoryId = newCategoryId;
-        targetChallenge.questionDescription = newquestionDescription;
+        targetChallenge.questionDescription = newQuestionDescription;
         targetChallenge.image = newImage;
         await targetChallenge.save();
         return targetChallenge;

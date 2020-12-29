@@ -240,14 +240,14 @@ module.exports = gql`
       name: String!
       modules: [String]!
       challenges: [String]!
-    ): Category!
+    ): Category! # done
     editCategory(
       categoryId: String!
       newName: String!
       newModules: [String]!
       newChallenges: [String]!
-    ): Category!
-    deleteCategory(categoryId: String!): [String]!
+    ): Category! # done
+    deleteCategory(categoryId: String!): [String]! # done
     createNewChallenge(
       categoryId: String!
       questionDescription: String!
@@ -280,11 +280,7 @@ module.exports = gql`
       moduleId: String!
       studentId: String!
     ): Answer! # done
-    verifyAnswer(
-      categoryId: String!
-      questionId: String!
-      moduleId: String!
-    ): Boolean!
+    verifyAnswer(answerId: String!, questionId: String!): Boolean! # done
     starModule(moduleId: String!): [String]! # done
     unstarModule(moduleId: String!): [String]! # done
     starQuestion(questionId: String!): [String]! # done

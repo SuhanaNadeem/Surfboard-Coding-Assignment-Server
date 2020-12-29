@@ -307,7 +307,7 @@ module.exports = {
         console.log(error);
         return None;
       }
-      const targetQuestion = Question.findOne(questionId);
+      const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
         throw UserInputError("Invalid input");
       } else if (!targetStudent.starredQuestions.includes(questionId)) {
@@ -322,9 +322,9 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        return None;
+        throw UserInputError("Invalid input");
       }
-      const targetQuestion = Question.findOne(questionId);
+      const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
         throw UserInputError("Invalid input");
       } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
@@ -334,6 +334,28 @@ module.exports = {
         return updatedStarredQuestions;
       }
     },
-    async verifyAnswer(_, { categoryId, questionId, moduleId }, context) {},
+    async verifyAnswer(_, { answerId, questionId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        throw UserInputError("Invalid input");
+      }
+      // will be called after submitAnswer()
+      const targetQuestion = Question.findById(questionId);
+      const targetAnswer = Answer.findById(answerId);
+      const expectedAnswers = await targetQuestion.expectedAnswers;
+      if (
+        targetAnswer === null ||
+        targetQuestion === null ||
+        expectedAnswers === null ||
+        targetAnswer !== expectedAnswers
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    },
   },
 };
