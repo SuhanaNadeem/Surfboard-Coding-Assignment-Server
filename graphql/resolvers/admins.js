@@ -33,7 +33,7 @@ module.exports = {
         const targetAdmin = await Admin.findById(admin.id);
         return targetAdmin;
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
     },
   },
@@ -127,7 +127,7 @@ module.exports = {
         await targetAdmin.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
 
@@ -140,7 +140,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
 
       const targetQuestion = Question.findOne({
@@ -178,7 +178,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
 
       const targetQuestionTemplate = QuestionTemplate.findOne({
@@ -209,7 +209,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
 
       const targetModule = Module.findOne({
@@ -246,7 +246,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetChallenge = Challenge.findOne({ questionDescription });
       if (targetChallenge == null) {
@@ -274,7 +274,7 @@ module.exports = {
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         console.log(error);
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
 
       const targetCategory = await Category.findOne({ name });
@@ -302,11 +302,11 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       var targetModule = await targetAdmin.modules.findById(moduleId);
       if (targetModule == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         targetModule.name = newName;
         targetModule.categoryId = newCategoryId;
@@ -333,11 +333,11 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       var targetQuestion = await Question.findById(questionId);
       if (targetQuestion == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         targetQuestion.image = newImage;
         targetQuestion.questionDescription = newQuestionDescription;
@@ -358,13 +358,13 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
-      var targetQuestionTemplate = await targetAdmin.modules.questions.findById(
+      var targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
       if (targetQuestionTemplate == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         targetQuestionTemplate.categoryId = newCategory;
         targetQuestionTemplate.inputFields = newInputFields;
@@ -383,11 +383,11 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       var targetChallenge = await Challenge.findById(challengeId);
       if (targetChallenge == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         targetChallenge.categoryId = newCategoryId;
         targetChallenge.questionDescription = newQuestionDescription;
@@ -401,11 +401,11 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       var targetCategory = await Category.findById(categoryId);
       if (targetCategory == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         targetCategory.name = newName;
 
@@ -418,15 +418,15 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
-      const targetModule = await targetAdmin.modules.findById(moduleId);
+      const targetModule = await Module.findById(moduleId);
       if (targetModule == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         await targetModule.delete();
 
-        const updatedModules = await targetAdmin.modules;
+        const updatedModules = targetAdmin.modules;
         return updatedModules;
       }
     },
@@ -436,16 +436,16 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetQuestion = await targetAdmin.modules.questions.findById(
         questionId
       );
       if (targetQuestion == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         await targetQuestion.delete();
-        await targetAdmin.modules.questions.save();
+        await targetAdmin.save();
         const updatedQuestions = await targetAdmin.modules.questions;
         return updatedQuestions;
       }
@@ -456,13 +456,13 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
         questionTemplateId
       );
       if (targetQuestionTemplate == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         await targetQuestionTemplate.delete();
 
@@ -475,13 +475,13 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetChallenge = await targetAdmin.challenges.findById(
         challengeId
       );
       if (targetChallenge == null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         await targetChallenge.delete();
         const updatedChallenges = await targetAdmin.challenges;
@@ -494,18 +494,18 @@ module.exports = {
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         console.log(error);
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
-      const targetCategory = await targetAdmin.categories.findById(categoryId);
-      if (targetCategory == null) {
-        throw UserInputError("Invalid input");
+      const targetCategory = await Category.findById(categoryId);
+      if (!targetCategory) {
+        throw new UserInputError("Invalid input");
       } else {
-        await targetCategory.delete();
-        const index = targetAdmin.categories.indexOf(questionId);
+        const index = targetAdmin.categories.indexOf(categoryId);
         targetAdmin.categories.splice(index, 1);
-        await targetAdmin.categories.save();
+        await targetAdmin.save();
+        await targetCategory.delete(); // TODO delete AFTER
         //TODO Splice from admin  getcategories query and new = save
-        const updatedCategories = await targetAdmin.categories;
+        const updatedCategories = targetAdmin.categories;
         return updatedCategories;
       }
     },

@@ -126,7 +126,7 @@ module.exports = {
         await targetMentor.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
   },

@@ -11,7 +11,7 @@ module.exports = {
     async getHintByQuestion(_, { questionId }, context) {
       const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         const targetHint = await targetQuestion.hint;
         return targetHint;
@@ -29,7 +29,7 @@ module.exports = {
         key: questionId,
       });
       if (quesAnsPair === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         const savedAnswer = quesAnsPair.value;
         return savedAnswer;
@@ -47,7 +47,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       targetQuestion = Question.findById(questionId);
       if (targetQuestion !== null && targetQuestion.hint === null) {
@@ -62,7 +62,7 @@ module.exports = {
         targetQuestion.hint = newHint.id;
         return newHint;
       }
-      return UserInputError("Invalid input");
+      return new UserInputError("Invalid input");
     },
     async editHint(
       _,
@@ -73,7 +73,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       targetQuestion = Question.findById(questionId);
       if (targetQuestion !== null) {
@@ -84,14 +84,14 @@ module.exports = {
         const updatedHint = targetQuestion.hint;
         return updatedHint;
       }
-      return UserInputError("Invalid input");
+      throw new UserInputError("Invalid input");
     },
     async deleteHint(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       targetQuestion = Question.findById(questionId);
       if (targetQuestion !== null) {
@@ -99,7 +99,7 @@ module.exports = {
         await targetQuestion.save();
         return targetQuestion;
       }
-      return UserInputError("Invalid input");
+      return new UserInputError("Invalid input");
     },
   },
 };

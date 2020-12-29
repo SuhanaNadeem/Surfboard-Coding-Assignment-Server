@@ -32,7 +32,7 @@ module.exports = {
         const targetStudent = await Student.findById(student.id);
         return targetStudent;
       } catch (error) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
     async getCompletedModulesByStudent(_, {}, context) {
@@ -162,7 +162,7 @@ module.exports = {
         await targetStudent.delete();
         return "Delete Successful";
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
 
@@ -177,7 +177,7 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
       if (targetModule === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (!targetStudent.completedModules.includes(moduleId)) {
         targetStudent.completedModules.push(moduleId);
         const updatedCompletedModules = await targetStudent.completedModules;
@@ -197,7 +197,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
         targetStudent.inProgressModules.push(targetModule.id);
         const updatedInProgressModules = await targetStudent.inProgressModules;
@@ -217,7 +217,7 @@ module.exports = {
 
       const targetBadge = Badge.findById(badgeId);
       if (targetBadge === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (!targetStudent.badges.includes(badgeId)) {
         targetStudent.badges.push(badgeId);
         const updatedBadges = await targetStudent.badges;
@@ -235,7 +235,7 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
@@ -271,7 +271,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (!targetStudent.starredModules.includes(moduleId)) {
         targetStudent.starredModules.push(moduleId);
         const updatedStarredModules = await targetStudent.starredModules;
@@ -290,7 +290,7 @@ module.exports = {
       const targetModule = Module.findById(moduleId);
 
       if (targetModule === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (targetStudent.starredModules.includes(moduleId)) {
         const index = targetStudent.starredModules.indexOf(moduleId);
         targetStudent.starredModules.splice(index, 1);
@@ -309,7 +309,7 @@ module.exports = {
       }
       const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (!targetStudent.starredQuestions.includes(questionId)) {
         targetStudent.starredQuestions.push(questionId);
         const updatedStarredQuestions = await targetStudent.starredQuestions;
@@ -322,11 +322,11 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
       const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
         const index = targetStudent.starredQuestions.indexOf(questionId);
         targetStudent.starredQuestions.splice(index, 1);
@@ -340,7 +340,7 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
       // will be called after submitAnswer()
       const targetQuestion = Question.findById(questionId);

@@ -18,7 +18,7 @@ module.exports = {
         } catch (error) {
           const student = checkStudentAuth(context);
           if (!student) {
-            throw AuthenticationError;
+            throw new AuthenticationError();
           }
         }
       }
@@ -26,7 +26,7 @@ module.exports = {
       const categories = await Category.find();
 
       if (!categories) {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       } else {
         return categories;
       }
@@ -37,7 +37,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetQuestionTemplates = await targetAdmin.questionTemplates;
       if (targetQuestionTemplates !== null) {
@@ -48,7 +48,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
     async getChallengesByCategory(_, { categoryId }, context) {
@@ -56,7 +56,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetChallenges = await targetAdmin.challenges;
       if (targetChallenges !== null) {
@@ -67,7 +67,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
     async getModulesByCategory(_, { categoryId }, context) {
@@ -75,7 +75,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw AuthenticationError;
+        throw new AuthenticationError();
       }
       const targetModules = await targetAdmin.modules;
       if (targetModules !== null) {
@@ -86,7 +86,7 @@ module.exports = {
           return matches;
         }
       } else {
-        throw UserInputError("Invalid input");
+        throw new UserInputError("Invalid input");
       }
     },
   },

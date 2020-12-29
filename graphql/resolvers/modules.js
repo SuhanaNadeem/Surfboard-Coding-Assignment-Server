@@ -109,7 +109,7 @@ module.exports = {
         }
         return studentModule.value;
       }
-      throw UserInputError("Invalid input");
+      throw new UserInputError("Invalid input");
     },
   },
 };
