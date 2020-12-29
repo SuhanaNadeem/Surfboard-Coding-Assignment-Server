@@ -227,7 +227,7 @@ module.exports = {
 
     async submitAnswer(
       _,
-      { answer, studentId, categoryId, questionId, moduleId },
+      { answer, categoryId, questionId, moduleId },
       context
     ) {
       try {
@@ -235,14 +235,14 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        return None;
+        throw UserInputError;
       }
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
       });
       const newAnswer = new Answer({
         answer,
-        studentId,
+        studentId=targetStudent.id,
         categoryId,
         questionId,
         moduleId,

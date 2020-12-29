@@ -269,7 +269,6 @@ module.exports = gql`
       categoryId: String!
       questionId: String!
       moduleId: String!
-      studentId: String!
     ): Answer! # done
     verifyAnswer(
       categoryId: String!
