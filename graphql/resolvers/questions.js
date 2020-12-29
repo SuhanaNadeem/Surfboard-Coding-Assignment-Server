@@ -1,5 +1,6 @@
 const checkStudentAuth = require("../../util/checkStudentAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
+const checkMentorAuth = require("../../util/checkMentorAuth");
 
 const { UserInputError, AuthenticationError } = require("apollo-server");
 
@@ -8,6 +9,28 @@ const Admin = require("../../models/Admin");
 
 module.exports = {
   Query: {
+    async getQuestions(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const questions = await QuestionTemplate.find();
+
+      if (!questions) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return questions;
+      }
+    },
     async getHintByQuestion(_, { questionId }, context) {
       const targetQuestion = Question.findById(questionId);
       if (targetQuestion === null) {

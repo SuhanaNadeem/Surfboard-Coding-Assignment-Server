@@ -4,12 +4,9 @@ const studentResolvers = require("./students");
 const categoryResolvers = require("./categories");
 const moduleResolvers = require("./modules");
 const questionResolvers = require("./questions");
+const questionTemplateResolvers = require("./questionTemplates");
 
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime,
-} = require("graphql-iso-date");
+const { GraphQLDateTime } = require("graphql-iso-date");
 
 module.exports = {
   DateTime: GraphQLDateTime,
@@ -20,6 +17,7 @@ module.exports = {
     ...categoryResolvers.Query,
     ...moduleResolvers.Query,
     ...questionResolvers.Query,
+    ...questionTemplateResolvers.Query,
   },
   Mutation: {
     ...adminResolvers.Mutation,

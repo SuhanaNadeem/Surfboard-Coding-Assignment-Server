@@ -148,7 +148,12 @@ module.exports = {
         questionDescription,
       });
 
-      if (!targetQuestion) {
+      const targetQuestionTemplate = await QuestionTemplate.findById(
+        questionTemplateId
+      );
+      if (!targetQuestionTemplate) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetQuestion) {
         const newQuestion = new Question({
           image,
           questionDescription,
@@ -178,11 +183,13 @@ module.exports = {
         throw new AuthenticationError();
       }
 
-      const targetQuestionTemplate = QuestionTemplate.findOne({
+      const targetQuestionTemplate = await QuestionTemplate.findOne({
         inputFields,
       });
-
-      if (!targetQuestionTemplate) {
+      const targetCategory = await Category.findById(categoryId);
+      if (!targetCategory) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetQuestionTemplate) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
           type,
@@ -211,7 +218,10 @@ module.exports = {
       const questions = [];
       const comments = [];
 
-      if (!targetModule) {
+      const targetCategory = await Category.findById(categoryId);
+      if (!targetCategory) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetModule) {
         const newModule = new Module({
           name,
           categoryId,
@@ -242,7 +252,10 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetChallenge = await Challenge.findOne({ questionDescription });
-      if (!targetChallenge) {
+      const targetCategory = await Category.findById(categoryId);
+      if (!targetCategory) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetChallenge) {
         const newChallenge = new Challenge({
           questionDescription,
           categoryId,
@@ -411,7 +424,7 @@ module.exports = {
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.modules.indexOf(questionTemplateId);
+        const index = targetAdmin.modules.indexOf(moduleId);
         targetAdmin.modules.splice(index, 1);
         await targetAdmin.save();
         await targetModule.delete();
@@ -427,9 +440,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetQuestion = await targetAdmin.modules.questions.findById(
-        questionId
-      );
+      const targetQuestion = await Question.findById(questionId);
       if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {

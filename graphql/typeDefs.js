@@ -153,9 +153,10 @@ module.exports = gql`
     getBadgesByStudent: [String]! # done
     getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
-    getCategories: [Category]!
-    getModules: [Module]!
-
+    getCategories: [Category]! # done checked
+    getModules: [Module]! # done checked
+    getQuestionTemplates: [QuestionTemplate]! # done checked
+    getQuestions: [Question]! # done
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [String]! # done
     getChallengesByCategory(categoryId: String!): [String]! # done
@@ -197,7 +198,7 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(name: String!, categoryId: String!, format: String): Module! # done
+    createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
     createNewQuestion(
       image: String
       questionDescription: String!
@@ -216,7 +217,7 @@ module.exports = gql`
       newCategoryId: String!
       newType: String!
       newFormat: String
-    ): Module! # done
+    ): Module! # done checked
     editQuestion(
       questionId: String!
       newImage: String
@@ -230,7 +231,7 @@ module.exports = gql`
       newInputFields: [String]!
       newType: String!
     ): QuestionTemplate! # done
-    deleteModule(moduleId: String!): [String]! # done
+    deleteModule(moduleId: String!): [String]! # done checked
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
     createNewCategory(name: String!): Category! # done checked
