@@ -234,9 +234,7 @@ module.exports = gql`
     deleteModule(moduleId: String!): [String]! # done
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
-    createNewCategory(
-      name: String! # modules and challenges may not exist but instead need to be added
-    ): Category! # done
+    createNewCategory(name: String!): [String]! # done
     editCategory(categoryId: String!, newName: String!): Category! # done
     deleteCategory(categoryId: String!): [String]! # done
     createNewChallenge(

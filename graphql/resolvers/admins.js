@@ -267,7 +267,6 @@ module.exports = {
       } else {
         const newCategory = new Category({
           name,
-
           createdAt: new Date(),
         });
 
