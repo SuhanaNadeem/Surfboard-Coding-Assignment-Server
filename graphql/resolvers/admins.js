@@ -22,7 +22,6 @@ function generateToken(admin) {
       email: admin.email,
     },
     SECRET_KEY
-    //{ expiresIn: "3h" }
   );
 }
 
@@ -160,6 +159,7 @@ module.exports = {
         await newQuestion.save();
         targetAdmin.modules.questions.push(newQuestion.id);
         await targetAdmin.modules.questions.save();
+        await targetAdmin.save();
 
         const updatedQuestions = await targetAdmin.modules.questions;
         return updatedQuestions;
@@ -194,6 +194,8 @@ module.exports = {
         });
         targetAdmin.questionTemplates.push(newQuestionTemplate.id);
         await targetAdmin.questionTemplates.save();
+        await targetAdmin.save();
+
         const updatedQuestionTemplates = await targetAdmin.questionTemplates;
         return updatedQuestionTemplates;
       } else {
@@ -225,6 +227,8 @@ module.exports = {
 
         await targetAdmin.modules.push(newModule.id);
         await targetAdmin.modules.save();
+        await targetAdmin.save();
+
         const updatedModules = await targetAdmin.modules;
         return updatedModules;
       } else {
@@ -255,6 +259,7 @@ module.exports = {
 
         await targetAdmin.challenges.push(newChallenge.id);
         await targetAdmin.challenges.save();
+        await targetAdmin.save();
         const updatedChallenges = await targetAdmin.challenges;
         return updatedChallenges;
       } else {
@@ -284,8 +289,6 @@ module.exports = {
         });
         await newCategory.save();
         targetAdmin.categories.push(newCategory.id);
-
-        // const updatedCategories = await targetAdmin.categories;
         await targetAdmin.save();
         return newCategory;
       }
@@ -498,8 +501,10 @@ module.exports = {
         throw UserInputError("Invalid input");
       } else {
         await targetCategory.delete();
+        const index = targetAdmin.categories.indexOf(questionId);
+        targetAdmin.categories.splice(index, 1);
         await targetAdmin.categories.save();
-        //TODO Splice from admin and take out the if null and just make admin lists required - edit model, getcategories query and new = save
+        //TODO Splice from admin  getcategories query and new = save
         const updatedCategories = await targetAdmin.categories;
         return updatedCategories;
       }

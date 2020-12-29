@@ -86,7 +86,7 @@ module.exports = {
       return targetModule;
     },
 
-    async changeModulePoints(
+    async incrementModulePoints(
       _,
       { moduleId, answerCorrect, numToIncrement },
       context

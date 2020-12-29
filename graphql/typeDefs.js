@@ -154,6 +154,7 @@ module.exports = gql`
     getBadgesByStudent: [String]! # done
     getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
+    getCategories: [Category]!
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [String]! # done
     getChallengesByCategory(categoryId: String!): [String]! # done

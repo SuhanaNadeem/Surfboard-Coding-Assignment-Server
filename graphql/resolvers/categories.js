@@ -1,10 +1,37 @@
 const checkAdminAuth = require("../../util/checkAdminAuth");
+const checkMentorAuth = require("../../util/checkMentorAuth");
+const checkStudentAuth = require("../../util/checkStudentAuth");
 
 const Admin = require("../../models/Admin");
+const Category = require("../../models/Category");
+
 const { UserInputError, AuthenticationError } = require("apollo-server");
 
 module.exports = {
   Query: {
+    async getCategories(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw AuthenticationError;
+          }
+        }
+      }
+
+      const categories = await Category.find();
+
+      if (!categories) {
+        throw UserInputError("Invalid input");
+      } else {
+        return categories;
+      }
+    },
+
     async getQuestionTemplatesByCategory(_, { categoryId }, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -63,6 +90,4 @@ module.exports = {
       }
     },
   },
-
-  Mutation: {},
 };
