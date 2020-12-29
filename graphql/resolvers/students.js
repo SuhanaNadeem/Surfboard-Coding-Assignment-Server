@@ -32,7 +32,7 @@ module.exports = {
         const targetStudent = await Student.findById(student.id);
         return targetStudent;
       } catch (error) {
-        throw new Error(error);
+        throw UserInputError("Invalid input");
       }
     },
     async getCompletedModulesByStudent(_, {}, context) {
@@ -227,7 +227,7 @@ module.exports = {
 
     async submitAnswer(
       _,
-      { answer, categoryId, questionId, moduleId },
+      { answer, studentId, categoryId, questionId, moduleId },
       context
     ) {
       try {
@@ -235,14 +235,14 @@ module.exports = {
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         console.log(error);
-        throw UserInputError;
+        throw UserInputError("Invalid input");
       }
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
       });
       const newAnswer = new Answer({
         answer,
-        studentId=targetStudent.id,
+        studentId,
         categoryId,
         questionId,
         moduleId,

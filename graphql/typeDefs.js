@@ -13,6 +13,7 @@ module.exports = gql`
     modules: [String]
     questionTemplates: [String]
     challenges: [String]
+    categories: [String]
 
     createdAt: DateTime!
     token: String
@@ -174,23 +175,23 @@ module.exports = gql`
       email: String!
       password: String!
       confirmPassword: String!
-    ): Admin!
-    loginAdmin(email: String!, password: String!): Admin!
+    ): Admin! # done checked
+    loginAdmin(email: String!, password: String!): Admin! # done checked
     deleteAdmin(adminId: String!): String # done
     signupMentor(
       email: String!
       password: String!
       confirmPassword: String!
-    ): Mentor!
-    loginMentor(email: String!, password: String!): Mentor!
+    ): Mentor! # done checked
+    loginMentor(email: String!, password: String!): Mentor! # done checked
     deleteMentor(mentorId: String!): String # done
     signupStudent(
       email: String!
       password: String!
       confirmPassword: String!
-    ): Student! # done
+    ): Student! # done checked
     deleteStudent(studentId: String!): String # done
-    loginStudent(email: String!, password: String!): Student! # done
+    loginStudent(email: String!, password: String!): Student! # done checked
     addCompletedModule(moduleId: String!): [String] # done
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
@@ -235,6 +236,18 @@ module.exports = gql`
     deleteModule(moduleId: String!): [String]! # done
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
+    createNewCategory(
+      name: String!
+      modules: [String]!
+      challenges: [String]!
+    ): Category!
+    editCategory(
+      categoryId: String!
+      newName: String!
+      newModules: [String]!
+      newChallenges: [String]!
+    ): Category!
+    deleteCategory(categoryId: String!): [String]!
     createNewChallenge(
       categoryId: String!
       questionDescription: String!
@@ -245,11 +258,7 @@ module.exports = gql`
       newquestionDescription: String!
       newImage: String
     ): Challenge! # done
-    deleteChallenge(
-      categoryId: String!
-      questionDescription: String!
-      image: String
-    ): Challenge! # done
+    deleteChallenge(challengeId: String!): [String]! # done
     createHint(
       questionId: String!
       categoryId: String!
@@ -269,6 +278,7 @@ module.exports = gql`
       categoryId: String!
       questionId: String!
       moduleId: String!
+      studentId: String!
     ): Answer! # done
     verifyAnswer(
       categoryId: String!
