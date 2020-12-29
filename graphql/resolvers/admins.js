@@ -198,7 +198,7 @@ module.exports = {
       }
     },
 
-    async createNewModule(_, { name, type, categoryId, format }, context) {
+    async createNewModule(_, { name, categoryId, format }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -210,12 +210,16 @@ module.exports = {
         name,
       });
 
+      const questions = [];
+      const comments = [];
+
       if (!targetModule) {
         const newModule = new Module({
           name,
-          type,
           categoryId,
           format,
+          questions,
+          comments,
           createdAt: new Date(),
         });
 
@@ -282,7 +286,7 @@ module.exports = {
     },
     async editModule(
       _,
-      { moduleId, newName, newType, newCategoryId, newFormat },
+      { moduleId, newName, newCategoryId, newFormat },
       context
     ) {
       try {
@@ -298,7 +302,6 @@ module.exports = {
         targetModule.name = newName;
         targetModule.categoryId = newCategoryId;
         targetModule.format = newFormat;
-        targetModule.type = newType;
 
         await targetModule.save();
         return targetModule;

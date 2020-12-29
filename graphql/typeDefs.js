@@ -67,11 +67,10 @@ module.exports = gql`
   type Module {
     id: String!
     name: String! # ASSUMING THIS IS UNIQUE
-    type: String! # learn or practice
     categoryId: String!
-    format: String # video or article | question type
-    comments: [String]
-    questions: [String]
+    format: String! # video or article | question type
+    comments: [String]!
+    questions: [String]!
     createdAt: DateTime!
   }
 
@@ -196,7 +195,7 @@ module.exports = gql`
     addInProgressModule(moduleId: String!): [String] # done
     addBadge(badgeId: String!): [String] # done
     # For admin
-    createNewModule(categoryId: String!, type: String!, format: String): Module! # done
+    createNewModule(categoryId: String!, format: String): Module! # done
     createNewQuestion(
       image: String
       questionDescription: String!
