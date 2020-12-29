@@ -92,12 +92,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const checkStudent = await Student.findOne({ email });
       if (checkStudent) {
-        throw new UserInputError("Invalid input")("Email already exists", {
+        throw new UserInputError("Email already exists", {
           errors: {
             email: "An student with this email already exists",
           },
@@ -122,14 +122,14 @@ module.exports = {
     async loginStudent(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const student = await Student.findOne({ email });
 
       if (!student) {
         errors.email = "Student not found";
-        throw new UserInputError("Invalid input")("Student not found", {
+        throw new UserInputError("Student not found", {
           errors,
         });
       }
@@ -138,7 +138,7 @@ module.exports = {
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Invalid input")("Wrong credentials", {
+        throw new UserInputError("Wrong credentials", {
           errors,
         });
       }

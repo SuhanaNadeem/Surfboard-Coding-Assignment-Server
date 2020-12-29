@@ -47,12 +47,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const checkAdmin = await Admin.findOne({ email });
       if (checkAdmin) {
-        throw new UserInputError("Invalid input")("Email already exists", {
+        throw new UserInputError("Email already exists", {
           errors: {
             email: "An admin with this email already exists",
           },
@@ -74,18 +74,18 @@ module.exports = {
       return { ...res._doc, id: res._id, token };
     },
 
-    async loginAdmin(_, {}, context) {
+    async loginAdmin(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
 
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const admin = await Admin.findOne({ email });
 
       if (!admin) {
         errors.email = "Admin not found";
-        throw new UserInputError("Invalid input")("Admin not found", {
+        throw new UserInputError("Admin not found", {
           errors,
         });
       }
@@ -94,7 +94,7 @@ module.exports = {
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Invalid input")("Wrong credentials", {
+        throw new UserInputError("Wrong credentials", {
           errors,
         });
       }
@@ -135,7 +135,7 @@ module.exports = {
       }
 
       const targetQuestion = Question.findOne({
-        questionDescription: questionDescription,
+        questionDescription,
       });
 
       if (targetQuestion === null) {
@@ -258,6 +258,7 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
+        console.log(error);
         throw AuthenticationError;
       }
       const targetCategory = Category.findOne({ name });

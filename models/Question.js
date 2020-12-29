@@ -9,7 +9,7 @@ const questionSchema = new Schema({
   },
   image: String,
   questionDescription: String,
-  expectedAnswers: [String], // TODO is this allowed
+  expectedAnswers: [String],
   createdAt: Date,
   hint: String,
   questionTemplateId: String,

@@ -56,12 +56,12 @@ module.exports = {
         confirmPassword
       );
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const checkMentor = await Mentor.findOne({ email });
       if (checkMentor) {
-        throw new UserInputError("Invalid input")("Email already exists", {
+        throw new UserInputError("Email already exists", {
           errors: {
             email: "An mentor with this email already exists",
           },
@@ -87,14 +87,14 @@ module.exports = {
       const { errors, valid } = validateUserLoginInput(email, password);
 
       if (!valid) {
-        throw new UserInputError("Invalid input")("Errors", { errors });
+        throw new UserInputError("Errors", { errors });
       }
 
       const mentor = await Mentor.findOne({ email });
 
       if (!mentor) {
         errors.email = "Mentor not found";
-        throw new UserInputError("Invalid input")("Mentor not found", {
+        throw new UserInputError("Mentor not found", {
           errors,
         });
       }
@@ -103,7 +103,7 @@ module.exports = {
 
       if (!match) {
         errors.password = "Wrong credentials";
-        throw new UserInputError("Invalid input")("Wrong credentials", {
+        throw new UserInputError("Wrong credentials", {
           errors,
         });
       }
