@@ -40,7 +40,7 @@ module.exports = {
   },
 
   Mutation: {
-    async signupAdmin(_, { email, password, confirmPassword }, context) {
+    async signupAdmin(_, { name, email, password, confirmPassword }, context) {
       var { valid, errors } = validateUserRegisterInput(
         email,
         password,
@@ -61,9 +61,19 @@ module.exports = {
 
       password = await bcrypt.hash(password, 12);
 
+      const modules = [];
+      const questionTemplates = [];
+      const challenges = [];
+      const categories = [];
+
       const newAdmin = new Admin({
+        name,
         email,
         password,
+        modules,
+        questionTemplates,
+        challenges,
+        categories,
         createdAt: new Date(),
       });
 
@@ -138,7 +148,7 @@ module.exports = {
         questionDescription,
       });
 
-      if (targetQuestion === null) {
+      if (targetQuestion == null) {
         const newQuestion = new Question({
           image,
           questionDescription,
@@ -175,7 +185,7 @@ module.exports = {
         inputFields,
       });
 
-      if (targetQuestionTemplate === null) {
+      if (targetQuestionTemplate == null) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
           type,
@@ -204,7 +214,7 @@ module.exports = {
         name,
       });
 
-      if (targetModule === null) {
+      if (targetModule == null) {
         const newModule = new Module({
           name,
           type,
@@ -235,7 +245,7 @@ module.exports = {
         throw AuthenticationError;
       }
       const targetChallenge = Challenge.findOne({ questionDescription });
-      if (targetChallenge === null) {
+      if (targetChallenge == null) {
         const newChallenge = new Challenge({
           questionDescription,
           categoryId,
@@ -261,20 +271,23 @@ module.exports = {
         console.log(error);
         throw AuthenticationError;
       }
-      const targetCategory = Category.findOne({ name });
-      if (targetCategory !== null) {
-        const unchangedCategories = await targetAdmin.categories;
-        return unchangedCategories;
+
+      const targetCategory = await Category.findOne({ name });
+      if (targetCategory) {
+        console.log(targetCategory);
+
+        return targetCategory;
       } else {
         const newCategory = new Category({
           name,
           createdAt: new Date(),
         });
+        await newCategory.save();
+        targetAdmin.categories.push(newCategory.id);
 
-        await targetAdmin.categories.push(newCategory.id);
-        await targetAdmin.categories.save();
-        const updatedCategories = await targetAdmin.categories;
-        return updatedCategories;
+        // const updatedCategories = await targetAdmin.categories;
+        await targetAdmin.save();
+        return newCategory;
       }
     },
     async editModule(
@@ -289,7 +302,7 @@ module.exports = {
         throw AuthenticationError;
       }
       var targetModule = await targetAdmin.modules.findById(moduleId);
-      if (targetModule === null) {
+      if (targetModule == null) {
         throw UserInputError("Invalid input");
       } else {
         targetModule.name = newName;
@@ -320,7 +333,7 @@ module.exports = {
         throw AuthenticationError;
       }
       var targetQuestion = await Question.findById(questionId);
-      if (targetQuestion === null) {
+      if (targetQuestion == null) {
         throw UserInputError("Invalid input");
       } else {
         targetQuestion.image = newImage;
@@ -347,7 +360,7 @@ module.exports = {
       var targetQuestionTemplate = await targetAdmin.modules.questions.findById(
         questionTemplateId
       );
-      if (targetQuestionTemplate === null) {
+      if (targetQuestionTemplate == null) {
         throw UserInputError("Invalid input");
       } else {
         targetQuestionTemplate.categoryId = newCategory;
@@ -370,7 +383,7 @@ module.exports = {
         throw AuthenticationError;
       }
       var targetChallenge = await Challenge.findById(challengeId);
-      if (targetChallenge === null) {
+      if (targetChallenge == null) {
         throw UserInputError("Invalid input");
       } else {
         targetChallenge.categoryId = newCategoryId;
@@ -388,7 +401,7 @@ module.exports = {
         throw AuthenticationError;
       }
       var targetCategory = await Category.findById(categoryId);
-      if (targetCategory === null) {
+      if (targetCategory == null) {
         throw UserInputError("Invalid input");
       } else {
         targetCategory.name = newName;
@@ -405,7 +418,7 @@ module.exports = {
         throw AuthenticationError;
       }
       const targetModule = await targetAdmin.modules.findById(moduleId);
-      if (targetModule === null) {
+      if (targetModule == null) {
         throw UserInputError("Invalid input");
       } else {
         await targetModule.delete();
@@ -425,7 +438,7 @@ module.exports = {
       const targetQuestion = await targetAdmin.modules.questions.findById(
         questionId
       );
-      if (targetQuestion === null) {
+      if (targetQuestion == null) {
         throw UserInputError("Invalid input");
       } else {
         await targetQuestion.delete();
@@ -445,7 +458,7 @@ module.exports = {
       const targetQuestionTemplate = await targetAdmin.questionTemplates.findById(
         questionTemplateId
       );
-      if (targetQuestionTemplate === null) {
+      if (targetQuestionTemplate == null) {
         throw UserInputError("Invalid input");
       } else {
         await targetQuestionTemplate.delete();
@@ -464,7 +477,7 @@ module.exports = {
       const targetChallenge = await targetAdmin.challenges.findById(
         challengeId
       );
-      if (targetChallenge === null) {
+      if (targetChallenge == null) {
         throw UserInputError("Invalid input");
       } else {
         await targetChallenge.delete();
@@ -481,11 +494,12 @@ module.exports = {
         throw AuthenticationError;
       }
       const targetCategory = await targetAdmin.categories.findById(categoryId);
-      if (targetCategory === null) {
+      if (targetCategory == null) {
         throw UserInputError("Invalid input");
       } else {
         await targetCategory.delete();
         await targetAdmin.categories.save();
+        //TODO Splice from admin and take out the if null and just make admin lists required - edit model, getcategories query and new = save
         const updatedCategories = await targetAdmin.categories;
         return updatedCategories;
       }

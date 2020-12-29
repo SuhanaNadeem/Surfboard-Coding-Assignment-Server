@@ -6,14 +6,14 @@ module.exports = gql`
   type Admin {
     id: String!
 
-    name: String
+    name: String!
     password: String!
     email: String!
 
-    modules: [String]
-    questionTemplates: [String]
-    challenges: [String]
-    categories: [String]
+    modules: [String]!
+    questionTemplates: [String]!
+    challenges: [String]!
+    categories: [String]!
 
     createdAt: DateTime!
     token: String
@@ -170,6 +170,7 @@ module.exports = gql`
   # actions
   type Mutation {
     signupAdmin(
+      name: String!
       email: String!
       password: String!
       confirmPassword: String!
@@ -234,7 +235,7 @@ module.exports = gql`
     deleteModule(moduleId: String!): [String]! # done
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
-    createNewCategory(name: String!): [String]! # done
+    createNewCategory(name: String!): Category! # done
     editCategory(categoryId: String!, newName: String!): Category! # done
     deleteCategory(categoryId: String!): [String]! # done
     createNewChallenge(

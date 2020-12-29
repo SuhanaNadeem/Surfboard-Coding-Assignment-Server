@@ -11,6 +11,10 @@ const adminSchema = new Schema({
   name: String,
   password: String,
   email: String,
+  modules: [String],
+  questionTemplates: [String],
+  challenges: [String],
+  categories: [String],
   createdAt: Date,
 });
 
