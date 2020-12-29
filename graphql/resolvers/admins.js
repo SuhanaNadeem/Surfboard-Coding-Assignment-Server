@@ -184,7 +184,6 @@ module.exports = {
         });
         targetAdmin.questionTemplates.push(newQuestionTemplate.id);
         await targetAdmin.questionTemplates.save();
-
         const updatedQuestionTemplates = await targetAdmin.questionTemplates;
         return updatedQuestionTemplates;
       } else {
@@ -254,7 +253,7 @@ module.exports = {
       }
     },
 
-    async createNewCategory(_, { name, modules, challenges }, context) {
+    async createNewCategory(_, { name }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -268,8 +267,7 @@ module.exports = {
       } else {
         const newCategory = new Category({
           name,
-          modules,
-          challenges,
+
           createdAt: new Date(),
         });
 
@@ -382,11 +380,7 @@ module.exports = {
         return targetChallenge;
       }
     },
-    async editCategory(
-      _,
-      { categoryId, newName, newModules, newChallenges },
-      context
-    ) {
+    async editCategory(_, { categoryId, newName }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -398,8 +392,7 @@ module.exports = {
         throw UserInputError("Invalid input");
       } else {
         targetCategory.name = newName;
-        targetCategory.modules = newModules;
-        targetCategory.challenges = newChallenges;
+
         await targetCategory.save();
         return targetCategory;
       }

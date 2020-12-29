@@ -79,8 +79,6 @@ module.exports = gql`
     id: String!
     name: String! # CAD, elec, prog
     createdAt: DateTime!
-    modules: [String]!
-    challenges: [String]!
   }
 
   type Badge {
@@ -237,16 +235,9 @@ module.exports = gql`
     deleteQuestion(questionId: String!): [String]! # done
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
     createNewCategory(
-      name: String!
-      modules: [String]!
-      challenges: [String]!
+      name: String! # modules and challenges may not exist but instead need to be added
     ): Category! # done
-    editCategory(
-      categoryId: String!
-      newName: String!
-      newModules: [String]!
-      newChallenges: [String]!
-    ): Category! # done
+    editCategory(categoryId: String!, newName: String!): Category! # done
     deleteCategory(categoryId: String!): [String]! # done
     createNewChallenge(
       categoryId: String!
