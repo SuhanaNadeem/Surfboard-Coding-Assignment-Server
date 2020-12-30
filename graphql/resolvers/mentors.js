@@ -35,6 +35,19 @@ module.exports = {
         throw new Error(err);
       }
     },
+    async getMentors(_, {}, context) {
+      try {
+        const mentor = checkMentorAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const mentors = await Mentor.find();
+      if (!mentors) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return mentors;
+      }
+    },
     async getStudentsByMentor(_, {}, context) {
       try {
         const mentor = checkMentorAuth(context);
@@ -121,8 +134,8 @@ module.exports = {
           throw new Error(error);
         }
       }
-      const targetMentor = Mentor.findById(mentorId);
-      if (targetMentor !== null) {
+      const targetMentor = await Mentor.findById(mentorId);
+      if (targetMentor) {
         await targetMentor.delete();
         return "Delete Successful";
       } else {

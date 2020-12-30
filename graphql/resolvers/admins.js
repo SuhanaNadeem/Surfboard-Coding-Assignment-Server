@@ -36,6 +36,19 @@ module.exports = {
         throw new AuthenticationError();
       }
     },
+    async getAdmins(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admins = await Admin.find();
+      if (!admins) {
+        throw new UserInputError("invalid input");
+      } else {
+        return admins;
+      }
+    },
   },
 
   Mutation: {
@@ -122,10 +135,9 @@ module.exports = {
           throw new Error(error);
         }
       }
-      const targetAdmin = Admin.findById(adminId);
+      const targetAdmin = await Admin.findById(adminId);
       if (targetAdmin) {
         await targetAdmin.delete();
-        await targetAdmin.save();
         return "Delete Successful";
       } else {
         throw new UserInputError("Invalid input");

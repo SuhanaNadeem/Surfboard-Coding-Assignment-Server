@@ -145,8 +145,11 @@ module.exports = gql`
   # retrieve information
   type Query {
     getAdmin: Admin! # done checked
-    getMentor: Mentor! # done
-    getStudent: Student! # done
+    getAdmins: [Admin]! # done checked
+    getMentor: Mentor! # done checked
+    getMentosr: [Mentor]! # done checked
+    getStudent: Student! # done checked
+    getStudents: [Student]! # done checked
     # for dashboard
     getCompletedModulesByStudent: [String]! # done
     getInProgressModulesByStudent: [String]! # done

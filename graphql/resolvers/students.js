@@ -35,6 +35,20 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
     },
+    async getStudents(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const students = await Student.find();
+      if (!students) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return students;
+      }
+    },
+
     async getCompletedModulesByStudent(_, {}, context) {
       try {
         const student = checkStudentAuth(context);
@@ -157,8 +171,8 @@ module.exports = {
           throw new Error(error);
         }
       }
-      const targetStudent = Student.findById(studentId);
-      if (targetStudent !== null) {
+      const targetStudent = await Student.findById(studentId);
+      if (targetStudent) {
         await targetStudent.delete();
         return "Delete Successful";
       } else {
