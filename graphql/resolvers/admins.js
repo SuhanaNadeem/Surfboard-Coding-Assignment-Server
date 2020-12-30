@@ -173,7 +173,7 @@ module.exports = {
 
     async createNewQuestionTemplate(
       _,
-      { categoryId, type, inputFields },
+      { name, categoryId, type, inputFields },
       context
     ) {
       try {
@@ -184,21 +184,25 @@ module.exports = {
       }
 
       const targetQuestionTemplate = await QuestionTemplate.findOne({
-        inputFields,
+        name,
       });
       const targetCategory = await Category.findById(categoryId);
+
       if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else if (!targetQuestionTemplate) {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
+          name,
           type,
           inputFields,
           createdAt: new Date(),
         });
+
         await newQuestionTemplate.save();
         targetAdmin.questionTemplates.push(newQuestionTemplate.id);
         await targetAdmin.save();
+
         return newQuestionTemplate;
       } else {
         return targetQuestionTemplate;
@@ -352,7 +356,7 @@ module.exports = {
 
     async editQuestionTemplate(
       _,
-      { questionTemplateId, newCategory, newInputFields, newType },
+      { questionTemplateId, newName, newCategoryId, newInputFields, newType },
       context
     ) {
       try {
@@ -367,9 +371,11 @@ module.exports = {
       if (!targetQuestionTemplate) {
         throw new UserInputError("Invalid input");
       } else {
-        targetQuestionTemplate.categoryId = newCategory;
+        targetQuestionTemplate.categoryId = newCategoryId;
         targetQuestionTemplate.inputFields = newInputFields;
         targetQuestionTemplate.type = newType;
+        targetQuestionTemplate.name = newName;
+
         await targetQuestionTemplate.save();
         return targetQuestionTemplate;
       }

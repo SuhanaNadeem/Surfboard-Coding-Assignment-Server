@@ -23,7 +23,6 @@ module.exports = {
       }
 
       const questionTemplates = await QuestionTemplate.find();
-
       if (!questionTemplates) {
         throw new UserInputError("Invalid input");
       } else {

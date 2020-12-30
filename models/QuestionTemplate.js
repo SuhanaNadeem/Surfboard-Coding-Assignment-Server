@@ -9,8 +9,9 @@ const questionTemplateSchema = new Schema({
   },
   type: String,
   categoryId: String,
-  inputFields: [String], // TODO is this allowed -- have to change anything?
+  inputFields: [String],
   createdAt: Date,
+  name: String,
 });
 
 module.exports = model("Question Template", questionTemplateSchema);

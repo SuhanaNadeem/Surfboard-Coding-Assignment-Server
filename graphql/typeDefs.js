@@ -110,6 +110,7 @@ module.exports = gql`
   # not the card itself, just available templates
   type QuestionTemplate {
     id: String!
+    name: String!
     type: String! # learn or practice
     categoryId: String! # CAD, electrical, programming
     inputFields: [String]! # diff things you can enter
@@ -158,10 +159,10 @@ module.exports = gql`
     getQuestionTemplates: [QuestionTemplate]! # done checked
     getQuestions: [Question]! # done
     #  like dif form fields to create questions
-    getQuestionTemplatesByCategory(categoryId: String!): [String]! # done
+    getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]! # done checked
     getChallengesByCategory(categoryId: String!): [String]! # done
     # for student's learn page (categories.js)
-    getModulesByCategory(categoryId: String!): [String]! # done
+    getModulesByCategory(categoryId: String!): [Module]! # done
     # can be of any of the types
     getQuestionsByModule(moduleId: String!): [String]! # done
     getCommentsByModule(moduleId: String!): [String]! # done
@@ -207,6 +208,7 @@ module.exports = gql`
       questionTemplateId: String!
     ): Question! # done
     createNewQuestionTemplate(
+      name: String!
       categoryId: String!
       inputFields: [String]!
       type: String!
@@ -226,6 +228,7 @@ module.exports = gql`
       newHint: String
     ): Question! # done
     editQuestionTemplate(
+      newName: String!
       questionTemplateId: String!
       newCategoryId: String!
       newInputFields: [String]!
