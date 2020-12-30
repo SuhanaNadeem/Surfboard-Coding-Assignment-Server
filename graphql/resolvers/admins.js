@@ -159,7 +159,7 @@ module.exports = {
       const targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
-      const targetModule = Module.findById(moduleId);
+      var targetModule = await Module.findById(moduleId);
       if (!targetQuestionTemplate || !targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetQuestion) {
@@ -172,7 +172,11 @@ module.exports = {
           createdAt: new Date(),
         });
         await newQuestion.save();
-        await targetModule.questions.push(newQuestion.id);
+        console.log(targetModule.questions);
+
+        targetModule.questions.push(newQuestion.id);
+
+        await targetModule.save();
         await targetAdmin.save();
         return newQuestion;
       } else {
@@ -466,15 +470,17 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
+      const targetModule = await Module.findOne({ questions: questionId });
       const targetQuestion = await Question.findById(questionId);
-      if (!targetQuestion) {
+      if (!targetQuestion || !targetModule) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.modules.questions.indexOf(targetQuestion);
-        targetAdmin.modules.questions.splice(index, 1);
-        await targetAdmin.save();
+        const index = targetModule.questions.indexOf(questionId);
+        targetModule.questions.splice(index, 1);
+        await targetModule.save();
         await targetQuestion.delete();
-        const updatedQuestions = targetAdmin.modules.questions;
+        await targetModule.save();
+        const updatedQuestions = targetModule.questions;
         return updatedQuestions;
       }
     },

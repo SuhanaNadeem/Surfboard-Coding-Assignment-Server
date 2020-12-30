@@ -206,7 +206,7 @@ module.exports = gql`
       expectedAnswers: [String]
       hint: String!
       questionTemplateId: String!
-    ): Question! # done
+    ): Question! # done checked
     createNewQuestionTemplate(
       name: String!
       categoryId: String!
@@ -217,8 +217,7 @@ module.exports = gql`
       moduleId: String!
       newName: String!
       newCategoryId: String!
-      newType: String!
-      newFormat: String
+      newFormat: String!
     ): Module! # done checked
     editQuestion(
       questionId: String!
@@ -226,8 +225,9 @@ module.exports = gql`
       newModuleId: String!
       newImage: String!
       newQuestionDescription: String!
+      newHint: String!
       newExpectedAnswers: [String]
-    ): Question! # done
+    ): Question! # done checked
     editQuestionTemplate(
       newName: String!
       questionTemplateId: String!
