@@ -144,7 +144,7 @@ module.exports = gql`
 
   # retrieve information
   type Query {
-    getAdmin: Admin! # done
+    getAdmin: Admin! # done checked
     getMentor: Mentor! # done
     getStudent: Student! # done
     # for dashboard
@@ -155,6 +155,7 @@ module.exports = gql`
     getMentorsByStudent: [String]! # done
     getCategories: [Category]! # done checked
     getModules: [Module]! # done checked
+    getChallenges: [Challenge]! # done checked
     getQuestionTemplates: [QuestionTemplate]! # done checked
     getQuestions: [Question]! # done
     #  like dif form fields to create questions
@@ -236,7 +237,7 @@ module.exports = gql`
       newType: String!
     ): QuestionTemplate! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
-    deleteQuestion(questionId: String!): [String]! # done
+    deleteQuestion(questionId: String!): [String]! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked
     editCategory(categoryId: String!, newName: String!): Category! # done checked
@@ -245,13 +246,14 @@ module.exports = gql`
       categoryId: String!
       questionDescription: String!
       image: String
-    ): Challenge! # done
+    ): Challenge! # done checked
     editChallenge(
+      challengeId: String!
       newCategoryId: String!
-      newquestionDescription: String!
+      newQuestionDescription: String!
       newImage: String
-    ): Challenge! # done
-    deleteChallenge(challengeId: String!): [String]! # done
+    ): Challenge! # done checked
+    deleteChallenge(challengeId: String!): [String]! # done checked
     # createHint(questionId: String!, hintDescription: String!): Hint! # done
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done

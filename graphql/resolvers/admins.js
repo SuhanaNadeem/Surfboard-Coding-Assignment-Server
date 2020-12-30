@@ -281,7 +281,7 @@ module.exports = {
         });
 
         await newChallenge.save();
-        targetAdmin.challenges.push(newChallenge.id);
+        await targetAdmin.challenges.push(newChallenge.id);
         await targetAdmin.save();
         return newChallenge;
       } else {
@@ -407,7 +407,7 @@ module.exports = {
 
     async editChallenge(
       _,
-      { challengeId, newQuestionDescription, newImage },
+      { challengeId, newCategoryId, newQuestionDescription, newImage },
       context
     ) {
       try {
@@ -423,6 +423,8 @@ module.exports = {
         targetChallenge.categoryId = newCategoryId;
         targetChallenge.questionDescription = newQuestionDescription;
         targetChallenge.image = newImage;
+        targetChallenge.categoryId = newCategoryId;
+
         await targetChallenge.save();
         return targetChallenge;
       }

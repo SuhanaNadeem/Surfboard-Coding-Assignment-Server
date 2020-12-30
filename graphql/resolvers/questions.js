@@ -23,12 +23,12 @@ module.exports = {
         }
       }
 
-      const question = await Question.find();
+      const questions = await Question.find();
 
-      if (!question) {
+      if (!questions) {
         throw new UserInputError("Invalid input");
       } else {
-        return question;
+        return questions;
       }
     },
     async getHintByQuestion(_, { questionId }, context) {
