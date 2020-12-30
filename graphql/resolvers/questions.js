@@ -33,10 +33,10 @@ module.exports = {
     },
     async getHintByQuestion(_, { questionId }, context) {
       const targetQuestion = Question.findById(questionId);
-      if (targetQuestion === null) {
+      if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
-        const targetHint = await targetQuestion.hint;
+        const targetHint = targetQuestion.hint;
         return targetHint;
       }
     },
@@ -60,69 +60,61 @@ module.exports = {
     },
   },
 
-  Mutation: {
-    async createHint(
-      _,
-      { questionId, categoryId, moduleId, hintDescription },
-      context
-    ) {
-      try {
-        const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
-      } catch (error) {
-        throw new AuthenticationError();
-      }
-      targetQuestion = Question.findById(questionId);
-      if (targetQuestion !== null && targetQuestion.hint === null) {
-        const newHint = new Module({
-          questionId,
-          categoryId,
-          moduleId,
-          hintDescription,
-          createdAt: new Date(),
-        });
-        await newHint.save();
-        targetQuestion.hint = newHint.id;
-        return newHint;
-      }
-      return new UserInputError("Invalid input");
-    },
-    async editHint(
-      _,
-      { questionId, newCategoryId, newModuleId, newHintDescription },
-      context
-    ) {
-      try {
-        const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
-      } catch (error) {
-        throw new AuthenticationError();
-      }
-      targetQuestion = Question.findById(questionId);
-      if (targetQuestion !== null) {
-        targetQuestion.categoryId = newCategoryId;
-        targetQuestion.moduleId = newModuleId;
-        targetQuestion.hintDescription = newHintDescription;
-        await targetQuestion.save();
-        const updatedHint = targetQuestion.hint;
-        return updatedHint;
-      }
-      throw new UserInputError("Invalid input");
-    },
-    async deleteHint(_, { questionId }, context) {
-      try {
-        const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
-      } catch (error) {
-        throw new AuthenticationError();
-      }
-      targetQuestion = Question.findById(questionId);
-      if (targetQuestion !== null) {
-        await targetQuestion.hint.delete();
-        await targetQuestion.save();
-        return targetQuestion;
-      }
-      return new UserInputError("Invalid input");
-    },
-  },
+  // Mutation: {
+  //   async createHint(_, { questionId, hintDescription }, context) {
+  //     try {
+  //       const admin = checkAdminAuth(context);
+  //       var targetAdmin = await Admin.findById(admin.id);
+  //     } catch (error) {
+  //       throw new AuthenticationError();
+  //     }
+  //     const targetQuestion = Question.findById(questionId);
+  //     if (targetQuestion) {
+  //       const newHint = new Hint({
+  //         questionId,
+  //         hintDescription,
+  //         createdAt: new Date(),
+  //       });
+  //       await newHint.save();
+  //       targetQuestion.hintId = newHint.id;
+  //       await targetQuestion.save();
+  //       return newHint;
+  //     } else {
+  //       return new UserInputError("Invalid input");
+  //     }
+  //   },
+  //   async editHint(_, { hintId, newHintDescription }, context) {
+  //     try {
+  //       const admin = checkAdminAuth(context);
+  //       var targetAdmin = await Admin.findById(admin.id);
+  //     } catch (error) {
+  //       throw new AuthenticationError();
+  //     }
+  //     const targetHint = Hint.findById(hintId);
+  //     if (targetHint) {
+  //       targetHint.hintDescription = newHintDescription;
+  //       await targetHint.save();
+  //       return targetHint;
+  //     }
+  //     throw new UserInputError("Invalid input");
+  //   },
+  //   async deleteHint(_, { hintId, questionId }, context) {
+  //     try {
+  //       const admin = checkAdminAuth(context);
+  //       var targetAdmin = await Admin.findById(admin.id);
+  //     } catch (error) {
+  //       throw new AuthenticationError();
+  //     }
+  //     const targetQuestion = Question.findById(questionId);
+  //     const targetHint = Hint.findById(hintId);
+
+  //     if (targetQuestion && targetHint) {
+  //       await targetQuestion.hintId.delete();
+  //       await targetQuestion.save();
+  //       await targetHint.delete();
+  //       return targetQuestion;
+  //     }
+  //     return new UserInputError("Invalid input");
+  //   },
+  // },
 };

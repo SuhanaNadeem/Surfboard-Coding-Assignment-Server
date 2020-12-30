@@ -7,6 +7,7 @@ const Category = require("../../models/Category");
 
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const QuestionTemplate = require("../../models/QuestionTemplate");
+const Module = require("../../models/Module");
 
 module.exports = {
   Query: {
@@ -78,10 +79,10 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetModules = await targetAdmin.modules;
+      const targetModules = targetAdmin.modules;
       if (targetModules) {
-        const matches = await targetModules.find({ categoryId });
-        if (matches) {
+        const matches = await Module.find({ categoryId });
+        if (!matches) {
           return [];
         } else {
           return matches;

@@ -134,7 +134,14 @@ module.exports = {
 
     async createNewQuestion(
       _,
-      { image, questionDescription, expectedAnswers, hint, questionTemplateId },
+      {
+        image,
+        hint,
+        moduleId,
+        questionDescription,
+        expectedAnswers,
+        questionTemplateId,
+      },
       context
     ) {
       try {
@@ -143,15 +150,17 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-
-      const targetQuestion = Question.findOne({
+      if (!hint) {
+        hint = "";
+      }
+      const targetQuestion = await Question.findOne({
         questionDescription,
       });
-
       const targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
-      if (!targetQuestionTemplate) {
+      const targetModule = Module.findById(moduleId);
+      if (!targetQuestionTemplate || !targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetQuestion) {
         const newQuestion = new Question({
@@ -163,7 +172,7 @@ module.exports = {
           createdAt: new Date(),
         });
         await newQuestion.save();
-        targetAdmin.modules.questions.push(newQuestion.id);
+        await targetModule.questions.push(newQuestion.id);
         await targetAdmin.save();
         return newQuestion;
       } else {
@@ -310,7 +319,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      var targetModule = await targetAdmin.modules.findById(moduleId);
+      var targetModule = await Module.findById(moduleId);
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
@@ -327,10 +336,12 @@ module.exports = {
       _,
       {
         questionId,
+        moduleId,
         newImage,
+        newHint,
         newQuestionDescription,
         newExpectedAnswers,
-        newHint,
+        newModuleId,
       },
       context
     ) {
@@ -341,14 +352,23 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetQuestion = await Question.findById(questionId);
-      if (!targetQuestion) {
+      var currentModule = await Module.findById(moduleId);
+      var newModule = await Module.findById(newModuleId);
+      if (!targetQuestion || !currentModule || !newModule) {
         throw new UserInputError("Invalid input");
       } else {
         targetQuestion.image = newImage;
         targetQuestion.questionDescription = newQuestionDescription;
         targetQuestion.expectedAnswers = newExpectedAnswers;
         targetQuestion.hint = newHint;
-
+        if (newModuleId != moduleId) {
+          const index = currentModule.questions.indexOf(questionId);
+          currentModule.questions.splice(index, 1);
+          await currentModule.save();
+          await newModule.questions.push(questionId);
+          await newModule.save();
+          targetQuestion.moduleId = newModuleId;
+        }
         await targetQuestion.save();
         return targetQuestion;
       }
@@ -450,7 +470,7 @@ module.exports = {
       if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.modules.questions.indexOf(questionTemplateId);
+        const index = targetAdmin.modules.questions.indexOf(targetQuestion);
         targetAdmin.modules.questions.splice(index, 1);
         await targetAdmin.save();
         await targetQuestion.delete();
@@ -487,9 +507,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetChallenge = await targetAdmin.challenges.findById(
-        challengeId
-      );
+      const targetChallenge = await Challenge.findById(challengeId);
       if (!targetChallenge) {
         throw new UserInputError("Invalid input");
       } else {

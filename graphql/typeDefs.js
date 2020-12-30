@@ -98,14 +98,12 @@ module.exports = gql`
     createdAt: DateTime!
   }
 
-  type Hint {
-    id: String!
-    questionId: String!
-    categoryId: String!
-    moduleId: String!
-    hintDescription: String!
-    createdAt: DateTime!
-  }
+  # type Hint {
+  #   id: String!
+  #   questionId: String!
+  #   hintDescription: String!
+  #   createdAt: DateTime!
+  # }
 
   # not the card itself, just available templates
   type QuestionTemplate {
@@ -114,6 +112,7 @@ module.exports = gql`
     type: String! # learn or practice
     categoryId: String! # CAD, electrical, programming
     inputFields: [String]! # diff things you can enter
+    hint: String
     createdAt: DateTime!
   }
 
@@ -167,7 +166,7 @@ module.exports = gql`
     getQuestionsByModule(moduleId: String!): [String]! # done
     getCommentsByModule(moduleId: String!): [String]! # done
     getModulesBySearch(search: String!): [String]! # started
-    getHintByQuestion(questionId: String!): Hint! # done
+    getHintByQuestion(questionId: String!): String! # done
     getSavedAnswerByQuestion(questionId: String!): [String]! # done
   }
 
@@ -201,10 +200,11 @@ module.exports = gql`
     # For admin
     createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
     createNewQuestion(
-      image: String
+      image: String!
+      moduleId: String!
       questionDescription: String!
       expectedAnswers: [String]
-      hint: String
+      hint: String!
       questionTemplateId: String!
     ): Question! # done
     createNewQuestionTemplate(
@@ -212,7 +212,7 @@ module.exports = gql`
       categoryId: String!
       inputFields: [String]!
       type: String!
-    ): QuestionTemplate! # done
+    ): QuestionTemplate! # done checked
     editModule(
       moduleId: String!
       newName: String!
@@ -222,10 +222,11 @@ module.exports = gql`
     ): Module! # done checked
     editQuestion(
       questionId: String!
-      newImage: String
+      moduleId: String!
+      newModuleId: String!
+      newImage: String!
       newQuestionDescription: String!
       newExpectedAnswers: [String]
-      newHint: String
     ): Question! # done
     editQuestionTemplate(
       newName: String!
@@ -233,10 +234,10 @@ module.exports = gql`
       newCategoryId: String!
       newInputFields: [String]!
       newType: String!
-    ): QuestionTemplate! # done
+    ): QuestionTemplate! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
     deleteQuestion(questionId: String!): [String]! # done
-    deleteQuestionTemplate(questionTemplateId: String!): [String]! # done
+    deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked
     editCategory(categoryId: String!, newName: String!): Category! # done checked
     deleteCategory(categoryId: String!): [String]! # done checked
@@ -251,19 +252,9 @@ module.exports = gql`
       newImage: String
     ): Challenge! # done
     deleteChallenge(challengeId: String!): [String]! # done
-    createHint(
-      questionId: String!
-      categoryId: String!
-      moduleId: String!
-      hintDescription: String!
-    ): Hint! # done
-    editHint(
-      questionId: String!
-      newCategoryId: String!
-      newModuleId: String!
-      newHintDescription: String!
-    ): Hint! # done
-    deleteHint(questionId: String!): Question! # done
+    # createHint(questionId: String!, hintDescription: String!): Hint! # done
+    # editHint(hintId: String!, newHintDescription: String!): Hint! # done
+    # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
     submitAnswer(
       answer: String!
