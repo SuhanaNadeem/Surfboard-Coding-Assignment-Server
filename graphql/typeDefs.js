@@ -147,7 +147,7 @@ module.exports = gql`
     getAdmin: Admin! # done checked
     getAdmins: [Admin]! # done checked
     getMentor: Mentor! # done checked
-    getMentosr: [Mentor]! # done checked
+    getMentors: [Mentor]! # done checked
     getStudent: Student! # done checked
     getStudents: [Student]! # done checked
     # for dashboard
