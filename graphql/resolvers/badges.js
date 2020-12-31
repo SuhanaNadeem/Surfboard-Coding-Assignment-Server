@@ -36,7 +36,7 @@ module.exports = {
   },
 
   Mutation: {
-    async createNewBadge(_, { name, description, criteria }, context) {
+    async createNewBadge(_, { image, name, description, criteria }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -49,6 +49,7 @@ module.exports = {
       if (!targetBadge) {
         const newBadge = new Badge({
           name,
+          image,
           criteria,
           description,
           createdAt: new Date(),
@@ -63,7 +64,7 @@ module.exports = {
 
     async editBadge(
       _,
-      { badgeId, newName, newCriteria, newDescription },
+      { badgeId, newImage, newName, newCriteria, newDescription },
       context
     ) {
       try {
@@ -79,6 +80,7 @@ module.exports = {
         targetBadge.name = newName;
         targetBadge.criteria = newCriteria;
         targetBadge.description = newDescription;
+        targetBadge.image = newImage;
 
         await targetBadge.save();
         return targetBadge;

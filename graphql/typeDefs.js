@@ -85,6 +85,7 @@ module.exports = gql`
   type Badge {
     id: String!
     name: String!
+    image: String!
     description: String
     createdAt: DateTime!
     criteria: String!
@@ -210,6 +211,7 @@ module.exports = gql`
     createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
     createNewBadge(
       name: String!
+      image: String!
       description: String!
       criteria: String
     ): Badge! # done checked
@@ -236,6 +238,7 @@ module.exports = gql`
     editBadge(
       badgeId: String!
       newName: String!
+      newImage: String!
       newCriteria: String!
       newDescription: String!
     ): Badge! # done checked
@@ -297,5 +300,5 @@ module.exports = gql`
       numToIncrement: Int!
     ): Int! # done
   }
-  # TODO giveBadgeToStudent
+  # TODO giveBadgeToStudent, deciding if answer is correct
 `;

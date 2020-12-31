@@ -11,6 +11,7 @@ const badgeSchema = new Schema({
   name: String,
   description: String,
   criteria: String,
+  image: String,
   createdAt: Date,
 });
 
