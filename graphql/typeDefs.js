@@ -161,6 +161,7 @@ module.exports = gql`
     getChallenges: [Challenge]! # done checked
     getQuestionTemplates: [QuestionTemplate]! # done checked
     getQuestions: [Question]! # done
+    getComments: [Comment]! # done
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]! # done checked
     getChallengesByCategory(categoryId: String!): [Challenge]! # done checked
@@ -275,7 +276,7 @@ module.exports = gql`
     unstarModule(moduleId: String!): [String]! # done
     starQuestion(questionId: String!): [String]! # done
     unstarQuestion(questionId: String!): [String]! # done
-    createComment(moduleId: String!, comment: String): Module # done checked
+    createNewComment(moduleId: String!, comment: String): Module # done checked
     deleteComment(moduleId: String!, commentId: String): Module # done
     incrementModulePoints(
       moduleId: String!

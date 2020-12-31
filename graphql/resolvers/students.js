@@ -204,7 +204,7 @@ module.exports = {
         return [];
       }
       const targetModule = Module.findById(moduleId);
-      if (targetModule === null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.completedModules.includes(moduleId)) {
         targetStudent.completedModules.push(moduleId);
@@ -224,7 +224,7 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
 
-      if (targetModule === null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
         targetStudent.inProgressModules.push(targetModule.id);
@@ -244,7 +244,7 @@ module.exports = {
       }
 
       const targetBadge = Badge.findById(badgeId);
-      if (targetBadge === null) {
+      if (!targetBadge) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.badges.includes(badgeId)) {
         targetStudent.badges.push(badgeId);
@@ -298,7 +298,7 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
 
-      if (targetModule === null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.starredModules.includes(moduleId)) {
         targetStudent.starredModules.push(moduleId);
@@ -317,7 +317,7 @@ module.exports = {
       }
       const targetModule = Module.findById(moduleId);
 
-      if (targetModule === null) {
+      if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (targetStudent.starredModules.includes(moduleId)) {
         const index = targetStudent.starredModules.indexOf(moduleId);
@@ -336,7 +336,7 @@ module.exports = {
         return None;
       }
       const targetQuestion = Question.findById(questionId);
-      if (targetQuestion === null) {
+      if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.starredQuestions.includes(questionId)) {
         targetStudent.starredQuestions.push(questionId);
@@ -353,7 +353,7 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
       const targetQuestion = Question.findById(questionId);
-      if (targetQuestion === null) {
+      if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
         const index = targetStudent.starredQuestions.indexOf(questionId);

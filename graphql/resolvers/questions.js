@@ -51,7 +51,7 @@ module.exports = {
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
       });
-      if (quesAnsPair === null) {
+      if (!quesAnsPair) {
         throw new UserInputError("Invalid input");
       } else {
         const savedAnswer = quesAnsPair.value;

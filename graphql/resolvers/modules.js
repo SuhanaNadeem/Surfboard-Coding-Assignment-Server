@@ -5,6 +5,7 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 const Module = require("../../models/Module");
 const Student = require("../../models/Student");
 const Comment = require("../../models/Comment");
+const { UserInputError } = require("apollo-server");
 
 module.exports = {
   Query: {
@@ -28,6 +29,28 @@ module.exports = {
         throw new UserInputError("Invalid input");
       } else {
         return modules;
+      }
+    },
+    async getComments(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const comments = await Module.find();
+
+      if (!comments) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return comments;
       }
     },
     async getModulesBySearch(_, { search }, context) {
@@ -86,17 +109,22 @@ module.exports = {
           }
         }
       }
-      const targetComments = await Module.findById(moduleId).comments;
-      if (!targetComments) {
-        return [];
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
       } else {
-        return targetComments;
+        const targetComments = targetModule.comments;
+        if (!targetComments) {
+          return [];
+        } else {
+          return targetComments;
+        }
       }
     },
   },
 
   Mutation: {
-    async createComment(_, { moduleId, comment }, context) {
+    async createNewComment(_, { moduleId, comment }, context) {
       try {
         var user = checkStudentAuth(context);
       } catch (error) {
@@ -106,17 +134,22 @@ module.exports = {
           throw new Error(error);
         }
       }
+      const targetComment = await Comment.findOne({ comment });
       const targetModule = await Module.findById(moduleId);
-      const newComment = new Comment({
-        comment: comment,
-        moduleId: moduleId,
-        createdAt: new Date(),
-        personId: user.id,
-      });
-      await newComment.save();
-      await targetModule.comments.push(newComment);
-      await targetModule.save();
-      return targetModule;
+      if (!targetComment && targetModule) {
+        const newComment = new Comment({
+          comment: comment,
+          moduleId: moduleId,
+          createdAt: new Date(),
+          personId: user.id,
+        });
+        await newComment.save();
+        await targetModule.comments.push(newComment);
+        await targetModule.save();
+        return targetModule;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
     },
 
     async deleteComment(_, { moduleId, commentId }, context) {
