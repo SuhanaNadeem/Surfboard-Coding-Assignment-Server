@@ -11,10 +11,12 @@ const Student = require("../../models/Student");
 const Badge = require("../../models/Badge");
 const Question = require("../../models/Question");
 const Mentor = require("../../models/Mentor");
+const Answer = require("../../models/Answer");
 
 const checkStudentAuth = require("../../util/checkStudentAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
 const checkMentorAuth = require("../../util/checkMentorAuth");
+const StringStringDict = require("../../models/StringStringDict");
 
 function generateToken(student) {
   return jwt.sign(
@@ -199,38 +201,59 @@ module.exports = {
         return updatedBadges;
       }
     },
+    //TODO delete answer, and must splice from dict
+    //TODO if question is in progress, then add it to quesanspairs with a null value
 
-    async submitAnswer(
-      _,
-      { answer, studentId, categoryId, questionId, moduleId },
-      context
-    ) {
+    async submitAnswer(_, { answer, studentId, questionId }, context) {
       try {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new AuthenticationError();
       }
-      const quesAnsPair = targetStudent.quesAnsDict.findOne({
+
+      const targetQuestion = await Question.findById(questionId);
+      if (!targetQuestion) {
+        throw new UserInputError("Invalid input");
+      }
+      var quesAnsPair = await StringStringDict.findOne({
         key: questionId,
       });
+
       const newAnswer = new Answer({
         answer,
         studentId,
-        categoryId,
         questionId,
-        moduleId,
         createdAt: new Date(),
       });
       await newAnswer.save();
-      if (quesAnsPair === null) {
-        await targetStudent.quesAnsDict.push({
+
+      if (!quesAnsPair) {
+        const newPair = new StringStringDict({
           key: questionId,
           value: newAnswer.id,
+          createdAt: new Date(),
         });
+        await newPair.save();
+        targetStudent.quesAnsDict.push(newPair);
       } else {
-        await targetStudent.quesAnsDict.push({ value: newAnswer.id });
+        if (!quesAnsPair.value) {
+          const index = targetStudent.quesAnsDict.indexOf({ key: questionId });
+          targetStudent.quesAnsDict.splice(index, 1);
+          await targetStudent.save();
+          await quesAnsPair.delete();
+          const newPair = new StringStringDict({
+            key: questionId,
+            value: newAnswer.id,
+            createdAt: new Date(),
+          });
+          await newPair.save();
+          targetStudent.quesAnsDict.push(newPair);
+        } else {
+          throw new UserInputError("Invalid input");
+        }
       }
+      await targetStudent.save();
       return newAnswer;
     },
 

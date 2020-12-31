@@ -3,15 +3,14 @@ const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
-const answerSchema = new Schema({
+const stringStringDictSchema = new Schema({
   _id: {
     type: String,
     default: () => nanoid(),
   },
-  answer: String,
-  studentId: String,
-  questionId: String,
+  key: String,
+  value: String,
   createdAt: Date,
 });
 
-module.exports = model("Answer", answerSchema);
+module.exports = model("StringStringDict", stringStringDictSchema);

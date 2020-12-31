@@ -53,12 +53,14 @@ module.exports = gql`
   }
 
   type StringStringDict {
+    id: String!
     key: String! # ques id
     value: String! # ans id
     createdAt: DateTime!
   }
 
   type StringIntDict {
+    id: String!
     key: String! # module id
     value: Int! # points
     createdAt: DateTime!
@@ -93,8 +95,6 @@ module.exports = gql`
     answer: String!
     studentId: String!
     questionId: String!
-    categoryId: String!
-    moduleId: String!
     createdAt: DateTime!
   }
 
@@ -151,6 +151,7 @@ module.exports = gql`
     getStudent: Student! # done checked
     getStudents: [Student]! # done checked
     getBadges: [Badge]! # done checked
+    getStringStringDicts: [StringStringDict]! # done checked
     # for dashboard
     getCompletedModulesByStudent: [String]! # done checked
     getInProgressModulesByStudent: [String]! # done checked
@@ -185,7 +186,7 @@ module.exports = gql`
       confirmPassword: String!
     ): Admin! # done checked
     loginAdmin(email: String!, password: String!): Admin! # done checked
-    deleteAdmin(adminId: String!): String # done
+    deleteAdmin(adminId: String!): String # done checked
     signupMentor(
       email: String!
       password: String!
@@ -254,6 +255,7 @@ module.exports = gql`
       newInputFields: [String]!
       newType: String!
     ): QuestionTemplate! # done checked
+    deleteStringStringDict(stringStringDictId: String!): [StringStringDict]!
     deleteModule(moduleId: String!): [String]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [String]! # done checked
@@ -279,9 +281,7 @@ module.exports = gql`
     # for learn/practice experience
     submitAnswer(
       answer: String!
-      categoryId: String!
       questionId: String!
-      moduleId: String!
       studentId: String!
     ): Answer! # done
     verifyAnswer(answerId: String!, questionId: String!): Boolean! # done
@@ -297,4 +297,5 @@ module.exports = gql`
       numToIncrement: Int!
     ): Int! # done
   }
+  # TODO giveBadgeToStudent
 `;

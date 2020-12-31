@@ -15,6 +15,7 @@ const Challenge = require("../../models/Challenge");
 const Category = require("../../models/Category");
 
 const checkAdminAuth = require("../../util/checkAdminAuth");
+const StringStringDict = require("../../models/StringStringDict");
 function generateToken(admin) {
   return jwt.sign(
     {
@@ -48,6 +49,16 @@ module.exports = {
       } else {
         return admins;
       }
+    },
+    async getStringStringDicts(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const stringStringDicts = await StringStringDict.find();
+
+      return stringStringDicts;
     },
   },
 
@@ -476,6 +487,26 @@ module.exports = {
         return updatedModules;
       }
     },
+    async deleteStringStringDict(_, { stringStringDictId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetStringStringDict = await StringStringDict.findById(
+        stringStringDictId
+      );
+      if (!targetStringStringDict) {
+        throw new UserInputError("Invalid input");
+      } else {
+        //TODO delete from students list too
+        await targetStringStringDict.delete();
+        const updatedStringStringDicts = await StringStringDict.find();
+        return updatedStringStringDicts;
+      }
+    },
+
     // TODO solve list problem with badges, in progress/completed modules
     async deleteQuestion(_, { questionId }, context) {
       try {
