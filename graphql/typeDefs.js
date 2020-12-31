@@ -161,7 +161,7 @@ module.exports = gql`
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
     getQuestionTemplates: [QuestionTemplate]! # done checked
-    getQuestions: [Question]! # done
+    getQuestions: [Question]! # done checked
     getComments: [Comment]! # done checked
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]! # done checked
@@ -172,7 +172,7 @@ module.exports = gql`
     getQuestionsByModule(moduleId: String!): [String]! # done checked
     getCommentsByModule(moduleId: String!): [String]! # done checked
     getModulesBySearch(search: String!): [String]! # started
-    getHintByQuestion(questionId: String!): String! # done
+    getHintByQuestion(questionId: String!): String! # done checked
     getSavedAnswerByQuestion(questionId: String!): [String]! # done
   }
 

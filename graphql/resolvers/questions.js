@@ -32,7 +32,20 @@ module.exports = {
       }
     },
     async getHintByQuestion(_, { questionId }, context) {
-      const targetQuestion = Question.findById(questionId);
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const targetQuestion = await Question.findById(questionId);
       if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
