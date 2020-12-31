@@ -476,7 +476,7 @@ module.exports = {
         return updatedModules;
       }
     },
-
+    // TODO solve list problem with badges, in progress/completed modules
     async deleteQuestion(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);

@@ -150,6 +150,7 @@ module.exports = gql`
     getMentors: [Mentor]! # done checked
     getStudent: Student! # done checked
     getStudents: [Student]! # done checked
+    getBadges: [Badge]! # done checked
     # for dashboard
     getCompletedModulesByStudent: [String]! # done checked
     getInProgressModulesByStudent: [String]! # done checked
@@ -206,6 +207,11 @@ module.exports = gql`
     addBadge(badgeId: String!): [String] # done
     # For admin
     createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
+    createNewBadge(
+      name: String!
+      description: String!
+      criteria: String
+    ): Badge! # done checked
     createNewQuestion(
       image: String!
       moduleId: String!
@@ -226,6 +232,12 @@ module.exports = gql`
       newCategoryId: String!
       newFormat: String!
     ): Module! # done checked
+    editBadge(
+      badgeId: String!
+      newName: String!
+      newCriteria: String!
+      newDescription: String!
+    ): Badge! # done checked
     editQuestion(
       questionId: String!
       moduleId: String!
@@ -243,6 +255,7 @@ module.exports = gql`
       newType: String!
     ): QuestionTemplate! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
+    deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [String]! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked

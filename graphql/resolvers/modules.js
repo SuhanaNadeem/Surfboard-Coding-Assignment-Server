@@ -251,8 +251,7 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return [];
+        throw new Error(error);
       }
       const targetModule = await Module.findById(moduleId);
       if (!targetModule) {

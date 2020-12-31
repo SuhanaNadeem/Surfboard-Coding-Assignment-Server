@@ -8,7 +8,6 @@ const {
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_STUDENT_KEY;
 const Student = require("../../models/Student");
-const Module = require("../../models/Module");
 const Badge = require("../../models/Badge");
 const Question = require("../../models/Question");
 const Mentor = require("../../models/Mentor");
@@ -187,15 +186,15 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return [];
+        throw new Error(error);
       }
 
-      const targetBadge = Badge.findById(badgeId);
+      const targetBadge = await Badge.findById(badgeId);
       if (!targetBadge) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.badges.includes(badgeId)) {
-        targetStudent.badges.push(badgeId);
+        await targetStudent.badges.push(badgeId);
+        await targetStudent.save();
         const updatedBadges = await targetStudent.badges;
         return updatedBadges;
       }
