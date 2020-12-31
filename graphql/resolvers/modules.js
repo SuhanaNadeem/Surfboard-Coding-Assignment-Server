@@ -4,6 +4,7 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 
 const Module = require("../../models/Module");
 const Student = require("../../models/Student");
+const Comment = require("../../models/Comment");
 
 module.exports = {
   Query: {
@@ -105,7 +106,7 @@ module.exports = {
           throw new Error(error);
         }
       }
-      targetModule = Module.findOne(moduleId);
+      const targetModule = await Module.findById(moduleId);
       const newComment = new Comment({
         comment: comment,
         moduleId: moduleId,
@@ -128,11 +129,14 @@ module.exports = {
           throw new Error(error);
         }
       }
-      targetModule = Module.findOne(moduleId);
-      targetComment = targetModule.comments.findById(commentId);
-      await targetComment.delete();
+      const targetModule = await Module.findById(moduleId);
+      const targetComment = await Comment.findById(commentId);
+      const index = targetModule.comments.indexOf(commentId);
+      targetModule.comments.splice(index, 1);
       await targetModule.save();
+      await targetComment.delete();
       return targetModule;
+      //TODO: fix this, finish comment related, then student, then mentor
     },
 
     async incrementModulePoints(

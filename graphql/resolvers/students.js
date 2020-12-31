@@ -99,7 +99,11 @@ module.exports = {
   },
 
   Mutation: {
-    async signupStudent(_, { email, password, confirmPassword }, context) {
+    async signupStudent(
+      _,
+      { email, orgName, name, password, confirmPassword },
+      context
+    ) {
       var { valid, errors } = validateUserRegisterInput(
         email,
         password,
@@ -122,7 +126,17 @@ module.exports = {
 
       const newStudent = new Student({
         email,
+        name,
+        orgName,
         password,
+        inProgressModules: [],
+        completedModules: [],
+        badges: [],
+        starredModules: [],
+        starredQuestions: [],
+        mentors: [],
+        quesAnsDict: [],
+        modulePointsDict: [],
         createdAt: new Date(),
       });
 

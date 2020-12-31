@@ -33,21 +33,21 @@ module.exports = gql`
   type Student {
     id: String!
 
-    orgName: String
-    name: String
+    orgName: String!
+    name: String!
     password: String!
     email: String!
 
-    inProgressModules: [String]
-    completedModules: [String]
-    badges: [String]
-    starredModules: [String]
-    starredQuestions: [String]
+    inProgressModules: [String]!
+    completedModules: [String]!
+    badges: [String]!
+    starredModules: [String]!
+    starredQuestions: [String]!
 
     mentors: [String]!
 
-    quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
-    modulePointsDict: [StringIntDict] # {module: points}
+    quesAnsDict: [StringStringDict]! # {questionsAttempted: submittedAnswers}
+    modulePointsDict: [StringIntDict]! # {module: points}
     createdAt: DateTime!
     token: String
   }
@@ -188,10 +188,12 @@ module.exports = gql`
       email: String!
       password: String!
       confirmPassword: String!
-    ): Mentor! # done checked
+    ): Mentor! # done
     loginMentor(email: String!, password: String!): Mentor! # done checked
     deleteMentor(mentorId: String!): String # done
     signupStudent(
+      name: String!
+      orgName: String!
       email: String!
       password: String!
       confirmPassword: String!
@@ -273,7 +275,7 @@ module.exports = gql`
     unstarModule(moduleId: String!): [String]! # done
     starQuestion(questionId: String!): [String]! # done
     unstarQuestion(questionId: String!): [String]! # done
-    createComment(moduleId: String!, comment: String): Module # done
+    createComment(moduleId: String!, comment: String): Module # done checked
     deleteComment(moduleId: String!, commentId: String): Module # done
     incrementModulePoints(
       moduleId: String!
