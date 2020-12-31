@@ -256,18 +256,15 @@ module.exports = {
         throw new AuthenticationError();
       }
       // will be called after submitAnswer()
-      const targetQuestion = Question.findById(questionId);
-      const targetAnswer = Answer.findById(answerId);
-      const expectedAnswers = await targetQuestion.expectedAnswers;
-      if (
-        targetAnswer === null ||
-        targetQuestion === null ||
-        expectedAnswers === null ||
-        targetAnswer !== expectedAnswers
-      ) {
-        return false;
-      } else {
+      const targetQuestion = await Question.findById(questionId);
+      const targetAnswer = await Answer.findById(answerId);
+      const expectedAnswer = targetQuestion.expectedAnswer;
+      if (!targetAnswer || !targetQuestion || !expectedAnswer) {
+        throw new AuthenticationError();
+      } else if (targetAnswer.answer === expectedAnswer) {
         return true;
+      } else {
+        return false;
       }
     },
   },

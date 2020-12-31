@@ -6,6 +6,7 @@ const Module = require("../../models/Module");
 const Student = require("../../models/Student");
 const Mentor = require("../../models/Mentor");
 const Comment = require("../../models/Comment");
+const StringIntDict = require("../../models/StringIntDict");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 
 module.exports = {
@@ -205,18 +206,37 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetModule = Module.findById(moduleId);
-      if (targetModule !== null) {
-        const studentModule = targetStudent.modulePointsDict.findOne({
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else {
+        var modulePointsPair = await StringIntDict.findOne({
           key: moduleId,
         });
-        if (answerCorrect) {
-          studentModule.value = studentModule.value + numToIncrement;
-          await studentModule.save();
+
+        if (!modulePointsPair) {
+          throw new UserInputError("Invalid input");
+        } else {
+          var points = modulePointsPair.value;
+          if (answerCorrect) {
+            points = points + numToIncrement;
+            const index = targetStudent.modulePointsDict.indexOf({
+              key: moduleId,
+            });
+            targetStudent.modulePointsDict.splice(index, 1);
+            await targetStudent.save();
+            await modulePointsPair.delete();
+            const newPair = new StringIntDict({
+              key: questionId,
+              value: points,
+              createdAt: new Date(),
+            });
+            await newPair.save();
+            targetStudent.modulePointsDict.push(newPair);
+          }
+          return points;
         }
-        return studentModule.value;
       }
-      throw new UserInputError("Invalid input");
     },
     async addCompletedModule(_, { moduleId }, context) {
       // add to students module list
@@ -309,6 +329,32 @@ module.exports = {
         await targetUser.save();
         const updatedStarredModules = targetUser.starredModules;
         return updatedStarredModules;
+      }
+    },
+    async startModule(_, { moduleId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetModule = await Module.findById(moduleId);
+      // TODO this keeps saying false
+      if (
+        targetModule &&
+        !targetStudent.modulePointsDict.includes({ key: moduleId })
+      ) {
+        const newPair = new StringIntDict({
+          key: moduleId,
+          value: 0,
+          createdAt: new Date(),
+        });
+        await newPair.save();
+        targetStudent.modulePointsDict.push(newPair);
+        await targetStudent.save();
+        return newPair;
+      } else {
+        throw new UserInputError("Invalid input");
       }
     },
   },

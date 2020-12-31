@@ -121,7 +121,7 @@ module.exports = gql`
     id: String!
     image: String
     questionDescription: String! # ASSUMING THIS IS UNIQUE
-    expectedAnswers: [String]
+    expectedAnswer: String
     createdAt: DateTime!
     hint: String
     questionTemplateId: String!
@@ -221,7 +221,7 @@ module.exports = gql`
       image: String!
       moduleId: String!
       questionDescription: String!
-      expectedAnswers: [String]
+      expectedAnswer: String
       hint: String!
       questionTemplateId: String!
     ): Question! # done checked
@@ -251,7 +251,7 @@ module.exports = gql`
       newImage: String!
       newQuestionDescription: String!
       newHint: String!
-      newExpectedAnswers: [String]
+      newExpectedAnswer: String
     ): Question! # done checked
     editQuestionTemplate(
       newName: String!
@@ -285,13 +285,14 @@ module.exports = gql`
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
-    startQuestion(questionId: String!): StringStringDict!
+    startQuestion(questionId: String!): StringStringDict! # done
+    startModule(moduleId: String!): StringIntDict! # done
     saveAnswer(
       answer: String!
       questionId: String!
       studentId: String!
-    ): Answer! # done
-    verifyAnswer(answerId: String!, questionId: String!): Boolean! # done
+    ): Answer! # done checked
+    verifyAnswer(answerId: String!, questionId: String!): Boolean! # done checked
     starModule(moduleId: String!): [String]! # done checked
     unstarModule(moduleId: String!): [String]! # done checked
     starQuestion(questionId: String!): [String]! # done checked

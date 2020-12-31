@@ -162,7 +162,7 @@ module.exports = {
         hint,
         moduleId,
         questionDescription,
-        expectedAnswers,
+        expectedAnswer,
         questionTemplateId,
       },
       context
@@ -189,7 +189,7 @@ module.exports = {
         const newQuestion = new Question({
           image,
           questionDescription,
-          expectedAnswers,
+          expectedAnswer,
           hint,
           questionTemplateId,
           createdAt: new Date(),
@@ -367,7 +367,7 @@ module.exports = {
         newImage,
         newHint,
         newQuestionDescription,
-        newExpectedAnswers,
+        newExpectedAnswer,
         newModuleId,
       },
       context
@@ -386,7 +386,7 @@ module.exports = {
       } else {
         targetQuestion.image = newImage;
         targetQuestion.questionDescription = newQuestionDescription;
-        targetQuestion.expectedAnswers = newExpectedAnswers;
+        targetQuestion.expectedAnswer = newExpectedAnswer;
         targetQuestion.hint = newHint;
         if (newModuleId != moduleId) {
           const index = currentModule.questions.indexOf(questionId);
