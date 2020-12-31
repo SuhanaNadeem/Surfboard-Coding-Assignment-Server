@@ -16,6 +16,7 @@ const Category = require("../../models/Category");
 
 const checkAdminAuth = require("../../util/checkAdminAuth");
 const StringStringDict = require("../../models/StringStringDict");
+const Student = require("../../models/Student");
 function generateToken(admin) {
   return jwt.sign(
     {
@@ -501,6 +502,14 @@ module.exports = {
         throw new UserInputError("Invalid input");
       } else {
         //TODO delete from students list too
+        // const allStudents = await Student.find();
+        // allStudents.forEach(function deleteQuesAnsPair(targetStudent) {
+        //   const index = targetStudent.quesAnsDict.indexOf({
+        //     id: stringStringDictId,
+        //   });
+        //   targetStudent.quesAnsDict.splice(index, 1);
+        //   await targetStudent.save();
+        // });
         await targetStringStringDict.delete();
         const updatedStringStringDicts = await StringStringDict.find();
         return updatedStringStringDicts;

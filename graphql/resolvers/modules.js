@@ -192,7 +192,6 @@ module.exports = {
       await targetModule.save();
       await targetComment.delete();
       return targetModule;
-      //TODO: fix this, finish comment related, then student, then mentor
     },
 
     async incrementModulePoints(

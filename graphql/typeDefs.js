@@ -305,5 +305,5 @@ module.exports = gql`
       numToIncrement: Int!
     ): Int! # done
   }
-  # TODO giveBadgeToStudent, deciding if answer is correct
+  # TODO giveBadgeToStudent
 `;

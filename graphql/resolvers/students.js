@@ -200,9 +200,6 @@ module.exports = {
         return updatedBadges;
       }
     },
-    //TODO delete answer, and must splice from dict
-    //TODO if question is in progress, then add it to quesanspairs with a null value
-
     async starQuestion(_, { questionId }, context) {
       try {
         var user = checkStudentAuth(context);
