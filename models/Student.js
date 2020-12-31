@@ -15,6 +15,8 @@ const studentSchema = new Schema({
 
   inProgressModules: [String],
   completedModules: [String],
+  starredModules: [String],
+  unstarredModules: [String],
   badges: [String],
   quesAnsDict: [{ key: String, value: String }],
   modulePointsDict: [{ key: String, value: Number }],

@@ -13,6 +13,9 @@ const Badge = require("../../models/Badge");
 const Question = require("../../models/Question");
 
 const checkStudentAuth = require("../../util/checkStudentAuth");
+const checkAdminAuth = require("../../util/checkAdminAuth");
+const checkMentorAuth = require("../../util/checkMentorAuth");
+
 function generateToken(student) {
   return jwt.sign(
     {
@@ -37,9 +40,16 @@ module.exports = {
     },
     async getStudents(_, {}, context) {
       try {
-        const student = checkStudentAuth(context);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
       const students = await Student.find();
       if (!students) {
@@ -293,16 +303,17 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return None;
+        throw new AuthenticationError();
       }
       const targetModule = Module.findById(moduleId);
-
+      console.log(targetStudent);
+      console.log(targetStudent.starredModules);
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.starredModules.includes(moduleId)) {
-        targetStudent.starredModules.push(moduleId);
-        const updatedStarredModules = await targetStudent.starredModules;
+        await targetStudent.starredModules.push(moduleId);
+        await targetStudent.save();
+        const updatedStarredModules = targetStudent.starredModules;
         return updatedStarredModules;
       }
     },
@@ -322,7 +333,8 @@ module.exports = {
       } else if (targetStudent.starredModules.includes(moduleId)) {
         const index = targetStudent.starredModules.indexOf(moduleId);
         targetStudent.starredModules.splice(index, 1);
-        const updatedStarredModules = await targetStudent.starredModules;
+        await targetStudent.save();
+        const updatedStarredModules = targetStudent.starredModules;
         return updatedStarredModules;
       }
     },

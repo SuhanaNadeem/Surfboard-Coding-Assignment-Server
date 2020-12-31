@@ -38,16 +38,16 @@ module.exports = gql`
     password: String!
     email: String!
 
-    inProgressModules: [String]!
-    completedModules: [String]!
-    badges: [String]!
-    starredModules: [String]!
-    starredQuestions: [String]!
+    inProgressModules: [String]
+    completedModules: [String]
+    badges: [String]
+    starredModules: [String]
+    starredQuestions: [String]
 
-    mentors: [String]!
+    mentors: [String]
 
-    quesAnsDict: [StringStringDict]! # {questionsAttempted: submittedAnswers}
-    modulePointsDict: [StringIntDict]! # {module: points}
+    quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
+    modulePointsDict: [StringIntDict] # {module: points}
     createdAt: DateTime!
     token: String
   }
@@ -161,7 +161,7 @@ module.exports = gql`
     getChallenges: [Challenge]! # done checked
     getQuestionTemplates: [QuestionTemplate]! # done checked
     getQuestions: [Question]! # done
-    getComments: [Comment]! # done
+    getComments: [Comment]! # done checked
     #  like dif form fields to create questions
     getQuestionTemplatesByCategory(categoryId: String!): [QuestionTemplate]! # done checked
     getChallengesByCategory(categoryId: String!): [Challenge]! # done checked
@@ -169,7 +169,7 @@ module.exports = gql`
     getModulesByCategory(categoryId: String!): [Module]! # done checked
     # can be of any of the types
     getQuestionsByModule(moduleId: String!): [String]! # done checked
-    getCommentsByModule(moduleId: String!): [String]! # done
+    getCommentsByModule(moduleId: String!): [String]! # done checked
     getModulesBySearch(search: String!): [String]! # started
     getHintByQuestion(questionId: String!): String! # done
     getSavedAnswerByQuestion(questionId: String!): [String]! # done
@@ -277,7 +277,7 @@ module.exports = gql`
     starQuestion(questionId: String!): [String]! # done
     unstarQuestion(questionId: String!): [String]! # done
     createNewComment(moduleId: String!, comment: String): Module # done checked
-    deleteComment(moduleId: String!, commentId: String): Module # done
+    deleteComment(moduleId: String!, commentId: String): Module # done checked
     incrementModulePoints(
       moduleId: String!
       answerCorrect: Boolean!
