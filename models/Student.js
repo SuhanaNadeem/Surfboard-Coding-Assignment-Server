@@ -17,6 +17,8 @@ const studentSchema = new Schema({
   completedModules: [String],
   starredModules: [String],
   unstarredModules: [String],
+  starredQuestions: [String],
+  unstarredQuestions: [String],
   badges: [String],
   quesAnsDict: [{ key: String, value: String }],
   modulePointsDict: [{ key: String, value: Number }],

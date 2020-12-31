@@ -151,8 +151,8 @@ module.exports = gql`
     getStudent: Student! # done checked
     getStudents: [Student]! # done checked
     # for dashboard
-    getCompletedModulesByStudent: [String]! # done
-    getInProgressModulesByStudent: [String]! # done
+    getCompletedModulesByStudent: [String]! # done checked
+    getInProgressModulesByStudent: [String]! # done checked
     getBadgesByStudent: [String]! # done
     getStudentsByMentor: [Student]! # done
     getMentorsByStudent: [String]! # done
@@ -199,10 +199,10 @@ module.exports = gql`
       password: String!
       confirmPassword: String!
     ): Student! # done checked
-    deleteStudent(studentId: String!): String # done
+    deleteStudent(studentId: String!): String # done checked
     loginStudent(email: String!, password: String!): Student! # done checked
-    addCompletedModule(moduleId: String!): [String] # done
-    addInProgressModule(moduleId: String!): [String] # done
+    addCompletedModule(moduleId: String!): [String] # done checked
+    addInProgressModule(moduleId: String!): [String] # done checked
     addBadge(badgeId: String!): [String] # done
     # For admin
     createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
@@ -272,10 +272,10 @@ module.exports = gql`
       studentId: String!
     ): Answer! # done
     verifyAnswer(answerId: String!, questionId: String!): Boolean! # done
-    starModule(moduleId: String!): [String]! # done
-    unstarModule(moduleId: String!): [String]! # done
-    starQuestion(questionId: String!): [String]! # done
-    unstarQuestion(questionId: String!): [String]! # done
+    starModule(moduleId: String!): [String]! # done checked
+    unstarModule(moduleId: String!): [String]! # done checked
+    starQuestion(questionId: String!): [String]! # done checked
+    unstarQuestion(questionId: String!): [String]! # done checked
     createNewComment(moduleId: String!, comment: String): Module # done checked
     deleteComment(moduleId: String!, commentId: String): Module # done checked
     incrementModulePoints(

@@ -11,6 +11,7 @@ const Student = require("../../models/Student");
 const Module = require("../../models/Module");
 const Badge = require("../../models/Badge");
 const Question = require("../../models/Question");
+const Mentor = require("../../models/Mentor");
 
 const checkStudentAuth = require("../../util/checkStudentAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
@@ -56,30 +57,6 @@ module.exports = {
         throw new UserInputError("Invalid input");
       } else {
         return students;
-      }
-    },
-
-    async getCompletedModulesByStudent(_, {}, context) {
-      try {
-        const student = checkStudentAuth(context);
-        const targetStudent = await Student.findById(student.id);
-        const completedModules = await targetStudent.completedModules;
-        return completedModules;
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
-    },
-
-    async getInProgressModulesByStudent(_, {}, context) {
-      try {
-        const student = checkStudentAuth(context);
-        const targetStudent = await Student.findById(student.id);
-        const inProgressModules = await targetStudent.inProgressModules;
-        return inProgressModules;
-      } catch (error) {
-        console.log(error);
-        return [];
       }
     },
 
@@ -204,45 +181,6 @@ module.exports = {
       }
     },
 
-    async addCompletedModule(_, { moduleId }, context) {
-      // add to students module list
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
-      const targetModule = Module.findById(moduleId);
-      if (!targetModule) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetStudent.completedModules.includes(moduleId)) {
-        targetStudent.completedModules.push(moduleId);
-        const updatedCompletedModules = await targetStudent.completedModules;
-        return updatedCompletedModules;
-      }
-    },
-
-    async addInProgressModule(_, { moduleId }, context) {
-      // add to students module list
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
-      const targetModule = Module.findById(moduleId);
-
-      if (!targetModule) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetStudent.inProgressModules.includes(targetModule.id)) {
-        targetStudent.inProgressModules.push(targetModule.id);
-        const updatedInProgressModules = await targetStudent.inProgressModules;
-        return updatedInProgressModules;
-      }
-    },
-
     async addBadge(_, { badgeId }, context) {
       // add to students module list
       try {
@@ -272,8 +210,7 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        throw new UserInputError("Invalid input");
+        throw new AuthenticationError();
       }
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,
@@ -298,79 +235,48 @@ module.exports = {
       return newAnswer;
     },
 
-    async starModule(_, { moduleId }, context) {
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        throw new AuthenticationError();
-      }
-      const targetModule = Module.findById(moduleId);
-      console.log(targetStudent);
-      console.log(targetStudent.starredModules);
-      if (!targetModule) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetStudent.starredModules.includes(moduleId)) {
-        await targetStudent.starredModules.push(moduleId);
-        await targetStudent.save();
-        const updatedStarredModules = targetStudent.starredModules;
-        return updatedStarredModules;
-      }
-    },
-
-    async unstarModule(_, { moduleId }, context) {
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        console.log(error);
-        return None;
-      }
-      const targetModule = Module.findById(moduleId);
-
-      if (!targetModule) {
-        throw new UserInputError("Invalid input");
-      } else if (targetStudent.starredModules.includes(moduleId)) {
-        const index = targetStudent.starredModules.indexOf(moduleId);
-        targetStudent.starredModules.splice(index, 1);
-        await targetStudent.save();
-        const updatedStarredModules = targetStudent.starredModules;
-        return updatedStarredModules;
-      }
-    },
-
     async starQuestion(_, { questionId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
       } catch (error) {
-        console.log(error);
-        return None;
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
       }
-      const targetQuestion = Question.findById(questionId);
+      const targetQuestion = await Question.findById(questionId);
       if (!targetQuestion) {
         throw new UserInputError("Invalid input");
-      } else if (!targetStudent.starredQuestions.includes(questionId)) {
-        targetStudent.starredQuestions.push(questionId);
-        const updatedStarredQuestions = await targetStudent.starredQuestions;
+      } else if (!targetUser.starredQuestions.includes(questionId)) {
+        await targetUser.starredQuestions.push(questionId);
+        await targetUser.save();
+        const updatedStarredQuestions = targetUser.starredQuestions;
         return updatedStarredQuestions;
       }
     },
     async unstarQuestion(_, { questionId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
       } catch (error) {
-        console.log(error);
-        throw new UserInputError("Invalid input");
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
       }
       const targetQuestion = Question.findById(questionId);
       if (!targetQuestion) {
         throw new UserInputError("Invalid input");
-      } else if (targetStudent.starredQuestions.includes(targetQuestion.id)) {
-        const index = targetStudent.starredQuestions.indexOf(questionId);
-        targetStudent.starredQuestions.splice(index, 1);
-        const updatedStarredQuestions = await targetStudent.starredQuestions;
+      } else if (targetUser.starredQuestions.includes(questionId)) {
+        const index = targetUser.starredQuestions.indexOf(questionId);
+        targetUser.starredQuestions.splice(index, 1);
+        await targetUser.save();
+        const updatedStarredQuestions = targetUser.starredQuestions;
         return updatedStarredQuestions;
       }
     },
@@ -379,8 +285,7 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        throw new UserInputError("Invalid input");
+        throw new AuthenticationError();
       }
       // will be called after submitAnswer()
       const targetQuestion = Question.findById(questionId);

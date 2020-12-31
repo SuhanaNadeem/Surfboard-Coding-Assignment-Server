@@ -45,8 +45,7 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return None;
+        throw new AuthenticationError();
       }
       const quesAnsPair = targetStudent.quesAnsDict.findOne({
         key: questionId,

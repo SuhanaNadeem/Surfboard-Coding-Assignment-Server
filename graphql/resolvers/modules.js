@@ -4,8 +4,9 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 
 const Module = require("../../models/Module");
 const Student = require("../../models/Student");
+const Mentor = require("../../models/Mentor");
 const Comment = require("../../models/Comment");
-const { UserInputError } = require("apollo-server");
+const { UserInputError, AuthenticationError } = require("apollo-server");
 
 module.exports = {
   Query: {
@@ -52,6 +53,27 @@ module.exports = {
       } else {
         return comments;
       }
+    },
+
+    async getCompletedModulesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const completedModules = targetStudent.completedModules;
+      return completedModules;
+    },
+    async getInProgressModulesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const inProgressModules = targetStudent.inProgressModules;
+      return inProgressModules;
     },
     async getModulesBySearch(_, { search }, context) {
       //   try {
@@ -181,8 +203,7 @@ module.exports = {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return None;
+        throw new AuthenticationError();
       }
       const targetModule = Module.findById(moduleId);
       if (targetModule !== null) {
@@ -196,6 +217,100 @@ module.exports = {
         return studentModule.value;
       }
       throw new UserInputError("Invalid input");
+    },
+    async addCompletedModule(_, { moduleId }, context) {
+      // add to students module list
+      try {
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule || !targetUser.inProgressModules.includes(moduleId)) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetUser.completedModules.includes(moduleId)) {
+        const index = targetUser.inProgressModules.indexOf(moduleId);
+        targetUser.inProgressModules.splice(index, 1);
+        await targetUser.save();
+        await targetUser.completedModules.push(moduleId);
+        await targetUser.save();
+        const updatedCompletedModules = targetUser.completedModules;
+        return updatedCompletedModules;
+      }
+    },
+
+    async addInProgressModule(_, { moduleId }, context) {
+      // add to students module list
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetStudent.inProgressModules.includes(moduleId)) {
+        await targetStudent.inProgressModules.push(moduleId);
+        await targetStudent.save();
+        const updatedInProgressModules = targetStudent.inProgressModules;
+        return updatedInProgressModules;
+      }
+    },
+    async starModule(_, { moduleId }, context) {
+      try {
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetUser.starredModules.includes(moduleId)) {
+        await targetUser.starredModules.push(moduleId);
+        await targetUser.save();
+        const updatedStarredModules = targetUser.starredModules;
+        return updatedStarredModules;
+      }
+    },
+
+    async unstarModule(_, { moduleId }, context) {
+      try {
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
+        // TODO MIGHT have to change this targetuser stuff
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else if (targetUser.starredModules.includes(moduleId)) {
+        const index = targetUser.starredModules.indexOf(moduleId);
+        targetUser.starredModules.splice(index, 1);
+        await targetUser.save();
+        const updatedStarredModules = targetUser.starredModules;
+        return updatedStarredModules;
+      }
     },
   },
 };
