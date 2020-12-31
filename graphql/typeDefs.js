@@ -162,6 +162,8 @@ module.exports = gql`
     getCategories: [Category]! # done checked
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
+    getAnswersByStudent(studentId: String!): [Answer]! # done checked
+    getAnswers: [Answer]! # done checked
     getQuestionTemplates: [QuestionTemplate]! # done checked
     getQuestions: [Question]! # done checked
     getComments: [Comment]! # done checked
@@ -262,6 +264,7 @@ module.exports = gql`
     deleteModule(moduleId: String!): [String]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [String]! # done checked
+    deleteAnswer(answerId: String!, studentId: String!): String! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked
     editCategory(categoryId: String!, newName: String!): Category! # done checked
@@ -282,7 +285,8 @@ module.exports = gql`
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
-    submitAnswer(
+    startQuestion(questionId: String!): StringStringDict!
+    saveAnswer(
       answer: String!
       questionId: String!
       studentId: String!

@@ -6,6 +6,8 @@ const { UserInputError, AuthenticationError } = require("apollo-server");
 
 const Question = require("../../models/Question");
 const Admin = require("../../models/Admin");
+const Student = require("../../models/Student");
+const StringStringDict = require("../../models/StringStringDict");
 
 module.exports = {
   Query: {
@@ -72,61 +74,38 @@ module.exports = {
     },
   },
 
-  // Mutation: {
-  //   async createHint(_, { questionId, hintDescription }, context) {
-  //     try {
-  //       const admin = checkAdminAuth(context);
-  //       var targetAdmin = await Admin.findById(admin.id);
-  //     } catch (error) {
-  //       throw new AuthenticationError();
-  //     }
-  //     const targetQuestion = Question.findById(questionId);
-  //     if (targetQuestion) {
-  //       const newHint = new Hint({
-  //         questionId,
-  //         hintDescription,
-  //         createdAt: new Date(),
-  //       });
-  //       await newHint.save();
-  //       targetQuestion.hintId = newHint.id;
-  //       await targetQuestion.save();
-  //       return newHint;
-  //     } else {
-  //       return new UserInputError("Invalid input");
-  //     }
-  //   },
-  //   async editHint(_, { hintId, newHintDescription }, context) {
-  //     try {
-  //       const admin = checkAdminAuth(context);
-  //       var targetAdmin = await Admin.findById(admin.id);
-  //     } catch (error) {
-  //       throw new AuthenticationError();
-  //     }
-  //     const targetHint = Hint.findById(hintId);
-  //     if (targetHint) {
-  //       targetHint.hintDescription = newHintDescription;
-  //       await targetHint.save();
-  //       return targetHint;
-  //     }
-  //     throw new UserInputError("Invalid input");
-  //   },
-  //   async deleteHint(_, { hintId, questionId }, context) {
-  //     try {
-  //       const admin = checkAdminAuth(context);
-  //       var targetAdmin = await Admin.findById(admin.id);
-  //     } catch (error) {
-  //       throw new AuthenticationError();
-  //     }
-  //     const targetQuestion = Question.findById(questionId);
-  //     const targetHint = Hint.findById(hintId);
-
-  //     if (targetQuestion && targetHint) {
-  //       await targetQuestion.hintId.delete();
-  //       await targetQuestion.save();
-  //       await targetHint.delete();
-  //       return targetQuestion;
-  //     }
-  //     return new UserInputError("Invalid input");
-  //   },
-  // },
+  Mutation: {
+    async startQuestion(_, { questionId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetQuestion = await Question.findById(questionId);
+      const targetPair = await StringStringDict.findOne({ key: questionId });
+      console.log(targetPair);
+      console.log("hi");
+      console.log(targetStudent.quesAnsDict);
+      // TODO this keeps saying false
+      console.log(targetStudent.quesAnsDict.includes({ key: questionId }));
+      if (
+        targetQuestion &&
+        !targetStudent.quesAnsDict.includes({ key: questionId })
+      ) {
+        const newPair = new StringStringDict({
+          key: questionId,
+          value: "",
+          createdAt: new Date(),
+        });
+        await newPair.save();
+        targetStudent.quesAnsDict.push(newPair);
+        await targetStudent.save();
+        console.log(targetStudent.quesAnsDict);
+        return newPair;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
+    },
+  },
 };
