@@ -44,23 +44,49 @@ module.exports = {
       //   }
       // TODO regex
       const targetModule = await Module.findOne({ name: search });
-      if (targetModule === null) {
-        return null;
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
       } else {
         return targetModule;
       }
     },
     async getQuestionsByModule(_, { moduleId }, context) {
-      const targetQuestions = await Module.findById(moduleId).questions;
-      if (targetQuestions === null) {
-        return [];
-      } else {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+
+      if (targetModule) {
+        const targetQuestions = targetModule.questions;
         return targetQuestions;
+      } else {
+        return [];
       }
     },
     async getCommentsByModule(_, { moduleId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
       const targetComments = await Module.findById(moduleId).comments;
-      if (targetComments === null) {
+      if (!targetComments) {
         return [];
       } else {
         return targetComments;

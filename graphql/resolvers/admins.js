@@ -184,11 +184,11 @@ module.exports = {
           createdAt: new Date(),
         });
         await newQuestion.save();
-        console.log(targetModule.questions);
 
         targetModule.questions.push(newQuestion.id);
 
         await targetModule.save();
+
         await targetAdmin.save();
         return newQuestion;
       } else {
