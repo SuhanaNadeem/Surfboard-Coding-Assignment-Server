@@ -60,28 +60,15 @@ module.exports = {
       }
     },
 
-    async getBadgesByStudent(_, {}, context) {
-      try {
-        const student = checkStudentAuth(context);
-        const targetStudent = await Student.findById(student.id);
-        const badges = await targetStudent.badges;
-        return badges;
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
-    },
-
     async getMentorsByStudent(_, {}, context) {
       try {
         const student = checkStudentAuth(context);
-        const targetStudent = await Student.findById(student.id);
-        const mentors = await targetStudent.mentors;
-        return mentors;
+        var targetStudent = await Student.findById(student.id);
       } catch (error) {
-        console.log(error);
-        return [];
+        throw new AuthenticationError();
       }
+      const mentors = targetStudent.mentors;
+      return mentors;
     },
   },
 
@@ -181,25 +168,6 @@ module.exports = {
       }
     },
 
-    async addBadge(_, { badgeId }, context) {
-      // add to students module list
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        throw new Error(error);
-      }
-
-      const targetBadge = await Badge.findById(badgeId);
-      if (!targetBadge) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetStudent.badges.includes(badgeId)) {
-        await targetStudent.badges.push(badgeId);
-        await targetStudent.save();
-        const updatedBadges = await targetStudent.badges;
-        return updatedBadges;
-      }
-    },
     async starQuestion(_, { questionId }, context) {
       try {
         var user = checkStudentAuth(context);
@@ -263,6 +231,24 @@ module.exports = {
       } else {
         return false;
       }
+    },
+    async addMentor(_, { mentorId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+
+      const targetMentor = await Mentor.findById(mentorId);
+      if (!targetMentor) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetStudent.mentors.includes(mentorId)) {
+        await targetStudent.mentors.push(mentorId);
+        await targetStudent.save();
+      }
+      const updatedMentors = targetStudent.mentors;
+      return updatedMentors;
     },
   },
 };

@@ -11,6 +11,7 @@ const Mentor = require("../../models/Mentor");
 
 const checkMentorAuth = require("../../util/checkMentorAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
+const Student = require("../../models/Student");
 
 function generateToken(mentor) {
   return jwt.sign(
@@ -25,21 +26,26 @@ function generateToken(mentor) {
 module.exports = {
   Query: {
     async getMentor(_, {}, context) {
-      const mentor = checkMentorAuth(context);
-
       try {
+        const mentor = checkMentorAuth(context);
         const targetMentor = await Mentor.findById(mentor.id);
-
         return targetMentor;
-      } catch (err) {
-        throw new Error(err);
+      } catch (error) {
+        throw new UserInputError("Invalid input");
       }
     },
     async getMentors(_, {}, context) {
       try {
-        const mentor = checkMentorAuth(context);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
       const mentors = await Mentor.find();
       if (!mentors) {
@@ -48,21 +54,31 @@ module.exports = {
         return mentors;
       }
     },
+
     async getStudentsByMentor(_, {}, context) {
       try {
         const mentor = checkMentorAuth(context);
-        const targetMentor = await Mentor.findById(mentor.id);
-        const students = await targetMentor.students;
-        return students;
+        var targetMentor = await Mentor.findById(mentor.id);
       } catch (error) {
-        console.log(error);
-        return [];
+        throw new AuthenticationError();
       }
+      var allStudents = await Student.find();
+      var students = [];
+      allStudents.forEach(function (targetStudent) {
+        if (targetStudent.mentors.includes(targetMentor.id)) {
+          students.push(targetStudent.id);
+        }
+      });
+      return students;
     },
   },
 
   Mutation: {
-    async signupMentor(_, { email, password, confirmPassword }, context) {
+    async signupMentor(
+      _,
+      { email, orgName, name, password, confirmPassword },
+      context
+    ) {
       var { valid, errors } = validateUserRegisterInput(
         email,
         password,
@@ -85,7 +101,9 @@ module.exports = {
 
       const newMentor = new Mentor({
         email,
+        name,
         password,
+        orgName,
         createdAt: new Date(),
       });
 
@@ -96,7 +114,7 @@ module.exports = {
       return { ...res._doc, id: res._id, token };
     },
 
-    async loginMentor(_, {}, context) {
+    async loginMentor(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
 
       if (!valid) {

@@ -20,7 +20,7 @@ module.exports = gql`
   }
   type Mentor {
     id: String!
-    name: String
+    name: String!
 
     orgName: String
     password: String!
@@ -156,9 +156,9 @@ module.exports = gql`
     # for dashboard
     getCompletedModulesByStudent: [String]! # done checked
     getInProgressModulesByStudent: [String]! # done checked
-    getBadgesByStudent: [String]! # done
-    getStudentsByMentor: [Student]! # done
-    getMentorsByStudent: [String]! # done
+    getBadgesByStudent: [String]! # done checked
+    getStudentsByMentor: [String]! # done checked
+    getMentorsByStudent: [String]! # done checked
     getCategories: [Category]! # done checked
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
@@ -192,11 +192,12 @@ module.exports = gql`
     deleteAdmin(adminId: String!): String # done checked
     signupMentor(
       email: String!
+      name: String!
       password: String!
       confirmPassword: String!
-    ): Mentor! # done
+    ): Mentor! # done checked
     loginMentor(email: String!, password: String!): Mentor! # done checked
-    deleteMentor(mentorId: String!): String # done
+    deleteMentor(mentorId: String!): String # done checked
     signupStudent(
       name: String!
       orgName: String!
@@ -208,7 +209,8 @@ module.exports = gql`
     loginStudent(email: String!, password: String!): Student! # done checked
     addCompletedModule(moduleId: String!): [String] # done checked
     addInProgressModule(moduleId: String!): [String] # done checked
-    addBadge(badgeId: String!): [String] # done
+    addBadge(badgeId: String!): [String] # done checked
+    addMentor(mentorId: String!): [String] # done checked
     # For admin
     createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
     createNewBadge(
@@ -260,7 +262,7 @@ module.exports = gql`
       newInputFields: [String]!
       newType: String!
     ): QuestionTemplate! # done checked
-    deleteStringStringDict(stringStringDictId: String!): [StringStringDict]!
+    deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [String]! # done checked
@@ -306,4 +308,5 @@ module.exports = gql`
     ): Int! # done
   }
   # TODO giveBadgeToStudent
+  # TODO finish checking m + q and those related to mentor + student
 `;

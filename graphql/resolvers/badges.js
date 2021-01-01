@@ -27,11 +27,18 @@ module.exports = {
 
       const badges = await Badge.find();
 
-      if (!badges) {
-        throw new UserInputError("Invalid input");
-      } else {
-        return badges;
+      return badges;
+    },
+    async getBadgesByStudent(_, {}, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
       }
+      const badges = targetStudent.badges;
+
+      return badges;
     },
   },
 
@@ -86,6 +93,25 @@ module.exports = {
         return targetBadge;
       }
     },
+    async addBadge(_, { badgeId }, context) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new Error(error);
+      }
+
+      const targetBadge = await Badge.findById(badgeId);
+      if (!targetBadge) {
+        throw new UserInputError("Invalid input");
+      } else if (!targetStudent.badges.includes(badgeId)) {
+        await targetStudent.badges.push(badgeId);
+        await targetStudent.save();
+      }
+      const updatedBadges = targetStudent.badges;
+      return updatedBadges;
+    },
+
     async deleteBadge(_, { badgeId }, context) {
       try {
         const admin = checkAdminAuth(context);

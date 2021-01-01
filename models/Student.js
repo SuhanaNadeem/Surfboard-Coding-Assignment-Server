@@ -22,7 +22,7 @@ const studentSchema = new Schema({
   badges: [String],
   quesAnsDict: [{ _id: String, key: String, value: String }],
   modulePointsDict: [{ _id: String, key: String, value: Number }],
-
+  mentors: [String],
   createdAt: Date,
 });
 
