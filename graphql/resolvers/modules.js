@@ -209,11 +209,17 @@ module.exports = {
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
-        var modulePointsPair = await StringIntDict.findOne({
-          key: moduleId,
+        const allModulePointPairs = targetStudent.modulePointsDict;
+        var modulePointsPair;
+        allModulePointPairs.forEach(function (currentModulePointsPair) {
+          if (currentModulePointsPair.key === moduleId) {
+            modulePointsPair = currentModulePointsPair;
+          }
         });
-
-        if (!modulePointsPair) {
+        const targetModulePointsPair = await StringIntDict.findById(
+          modulePointsPair.id
+        );
+        if (!modulePointsPair || !targetModulePointsPair) {
           throw new UserInputError("Invalid input");
         } else {
           var points = modulePointsPair.value;
@@ -224,14 +230,15 @@ module.exports = {
             });
             targetStudent.modulePointsDict.splice(index, 1);
             await targetStudent.save();
-            await modulePointsPair.delete();
+            await targetModulePointsPair.delete();
             const newPair = new StringIntDict({
-              key: questionId,
+              key: moduleId,
               value: points,
               createdAt: new Date(),
             });
             await newPair.save();
             targetStudent.modulePointsDict.push(newPair);
+            await targetStudent.save();
           }
           return points;
         }
@@ -338,11 +345,14 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetModule = await Module.findById(moduleId);
-      // TODO this keeps saying false
-      if (
-        targetModule &&
-        !targetStudent.modulePointsDict.includes({ key: moduleId })
-      ) {
+      const allModulePointPairs = targetStudent.modulePointsDict;
+      var includes = false;
+      allModulePointPairs.forEach(function (targetModulePointPair) {
+        if (targetModulePointPair.key === moduleId) {
+          includes = true;
+        }
+      });
+      if (targetModule && !includes) {
         const newPair = new StringIntDict({
           key: moduleId,
           value: 0,
@@ -350,6 +360,7 @@ module.exports = {
         });
         await newPair.save();
         targetStudent.modulePointsDict.push(newPair);
+        console.log(targetStudent.modulePointsDict);
         await targetStudent.save();
         return newPair;
       } else {

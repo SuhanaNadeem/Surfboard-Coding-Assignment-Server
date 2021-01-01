@@ -181,9 +181,9 @@ module.exports = {
         }
       }
       const targetQuestion = await Question.findById(questionId);
-      if (!targetQuestion) {
+      if (!targetQuestion || targetUser.starredQuestions.includes(questionId)) {
         throw new UserInputError("Invalid input");
-      } else if (!targetUser.starredQuestions.includes(questionId)) {
+      } else {
         await targetUser.starredQuestions.push(questionId);
         await targetUser.save();
         const updatedStarredQuestions = targetUser.starredQuestions;
@@ -203,9 +203,12 @@ module.exports = {
         }
       }
       const targetQuestion = Question.findById(questionId);
-      if (!targetQuestion) {
+      if (
+        !targetQuestion ||
+        !targetUser.starredQuestions.includes(questionId)
+      ) {
         throw new UserInputError("Invalid input");
-      } else if (targetUser.starredQuestions.includes(questionId)) {
+      } else {
         const index = targetUser.starredQuestions.indexOf(questionId);
         targetUser.starredQuestions.splice(index, 1);
         await targetUser.save();
@@ -241,9 +244,9 @@ module.exports = {
       }
 
       const targetMentor = await Mentor.findById(mentorId);
-      if (!targetMentor) {
+      if (!targetMentor || targetStudent.mentors.includes(mentorId)) {
         throw new UserInputError("Invalid input");
-      } else if (!targetStudent.mentors.includes(mentorId)) {
+      } else {
         await targetStudent.mentors.push(mentorId);
         await targetStudent.save();
       }

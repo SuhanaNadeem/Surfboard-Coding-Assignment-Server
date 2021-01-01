@@ -153,6 +153,7 @@ module.exports = gql`
     getStudents: [Student]! # done checked
     getBadges: [Badge]! # done checked
     getStringStringDicts: [StringStringDict]! # done checked
+    getStringIntDicts: [StringIntDict]! # done checked
     # for dashboard
     getCompletedModulesByStudent: [String]! # done checked
     getInProgressModulesByStudent: [String]! # done checked
@@ -177,7 +178,7 @@ module.exports = gql`
     getCommentsByModule(moduleId: String!): [String]! # done checked
     getModulesBySearch(search: String!): [String]! # started
     getHintByQuestion(questionId: String!): String! # done checked
-    getSavedAnswerByQuestion(questionId: String!): [String]! # done
+    getSavedAnswerByQuestion(questionId: String!): String! # done checked
   }
 
   # actions
@@ -287,8 +288,8 @@ module.exports = gql`
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
-    startQuestion(questionId: String!): StringStringDict! # done
-    startModule(moduleId: String!): StringIntDict! # done
+    startQuestion(questionId: String!): StringStringDict! # done checked
+    startModule(moduleId: String!): StringIntDict! # done checked
     saveAnswer(
       answer: String!
       questionId: String!
@@ -305,8 +306,7 @@ module.exports = gql`
       moduleId: String!
       answerCorrect: Boolean!
       numToIncrement: Int!
-    ): Int! # done
+    ): Int! # done checked
   }
   # TODO giveBadgeToStudent
-  # TODO finish checking m + q and those related to mentor + student
 `;

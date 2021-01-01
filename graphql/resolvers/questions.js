@@ -62,10 +62,16 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const quesAnsPair = targetStudent.quesAnsDict.findOne({
-        key: questionId,
+      const targetQuestion = await Question.findById(questionId);
+      const allQuesAnsPairs = targetStudent.quesAnsDict;
+
+      var quesAnsPair;
+      allQuesAnsPairs.forEach(function (currentQuesAnsPair) {
+        if (currentQuesAnsPair.key === questionId) {
+          quesAnsPair = currentQuesAnsPair;
+        }
       });
-      if (!quesAnsPair) {
+      if (!quesAnsPair || !targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
         const savedAnswer = quesAnsPair.value;
@@ -83,16 +89,14 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetQuestion = await Question.findById(questionId);
-      const targetPair = await StringStringDict.findOne({ key: questionId });
-      console.log(targetPair);
-      console.log("hi");
-      console.log(targetStudent.quesAnsDict);
-      // TODO this keeps saying false
-      console.log(targetStudent.quesAnsDict.includes({ key: questionId }));
-      if (
-        targetQuestion &&
-        !targetStudent.quesAnsDict.includes({ key: questionId })
-      ) {
+      const allQuesAnsPairs = targetStudent.quesAnsDict;
+      var includes = false;
+      allQuesAnsPairs.forEach(function (targetQuesAnsPair) {
+        if (targetQuesAnsPair.key === questionId) {
+          includes = true;
+        }
+      });
+      if (targetQuestion && !includes) {
         const newPair = new StringStringDict({
           key: questionId,
           value: "",
@@ -101,7 +105,6 @@ module.exports = {
         await newPair.save();
         targetStudent.quesAnsDict.push(newPair);
         await targetStudent.save();
-        console.log(targetStudent.quesAnsDict);
         return newPair;
       } else {
         throw new UserInputError("Invalid input");

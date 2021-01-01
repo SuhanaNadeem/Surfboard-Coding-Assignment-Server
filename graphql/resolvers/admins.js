@@ -17,6 +17,7 @@ const Category = require("../../models/Category");
 const checkAdminAuth = require("../../util/checkAdminAuth");
 const StringStringDict = require("../../models/StringStringDict");
 const Student = require("../../models/Student");
+const StringIntDict = require("../../models/StringIntDict");
 function generateToken(admin) {
   return jwt.sign(
     {
@@ -60,6 +61,16 @@ module.exports = {
       const stringStringDicts = await StringStringDict.find();
 
       return stringStringDicts;
+    },
+    async getStringIntDicts(_, {}, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const stringIntDicts = await StringIntDict.find();
+
+      return stringIntDicts;
     },
   },
 
@@ -502,14 +513,17 @@ module.exports = {
         throw new UserInputError("Invalid input");
       } else {
         //TODO delete from students list too
-        // const allStudents = await Student.find();
-        // allStudents.forEach(function deleteQuesAnsPair(targetStudent) {
-        //   const index = targetStudent.quesAnsDict.indexOf({
-        //     id: stringStringDictId,
-        //   });
-        //   targetStudent.quesAnsDict.splice(index, 1);
-        //   await targetStudent.save();
-        // });
+        var allStudents = await Student.find();
+        allStudents.forEach(async function (targetStudent) {
+          console.log(targetStudent.quesAnsDict);
+          const index = targetStudent.quesAnsDict.indexOf({
+            id: stringStringDictId,
+          });
+          targetStudent.quesAnsDict.splice(index, 1);
+          console.log("here");
+          await targetStudent.save();
+          console.log(targetStudent.quesAnsDict);
+        });
         await targetStringStringDict.delete();
         const updatedStringStringDicts = await StringStringDict.find();
         return updatedStringStringDicts;
