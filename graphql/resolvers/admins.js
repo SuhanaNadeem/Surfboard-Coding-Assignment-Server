@@ -512,17 +512,13 @@ module.exports = {
       if (!targetStringStringDict) {
         throw new UserInputError("Invalid input");
       } else {
-        //TODO delete from students list too
         var allStudents = await Student.find();
         allStudents.forEach(async function (targetStudent) {
-          console.log(targetStudent.quesAnsDict);
           const index = targetStudent.quesAnsDict.indexOf({
             id: stringStringDictId,
           });
           targetStudent.quesAnsDict.splice(index, 1);
-          console.log("here");
           await targetStudent.save();
-          console.log(targetStudent.quesAnsDict);
         });
         await targetStringStringDict.delete();
         const updatedStringStringDicts = await StringStringDict.find();

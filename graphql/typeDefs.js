@@ -161,6 +161,7 @@ module.exports = gql`
     getStudentsByMentor: [String]! # done checked
     getMentorsByStudent: [String]! # done checked
     getCategories: [Category]! # done checked
+    getModuleById: Module! # done checked
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
     getAnswersByStudent(studentId: String!): [Answer]! # done checked

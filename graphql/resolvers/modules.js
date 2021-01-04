@@ -11,6 +11,28 @@ const { UserInputError, AuthenticationError } = require("apollo-server");
 
 module.exports = {
   Query: {
+    async getModuleById(_, { moduleId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const module = await Module.findById(moduleId);
+      if (!module) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return module;
+      }
+    },
+
     async getModules(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -27,11 +49,7 @@ module.exports = {
 
       const modules = await Module.find();
 
-      if (!modules) {
-        throw new UserInputError("Invalid input");
-      } else {
-        return modules;
-      }
+      return modules;
     },
     async getComments(_, {}, context) {
       try {
