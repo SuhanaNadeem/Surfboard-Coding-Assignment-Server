@@ -76,21 +76,19 @@ module.exports = {
     async getModulesByCategory(_, { categoryId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        throw new AuthenticationError();
-      }
-      const targetModules = targetAdmin.modules;
-      if (targetModules) {
-        const matches = await Module.find({ categoryId });
-        if (!matches) {
-          return [];
-        } else {
-          return matches;
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
         }
-      } else {
-        throw new UserInputError("Invalid input");
       }
+
+      const modules = await Module.find({ categoryId });
+      return modules;
     },
   },
 };

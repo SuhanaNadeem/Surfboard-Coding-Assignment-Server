@@ -308,5 +308,5 @@ module.exports = gql`
       numToIncrement: Int!
     ): Int! # done checked
   }
-  # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin
+  # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin
 `;
