@@ -155,13 +155,14 @@ module.exports = gql`
     getStringStringDicts: [StringStringDict]! # done checked
     getStringIntDicts: [StringIntDict]! # done checked
     # for dashboard
-    getCompletedModulesByStudent: [String]! # done checked
-    getInProgressModulesByStudent: [String]! # done checked
+    getCompletedModulesByStudent: [Module]! # done checked
+    getInProgressModulesByStudent: [Module]! # done checked
     getBadgesByStudent: [String]! # done checked
     getStudentsByMentor: [String]! # done checked
     getMentorsByStudent: [String]! # done checked
     getCategories: [Category]! # done checked
-    getModuleById: Module! # done checked
+    getModuleById(moduleId: String!): Module! # done checked
+    getCategoryById(categoryId: String!): Category! # done checked
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
     getAnswersByStudent(studentId: String!): [Answer]! # done checked

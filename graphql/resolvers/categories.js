@@ -12,6 +12,28 @@ const Challenge = require("../../models/Challenge");
 
 module.exports = {
   Query: {
+    async getCategoryById(_, { categoryId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return category;
+      }
+    },
+
     async getCategories(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);

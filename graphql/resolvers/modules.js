@@ -81,7 +81,11 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const completedModules = targetStudent.completedModules;
+      const completedModuleIds = targetStudent.completedModules;
+
+      const completedModules = await Module.find({
+        _id: { $in: completedModuleIds },
+      });
       return completedModules;
     },
     async getInProgressModulesByStudent(_, {}, context) {
@@ -91,7 +95,11 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const inProgressModules = targetStudent.inProgressModules;
+      const inProgressModuleIds = targetStudent.inProgressModules;
+
+      const inProgressModules = await Module.find({
+        _id: { $in: inProgressModuleIds },
+      });
       return inProgressModules;
     },
     async getModulesBySearch(_, { search }, context) {
@@ -305,6 +313,8 @@ module.exports = {
         await targetStudent.save();
         const updatedInProgressModules = targetStudent.inProgressModules;
         return updatedInProgressModules;
+      } else {
+        throw new UserInputError("Invalid input");
       }
     },
     async starModule(_, { moduleId }, context) {
