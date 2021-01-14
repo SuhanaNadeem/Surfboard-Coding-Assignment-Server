@@ -70,7 +70,7 @@ module.exports = gql`
     id: String!
     name: String! # ASSUMING THIS IS UNIQUE
     categoryId: String!
-    format: String! # video or article | question type
+    format: String! # question type
     comments: [String]!
     questions: [String]!
     createdAt: DateTime!
@@ -125,6 +125,8 @@ module.exports = gql`
     createdAt: DateTime!
     hint: String
     questionTemplateId: String!
+    points: Int
+    moduleId: String
   }
 
   type Challenge {
@@ -229,6 +231,7 @@ module.exports = gql`
       expectedAnswer: String
       hint: String!
       questionTemplateId: String!
+      points: Int
     ): Question! # done checked
     createNewQuestionTemplate(
       name: String!
@@ -257,6 +260,7 @@ module.exports = gql`
       newQuestionDescription: String!
       newHint: String!
       newExpectedAnswer: String
+      newPoints: Int
     ): Question! # done checked
     editQuestionTemplate(
       newName: String!

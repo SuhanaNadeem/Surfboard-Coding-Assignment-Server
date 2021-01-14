@@ -176,6 +176,7 @@ module.exports = {
         questionDescription,
         expectedAnswer,
         questionTemplateId,
+        points,
       },
       context
     ) {
@@ -204,6 +205,8 @@ module.exports = {
           expectedAnswer,
           hint,
           questionTemplateId,
+          points,
+          moduleId,
           createdAt: new Date(),
         });
         await newQuestion.save();
@@ -381,6 +384,7 @@ module.exports = {
         newQuestionDescription,
         newExpectedAnswer,
         newModuleId,
+        newPoints,
       },
       context
     ) {
@@ -396,10 +400,12 @@ module.exports = {
       if (!targetQuestion || !currentModule || !newModule) {
         throw new UserInputError("Invalid input");
       } else {
+        console.log(targetQuestion);
         targetQuestion.image = newImage;
         targetQuestion.questionDescription = newQuestionDescription;
         targetQuestion.expectedAnswer = newExpectedAnswer;
         targetQuestion.hint = newHint;
+        targetQuestion.points = newPoints;
         if (newModuleId != moduleId) {
           const index = currentModule.questions.indexOf(questionId);
           currentModule.questions.splice(index, 1);

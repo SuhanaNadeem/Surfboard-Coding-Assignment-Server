@@ -13,6 +13,8 @@ const questionSchema = new Schema({
   createdAt: Date,
   hint: String,
   questionTemplateId: String,
+  moduleId: String,
+  points: Number,
 });
 
 module.exports = model("Question", questionSchema);
