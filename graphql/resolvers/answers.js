@@ -39,17 +39,11 @@ module.exports = {
           }
         }
       }
-      console.log(1);
       const targetStudent = await Student.findById(studentId);
       if (targetStudent) {
-        console.log(2);
-
         const answers = await Answer.find({ studentId });
-        console.log(answers);
         return answers;
       } else {
-        console.log(3);
-
         throw new UserInputError("Invalid input");
       }
     },

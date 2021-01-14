@@ -400,7 +400,6 @@ module.exports = {
       if (!targetQuestion || !currentModule || !newModule) {
         throw new UserInputError("Invalid input");
       } else {
-        console.log(targetQuestion);
         targetQuestion.image = newImage;
         targetQuestion.questionDescription = newQuestionDescription;
         targetQuestion.expectedAnswer = newExpectedAnswer;

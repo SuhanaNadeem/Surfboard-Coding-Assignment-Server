@@ -47,7 +47,7 @@ module.exports = gql`
     mentors: [String]
 
     quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
-    modulePointsDict: [StringIntDict] # {module: points}
+    modulePointsDict: [StringIntDict] # {studentId + module: points}
     createdAt: DateTime!
     token: String
   }
@@ -63,6 +63,7 @@ module.exports = gql`
     id: String!
     key: String! # module id
     value: Int! # points
+    studentId: String
     createdAt: DateTime!
   }
 
@@ -183,6 +184,7 @@ module.exports = gql`
     getModulesBySearch(search: String!): [String]! # started
     getHintByQuestion(questionId: String!): String! # done checked
     getSavedAnswerByQuestion(questionId: String!): String! # done checked
+    getModulePointsByStudent(studentId: String!, moduleId: String!): Int # done checked
   }
 
   # actions
@@ -295,7 +297,7 @@ module.exports = gql`
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
     startQuestion(questionId: String!): StringStringDict! # done checked
-    startModule(moduleId: String!): StringIntDict! # done checked
+    startModule(moduleId: String!, studentId: String): StringIntDict! # done checked
     saveAnswer(
       answer: String!
       questionId: String!
@@ -312,6 +314,7 @@ module.exports = gql`
       moduleId: String!
       answerCorrect: Boolean!
       numToIncrement: Int!
+      studentId: String
     ): Int! # done checked
   }
   # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin

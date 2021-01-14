@@ -51,6 +51,30 @@ module.exports = {
 
       return modules;
     },
+
+    async getModulePointsByStudent(_, { studentId, moduleId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+      const targetStudent = await Student.findById(studentId);
+      if (targetStudent && targetModule) {
+        const modulePoints = targetStudent.modulePointsDict.find({ moduleId });
+        return modulePoints;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
+    },
+
     async getComments(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -219,10 +243,9 @@ module.exports = {
       await targetComment.delete();
       return targetModule;
     },
-
     async incrementModulePoints(
       _,
-      { moduleId, answerCorrect, numToIncrement },
+      { moduleId, answerCorrect, numToIncrement, studentId },
       context
     ) {
       try {
@@ -238,7 +261,10 @@ module.exports = {
         const allModulePointPairs = targetStudent.modulePointsDict;
         var modulePointsPair;
         allModulePointPairs.forEach(function (currentModulePointsPair) {
-          if (currentModulePointsPair.key === moduleId) {
+          if (
+            currentModulePointsPair.key === moduleId &&
+            currentModulePointsPair.studentId === studentId
+          ) {
             modulePointsPair = currentModulePointsPair;
           }
         });
@@ -253,6 +279,7 @@ module.exports = {
             points = points + numToIncrement;
             const index = targetStudent.modulePointsDict.indexOf({
               key: moduleId,
+              studentId,
             });
             targetStudent.modulePointsDict.splice(index, 1);
             await targetStudent.save();
@@ -260,6 +287,7 @@ module.exports = {
             const newPair = new StringIntDict({
               key: moduleId,
               value: points,
+              studentId,
               createdAt: new Date(),
             });
             await newPair.save();
@@ -365,30 +393,46 @@ module.exports = {
         return updatedStarredModules;
       }
     },
-    async startModule(_, { moduleId }, context) {
+    async startModule(_, { moduleId, studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      var targetStudent = await Student.findById(studentId);
+
+      if (!targetStudent) {
+        throw new UserInputError("invalid input");
       }
       const targetModule = await Module.findById(moduleId);
       const allModulePointPairs = targetStudent.modulePointsDict;
       var includes = false;
+
       allModulePointPairs.forEach(function (targetModulePointPair) {
-        if (targetModulePointPair.key === moduleId) {
+        if (
+          targetModulePointPair.key === moduleId &&
+          targetModulePointPair.studentId === studentId
+        ) {
           includes = true;
         }
       });
+
       if (targetModule && !includes) {
         const newPair = new StringIntDict({
           key: moduleId,
           value: 0,
+          studentId,
           createdAt: new Date(),
         });
         await newPair.save();
         targetStudent.modulePointsDict.push(newPair);
-        console.log(targetStudent.modulePointsDict);
         await targetStudent.save();
         return newPair;
       } else {

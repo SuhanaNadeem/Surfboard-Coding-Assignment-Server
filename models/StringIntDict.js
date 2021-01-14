@@ -10,6 +10,7 @@ const stringIntDictSchema = new Schema({
   },
   key: String,
   value: Number,
+  studentId: String,
   createdAt: Date,
 });
 
