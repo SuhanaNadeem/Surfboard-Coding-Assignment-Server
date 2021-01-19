@@ -21,7 +21,9 @@ const studentSchema = new Schema({
   unstarredQuestions: [String],
   badges: [String],
   quesAnsDict: [{ _id: String, key: String, value: String }],
-  modulePointsDict: [{ _id: String, key: String, value: Number }],
+  modulePointsDict: [
+    { _id: String, key: String, value: Number, studentId: String },
+  ],
   mentors: [String],
   createdAt: Date,
 });

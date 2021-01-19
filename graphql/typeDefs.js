@@ -272,6 +272,7 @@ module.exports = gql`
       newType: String!
     ): QuestionTemplate! # done checked
     deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
+    deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [String]! # done checked
@@ -297,7 +298,7 @@ module.exports = gql`
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
     startQuestion(questionId: String!): StringStringDict! # done checked
-    startModule(moduleId: String!, studentId: String): StringIntDict! # done checked
+    startModule(moduleId: String!, studentId: String!): StringIntDict! # done checked
     saveAnswer(
       answer: String!
       questionId: String!
@@ -314,7 +315,7 @@ module.exports = gql`
       moduleId: String!
       answerCorrect: Boolean!
       numToIncrement: Int!
-      studentId: String
+      studentId: String!
     ): Int! # done checked
   }
   # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin

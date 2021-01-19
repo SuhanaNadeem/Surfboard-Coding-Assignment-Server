@@ -530,7 +530,30 @@ module.exports = {
         return updatedStringStringDicts;
       }
     },
-
+    async deleteStringIntDict(_, { stringIntDictId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+        var targetAdmin = await Admin.findById(admin.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetStringIntDict = await StringIntDict.findById(stringIntDictId);
+      if (!targetStringIntDict) {
+        throw new UserInputError("Invalid input");
+      } else {
+        var allStudents = await Student.find();
+        allStudents.forEach(async function (targetStudent) {
+          const index = targetStudent.modulePointsDict.indexOf({
+            id: stringIntDictId,
+          });
+          targetStudent.modulePointsDict.splice(index, 1);
+          await targetStudent.save();
+        });
+        await targetStringIntDict.delete();
+        const updatedStringIntDicts = await StringIntDict.find();
+        return updatedStringIntDicts;
+      }
+    },
     // TODO solve list problem with badges, in progress/completed modules
     async deleteQuestion(_, { questionId }, context) {
       try {

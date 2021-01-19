@@ -65,10 +65,12 @@ module.exports = {
           }
         }
       }
-      const targetModule = await Module.findById(moduleId);
-      const targetStudent = await Student.findById(studentId);
-      if (targetStudent && targetModule) {
-        const modulePoints = targetStudent.modulePointsDict.find({ moduleId });
+      const targetModulePointsPair = await StringIntDict.find({
+        key: moduleId,
+        studentId,
+      });
+      if (targetModulePointsPair === true) {
+        const modulePoints = targetModulePointsPair.value;
         return modulePoints;
       } else {
         throw new UserInputError("Invalid input");
@@ -254,48 +256,37 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetModule = await Module.findById(moduleId);
-      if (!targetModule) {
+      const targetModulePointsPair = await StringIntDict.find({
+        key: moduleId,
+        studentId,
+      });
+
+      if (!targetModulePointsPair || targetModulePointsPair.length == 0) {
         throw new UserInputError("Invalid input");
       } else {
-        const allModulePointPairs = targetStudent.modulePointsDict;
-        var modulePointsPair;
-        allModulePointPairs.forEach(function (currentModulePointsPair) {
-          if (
-            currentModulePointsPair.key === moduleId &&
-            currentModulePointsPair.studentId === studentId
-          ) {
-            modulePointsPair = currentModulePointsPair;
-          }
-        });
-        const targetModulePointsPair = await StringIntDict.findById(
-          modulePointsPair.id
-        );
-        if (!modulePointsPair || !targetModulePointsPair) {
-          throw new UserInputError("Invalid input");
-        } else {
-          var points = modulePointsPair.value;
-          if (answerCorrect) {
-            points = points + numToIncrement;
-            const index = targetStudent.modulePointsDict.indexOf({
-              key: moduleId,
-              studentId,
-            });
-            targetStudent.modulePointsDict.splice(index, 1);
-            await targetStudent.save();
-            await targetModulePointsPair.delete();
-            const newPair = new StringIntDict({
-              key: moduleId,
-              value: points,
-              studentId,
-              createdAt: new Date(),
-            });
-            await newPair.save();
-            targetStudent.modulePointsDict.push(newPair);
-            await targetStudent.save();
-          }
-          return points;
+        var points = targetModulePointsPair[0].value;
+
+        if (answerCorrect) {
+          points = points + numToIncrement;
+          const index = targetStudent.modulePointsDict.indexOf({
+            key: moduleId,
+            studentId,
+          });
+          targetStudent.modulePointsDict.splice(index, 1);
+          await targetStudent.save();
+
+          await StringIntDict.deleteOne({ key: moduleId, studentId });
+          const newPair = new StringIntDict({
+            key: moduleId,
+            value: points,
+            studentId,
+            createdAt: new Date(),
+          });
+          await newPair.save();
+          targetStudent.modulePointsDict.push(newPair);
+          await targetStudent.save();
         }
+        return points;
       }
     },
     async addCompletedModule(_, { moduleId }, context) {
@@ -412,19 +403,17 @@ module.exports = {
         throw new UserInputError("invalid input");
       }
       const targetModule = await Module.findById(moduleId);
-      const allModulePointPairs = targetStudent.modulePointsDict;
-      var includes = false;
-
-      allModulePointPairs.forEach(function (targetModulePointPair) {
-        if (
-          targetModulePointPair.key === moduleId &&
-          targetModulePointPair.studentId === studentId
-        ) {
-          includes = true;
-        }
-      });
-
-      if (targetModule && !includes) {
+      const targetPair = await StringIntDict.find({ key: moduleId, studentId });
+      // var includes = false;
+      // allModulePointPairs.forEach(function (targetModulePointsPair) {
+      //   if (
+      //     targetModulePointsPair.key === moduleId &&
+      //     targetModulePointsPair.studentId === studentId
+      //   ) {
+      //     includes = true;
+      //   }
+      // });
+      if (targetModule && (!targetPair || targetPair.length === 0)) {
         const newPair = new StringIntDict({
           key: moduleId,
           value: 0,
