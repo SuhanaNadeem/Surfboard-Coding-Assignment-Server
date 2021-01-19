@@ -8,6 +8,7 @@ const Mentor = require("../../models/Mentor");
 const Comment = require("../../models/Comment");
 const StringIntDict = require("../../models/StringIntDict");
 const { UserInputError, AuthenticationError } = require("apollo-server");
+const Question = require("../../models/Question");
 
 module.exports = {
   Query: {
@@ -169,6 +170,36 @@ module.exports = {
         return targetQuestions;
       } else {
         return [];
+      }
+    },
+    async getTotalPossibleModulePoints(_, { moduleId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetModule = await Module.findById(moduleId);
+      const moduleQuestions = targetModule.questions;
+      if (!targetModule || !moduleQuestions) {
+        throw new UserInputError("Invalid input");
+      } else {
+        var totalPoints = 0;
+        var points;
+        const allQuestions = await Question.find({ moduleId });
+        allQuestions.forEach(function (targetQuestion) {
+          points = targetQuestion.points;
+          if (points) {
+            totalPoints += points;
+          }
+        });
+        return totalPoints;
       }
     },
     async getCommentsByModule(_, { moduleId }, context) {
