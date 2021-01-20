@@ -554,7 +554,6 @@ module.exports = {
         return updatedStringIntDicts;
       }
     },
-    // TODO solve list problem with badges, in progress/completed modules
     async deleteQuestion(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -572,7 +571,7 @@ module.exports = {
         await targetModule.save();
         await targetQuestion.delete();
         await targetModule.save();
-        const updatedQuestions = targetModule.questions;
+        const updatedQuestions = await Question.find();
         return updatedQuestions;
       }
     },

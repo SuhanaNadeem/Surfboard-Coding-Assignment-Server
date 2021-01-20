@@ -276,7 +276,7 @@ module.exports = gql`
     deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked
     deleteModule(moduleId: String!): [String]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
-    deleteQuestion(questionId: String!): [String]! # done checked
+    deleteQuestion(questionId: String!): [Question]! # done checked
     deleteAnswer(answerId: String!, studentId: String!): String! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked
