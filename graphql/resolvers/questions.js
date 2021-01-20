@@ -11,6 +11,28 @@ const StringStringDict = require("../../models/StringStringDict");
 
 module.exports = {
   Query: {
+    async getQuestionById(_, { questionId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const targetQuestion = await Question.findById(questionId);
+      if (!targetQuestion) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetQuestion;
+      }
+    },
+
     async getQuestions(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);

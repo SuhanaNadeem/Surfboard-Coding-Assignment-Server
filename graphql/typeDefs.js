@@ -168,6 +168,7 @@ module.exports = gql`
     getCategories: [Category]! # done checked
     getModuleById(moduleId: String!): Module! # done checked
     getCategoryById(categoryId: String!): Category! # done checked
+    getQuestionById(questionId: String!): Question! # done checked
     getModules: [Module]! # done checked
     getChallenges: [Challenge]! # done checked
     getAnswersByStudent(studentId: String!): [Answer]! # done checked
