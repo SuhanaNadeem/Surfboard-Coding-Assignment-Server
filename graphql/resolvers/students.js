@@ -39,6 +39,27 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
     },
+
+    async getStudentById(_, { studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetStudent;
+      }
+    },
     async getStudents(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);
