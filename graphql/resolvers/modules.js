@@ -70,11 +70,11 @@ module.exports = {
         key: moduleId,
         studentId,
       });
-      if (targetModulePointsPair === true) {
-        const modulePoints = targetModulePointsPair.value;
-        return modulePoints;
-      } else {
+      if (!targetModulePointsPair || targetModulePointsPair.length == 0) {
         throw new UserInputError("Invalid input");
+      } else {
+        const modulePoints = targetModulePointsPair[0].value;
+        return modulePoints;
       }
     },
 
@@ -359,6 +359,7 @@ module.exports = {
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else if (!targetStudent.inProgressModules.includes(moduleId)) {
+        // currently you're allowed to redo a completed module - when you open it, it should have the previous info
         await targetStudent.inProgressModules.push(moduleId);
         await targetStudent.save();
         const updatedInProgressModules = targetStudent.inProgressModules;

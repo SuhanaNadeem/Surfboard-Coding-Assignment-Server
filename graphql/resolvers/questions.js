@@ -62,26 +62,32 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetQuestion = await Question.findById(questionId);
-      const allQuesAnsPairs = targetStudent.quesAnsDict;
+      // const targetQuestion = await Question.findById(questionId);
+      // const allQuesAnsPairs = targetStudent.quesAnsDict;
 
-      var quesAnsPair;
-      allQuesAnsPairs.forEach(function (currentQuesAnsPair) {
-        if (currentQuesAnsPair.key === questionId) {
-          quesAnsPair = currentQuesAnsPair;
-        }
+      // var quesAnsPair;
+      // allQuesAnsPairs.forEach(function (currentQuesAnsPair) {
+      //   if (currentQuesAnsPair.key === questionId) {
+      //     quesAnsPair = currentQuesAnsPair;
+      //   }
+      // });
+
+      const targetQuesAnsPair = await StringStringDict.find({
+        key: questionId,
+        studentId,
       });
-      if (!quesAnsPair || !targetQuestion) {
+
+      if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
         throw new UserInputError("Invalid input");
       } else {
-        const savedAnswer = quesAnsPair.value;
+        const savedAnswer = targetQuesAnsPair[0].value;
         return savedAnswer;
       }
     },
   },
 
   Mutation: {
-    async startQuestion(_, { questionId }, context) {
+    async startQuestion(_, { questionId, studentId }, context) {
       try {
         const student = checkStudentAuth(context);
         var targetStudent = await Student.findById(student.id);
@@ -89,17 +95,25 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetQuestion = await Question.findById(questionId);
-      const allQuesAnsPairs = targetStudent.quesAnsDict;
-      var includes = false;
-      allQuesAnsPairs.forEach(function (targetQuesAnsPair) {
-        if (targetQuesAnsPair.key === questionId) {
-          includes = true;
-        }
+      const targetQuesAnsPair = await StringStringDict.find({
+        key: questionId,
+        studentId,
       });
-      if (targetQuestion && !includes) {
+      // const allQuesAnsPairs = targetStudent.quesAnsDict;
+      // var includes = false;
+      // allQuesAnsPairs.forEach(function (targetQuesAnsPair) {
+      //   if (targetQuesAnsPair.key === questionId) {
+      //     includes = true;
+      //   }
+      // });
+      if (
+        targetQuestion &&
+        (!targetQuesAnsPair || targetQuesAnsPair.length == 0)
+      ) {
         const newPair = new StringStringDict({
           key: questionId,
           value: "",
+          studentId,
           createdAt: new Date(),
         });
         await newPair.save();

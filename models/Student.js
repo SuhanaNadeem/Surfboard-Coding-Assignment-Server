@@ -20,7 +20,7 @@ const studentSchema = new Schema({
   starredQuestions: [String],
   unstarredQuestions: [String],
   badges: [String],
-  quesAnsDict: [{ _id: String, key: String, value: String }],
+  quesAnsDict: [{ _id: String, key: String, value: String, studentId: String }],
   modulePointsDict: [
     { _id: String, key: String, value: Number, studentId: String },
   ],

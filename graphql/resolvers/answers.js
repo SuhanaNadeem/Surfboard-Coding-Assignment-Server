@@ -64,9 +64,13 @@ module.exports = {
       if (targetAnswer) {
         var quesAnsPair = await StringStringDict.findOne({
           value: answerId,
+          studentId,
         });
         if (quesAnsPair) {
-          const index = targetStudent.quesAnsDict.indexOf({ value: answerId });
+          const index = targetStudent.quesAnsDict.indexOf({
+            value: answerId,
+            studentId,
+          });
           targetStudent.quesAnsDict.splice(index, 1);
           await targetStudent.save();
           await quesAnsPair.delete();
@@ -97,6 +101,7 @@ module.exports = {
       } else {
         var quesAnsPair = await StringStringDict.findOne({
           key: questionId,
+          studentId,
         });
 
         const newAnswer = new Answer({
@@ -113,6 +118,7 @@ module.exports = {
         } else {
           const index = targetStudent.quesAnsDict.indexOf({
             key: questionId,
+            studentId,
           });
           targetStudent.quesAnsDict.splice(index, 1);
           await targetStudent.save();
@@ -120,6 +126,7 @@ module.exports = {
           const newPair = new StringStringDict({
             key: questionId,
             value: newAnswer.id,
+            studentId,
             createdAt: new Date(),
           });
           await newPair.save();

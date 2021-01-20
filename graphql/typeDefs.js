@@ -56,6 +56,7 @@ module.exports = gql`
     id: String!
     key: String! # ques id
     value: String! # ans id
+    studentId: String
     createdAt: DateTime!
   }
 
@@ -298,7 +299,7 @@ module.exports = gql`
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done
     # for learn/practice experience
-    startQuestion(questionId: String!): StringStringDict! # done checked
+    startQuestion(questionId: String!, studentId: String!): StringStringDict! # done checked
     startModule(moduleId: String!, studentId: String!): StringIntDict! # done checked
     saveAnswer(
       answer: String!
