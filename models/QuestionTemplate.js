@@ -7,7 +7,6 @@ const questionTemplateSchema = new Schema({
     type: String,
     default: () => nanoid(),
   },
-  type: String,
   categoryId: String,
   inputFields: [String],
   createdAt: Date,

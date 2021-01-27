@@ -72,10 +72,10 @@ module.exports = gql`
     id: String!
     name: String! # ASSUMING THIS IS UNIQUE
     categoryId: String!
-    format: String! # question type
     comments: [String]!
     questions: [String]!
     createdAt: DateTime!
+    learningObjectives: [String]
   }
 
   type Category {
@@ -112,16 +112,15 @@ module.exports = gql`
   type QuestionTemplate {
     id: String!
     name: String!
-    type: String! # learn or practice
     categoryId: String! # CAD, electrical, programming
     inputFields: [String]! # diff things you can enter
-    hint: String
     createdAt: DateTime!
   }
-
   type Question {
     id: String!
+    type: String
     image: String
+    questionName: String
     questionDescription: String! # ASSUMING THIS IS UNIQUE
     expectedAnswer: String
     createdAt: DateTime!
@@ -129,6 +128,9 @@ module.exports = gql`
     questionTemplateId: String!
     points: Int
     moduleId: String
+    videoLink: String
+    articleLink: String
+    skillDescription: String
   }
 
   type Challenge {
@@ -223,7 +225,7 @@ module.exports = gql`
     addBadge(badgeId: String!): [String] # done checked
     addMentor(mentorId: String!): [String] # done checked
     # For admin
-    createNewModule(name: String!, categoryId: String!, format: String): Module! # done checked
+    createNewModule(name: String!, categoryId: String!): Module! # done checked
     createNewBadge(
       name: String!
       image: String!
@@ -238,18 +240,21 @@ module.exports = gql`
       hint: String!
       questionTemplateId: String!
       points: Int
+      videoLink: String
+      articleLink: String
+      skillDescription: String
+      questionName: String
+      type: String
     ): Question! # done checked
     createNewQuestionTemplate(
       name: String!
       categoryId: String!
       inputFields: [String]!
-      type: String!
     ): QuestionTemplate! # done checked
     editModule(
       moduleId: String!
       newName: String!
       newCategoryId: String!
-      newFormat: String!
     ): Module! # done checked
     editBadge(
       badgeId: String!
@@ -267,13 +272,17 @@ module.exports = gql`
       newHint: String!
       newExpectedAnswer: String
       newPoints: Int
+      newVideoLink: String
+      newArticleLink: String
+      newSkillDescription: String
+      newQuestionName: String
+      newType: String
     ): Question! # done checked
     editQuestionTemplate(
       newName: String!
       questionTemplateId: String!
       newCategoryId: String!
       newInputFields: [String]!
-      newType: String!
     ): QuestionTemplate! # done checked
     deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
     deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked

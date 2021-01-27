@@ -177,6 +177,11 @@ module.exports = {
         expectedAnswer,
         questionTemplateId,
         points,
+        videoLink,
+        articleLink,
+        skillDescription,
+        questionName,
+        type,
       },
       context
     ) {
@@ -207,6 +212,11 @@ module.exports = {
           questionTemplateId,
           points,
           moduleId,
+          videoLink,
+          articleLink,
+          skillDescription,
+          questionName,
+          type,
           createdAt: new Date(),
         });
         await newQuestion.save();
@@ -224,7 +234,7 @@ module.exports = {
 
     async createNewQuestionTemplate(
       _,
-      { name, categoryId, type, inputFields },
+      { name, categoryId, inputFields },
       context
     ) {
       try {
@@ -245,7 +255,6 @@ module.exports = {
         const newQuestionTemplate = new QuestionTemplate({
           categoryId,
           name,
-          type,
           inputFields,
           createdAt: new Date(),
         });
@@ -260,7 +269,7 @@ module.exports = {
       }
     },
 
-    async createNewModule(_, { name, categoryId, format }, context) {
+    async createNewModule(_, { name, categoryId }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -280,7 +289,6 @@ module.exports = {
         const newModule = new Module({
           name,
           categoryId,
-          format,
           questions,
           comments,
           createdAt: new Date(),
@@ -350,11 +358,7 @@ module.exports = {
         return targetCategory;
       }
     },
-    async editModule(
-      _,
-      { moduleId, newName, newCategoryId, newFormat },
-      context
-    ) {
+    async editModule(_, { moduleId, newName, newCategoryId }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -367,7 +371,6 @@ module.exports = {
       } else {
         targetModule.name = newName;
         targetModule.categoryId = newCategoryId;
-        targetModule.format = newFormat;
 
         await targetModule.save();
         return targetModule;
@@ -385,6 +388,11 @@ module.exports = {
         newExpectedAnswer,
         newModuleId,
         newPoints,
+        newVideoLink,
+        newArticleLink,
+        newSkillDescription,
+        newQuestionName,
+        newType,
       },
       context
     ) {
@@ -405,6 +413,13 @@ module.exports = {
         targetQuestion.expectedAnswer = newExpectedAnswer;
         targetQuestion.hint = newHint;
         targetQuestion.points = newPoints;
+
+        targetQuestion.videoLink = newVideoLink;
+        targetQuestion.articleLink = newArticleLink;
+        targetQuestion.type = newType;
+        targetQuestion.skillDescription = newSkillDescription;
+        targetQuestion.questionName = newQuestionName;
+
         if (newModuleId != moduleId) {
           const index = currentModule.questions.indexOf(questionId);
           currentModule.questions.splice(index, 1);
@@ -420,7 +435,7 @@ module.exports = {
 
     async editQuestionTemplate(
       _,
-      { questionTemplateId, newName, newCategoryId, newInputFields, newType },
+      { questionTemplateId, newName, newCategoryId, newInputFields },
       context
     ) {
       try {
@@ -437,7 +452,6 @@ module.exports = {
       } else {
         targetQuestionTemplate.categoryId = newCategoryId;
         targetQuestionTemplate.inputFields = newInputFields;
-        targetQuestionTemplate.type = newType;
         targetQuestionTemplate.name = newName;
 
         await targetQuestionTemplate.save();

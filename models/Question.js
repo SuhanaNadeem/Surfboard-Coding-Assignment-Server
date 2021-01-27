@@ -15,6 +15,11 @@ const questionSchema = new Schema({
   questionTemplateId: String,
   moduleId: String,
   points: Number,
+  type: String,
+  skillDescription: String,
+  videoLink: String,
+  articleLink: String,
+  questionName: String,
 });
 
 module.exports = model("Question", questionSchema);

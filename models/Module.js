@@ -10,10 +10,10 @@ const moduleSchema = new Schema({
   },
   name: String,
   categoryId: String,
-  format: String,
   comments: [String],
   questions: [String],
   createdAt: Date,
+  learningObjectives: [String],
 });
 
 module.exports = model("Module", moduleSchema);
