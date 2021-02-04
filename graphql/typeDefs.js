@@ -183,6 +183,10 @@ module.exports = gql`
     getChallengesByCategory(categoryId: String!): [Challenge]! # done checked
     # for student's learn page (categories.js)
     getModulesByCategory(categoryId: String!): [Module]! # done checked
+    getIncompleteModulesByCategory(
+      studentId: String!
+      categoryId: String!
+    ): [Module]! # done checked
     # can be of any of the types
     getQuestionsByModule(moduleId: String!): [String]! # done checked
     getCommentsByModule(moduleId: String!): [String]! # done checked
