@@ -586,6 +586,7 @@ module.exports = {
         await targetQuestion.delete();
         await targetModule.save();
         const updatedQuestions = await Question.find();
+        console.log(targetModule.questions);
         return updatedQuestions;
       }
     },

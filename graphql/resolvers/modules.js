@@ -368,6 +368,63 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
     },
+
+    async removeInProgressModule(_, { moduleId, studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else if (targetStudent.inProgressModules.includes(moduleId)) {
+        const index = targetStudent.inProgressModules.indexOf(moduleId);
+        targetStudent.inProgressModules.splice(index, 1);
+        await targetStudent.save();
+        const updatedInProgressModules = targetStudent.inProgressModules;
+        return updatedInProgressModules;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
+    },
+
+    async removeCompletedModule(_, { moduleId, studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Invalid input");
+      } else if (targetStudent.completedModules.includes(moduleId)) {
+        const index = targetStudent.completedModules.indexOf(moduleId);
+        targetStudent.completedModules.splice(index, 1);
+        await targetStudent.save();
+        const updatedcompletedModules = targetStudent.completedModules;
+        return updatedcompletedModules;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
+    },
+
     async starModule(_, { moduleId }, context) {
       try {
         var user = checkStudentAuth(context);
