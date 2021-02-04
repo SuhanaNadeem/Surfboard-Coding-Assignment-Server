@@ -552,17 +552,29 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetStringIntDict = await StringIntDict.findById(stringIntDictId);
+      const moduleId = targetStringIntDict.key;
       if (!targetStringIntDict) {
         throw new UserInputError("Invalid input");
       } else {
         var allStudents = await Student.find();
         allStudents.forEach(async function (targetStudent) {
-          const index = targetStudent.modulePointsDict.indexOf({
+          const index1 = targetStudent.modulePointsDict.indexOf({
             id: stringIntDictId,
           });
-          targetStudent.modulePointsDict.splice(index, 1);
+          targetStudent.modulePointsDict.splice(index1, 1);
           await targetStudent.save();
+          if (targetStudent.completedModules.includes(moduleId)) {
+            const index2 = targetStudent.completedModules.indexOf(moduleId);
+            targetStudent.completedModules.splice(index2, 1);
+            await targetStudent.save();
+          }
+          if (targetStudent.inProgressModules.includes(moduleId)) {
+            const index3 = targetStudent.inProgressModules.indexOf(moduleId);
+            targetStudent.inProgressModules.splice(index3, 1);
+            await targetStudent.save();
+          }
         });
+
         await targetStringIntDict.delete();
         const updatedStringIntDicts = await StringIntDict.find();
         return updatedStringIntDicts;

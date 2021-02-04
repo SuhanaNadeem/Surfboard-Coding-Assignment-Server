@@ -390,6 +390,10 @@ module.exports = {
         const index = targetStudent.inProgressModules.indexOf(moduleId);
         targetStudent.inProgressModules.splice(index, 1);
         await targetStudent.save();
+        const targetModulePointsPair = await StringIntDict.find({
+          key: moduleId,
+        });
+        await targetModulePointsPair.delete();
         const updatedInProgressModules = targetStudent.inProgressModules;
         return updatedInProgressModules;
       } else {
@@ -418,6 +422,10 @@ module.exports = {
         const index = targetStudent.completedModules.indexOf(moduleId);
         targetStudent.completedModules.splice(index, 1);
         await targetStudent.save();
+        const targetModulePointsPair = await StringIntDict.find({
+          key: moduleId,
+        });
+        await targetModulePointsPair.delete();
         const updatedcompletedModules = targetStudent.completedModules;
         return updatedcompletedModules;
       } else {
@@ -489,7 +497,7 @@ module.exports = {
       var targetStudent = await Student.findById(studentId);
 
       if (!targetStudent) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("Invalid input");
       }
       const targetModule = await Module.findById(moduleId);
       const targetPair = await StringIntDict.find({ key: moduleId, studentId });
@@ -502,6 +510,8 @@ module.exports = {
       //     includes = true;
       //   }
       // });
+      console.log(targetModule);
+      console.log(targetPair);
       if (targetModule && (!targetPair || targetPair.length === 0)) {
         const newPair = new StringIntDict({
           key: moduleId,
