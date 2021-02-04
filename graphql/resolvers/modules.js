@@ -355,17 +355,24 @@ module.exports = {
       } catch (error) {
         throw new Error(error);
       }
+      const targetModulePointsPair = await StringIntDict.find({
+        key: moduleId,
+        studentId: targetStudent.id,
+      });
       const targetModule = await Module.findById(moduleId);
-      if (!targetModule) {
+      if (
+        !targetModule ||
+        !targetModulePointsPair ||
+        targetModulePointsPair.length === 0 ||
+        targetStudent.inProgressModules.includes(moduleId)
+      ) {
         throw new UserInputError("Invalid input");
-      } else if (!targetStudent.inProgressModules.includes(moduleId)) {
+      } else {
         // currently you're allowed to redo a completed module - when you open it, it should have the previous info
         await targetStudent.inProgressModules.push(moduleId);
         await targetStudent.save();
         const updatedInProgressModules = targetStudent.inProgressModules;
         return updatedInProgressModules;
-      } else {
-        throw new UserInputError("Invalid input");
       }
     },
 
@@ -392,6 +399,7 @@ module.exports = {
         await targetStudent.save();
         const targetModulePointsPair = await StringIntDict.find({
           key: moduleId,
+          studentId,
         });
         await targetModulePointsPair.delete();
         const updatedInProgressModules = targetStudent.inProgressModules;
@@ -424,6 +432,7 @@ module.exports = {
         await targetStudent.save();
         const targetModulePointsPair = await StringIntDict.find({
           key: moduleId,
+          studentId,
         });
         await targetModulePointsPair.delete();
         const updatedcompletedModules = targetStudent.completedModules;

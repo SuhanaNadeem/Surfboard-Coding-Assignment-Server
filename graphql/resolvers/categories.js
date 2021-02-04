@@ -136,7 +136,7 @@ module.exports = {
       if (!targetStudent || !allModules) {
         throw new UserInputError("Invalid input");
       } else {
-        var inProgress = true;
+        var inProgress = false;
         var completed = false;
         allModules.forEach(async function (targetModule) {
           if (targetStudent.inProgressModules.includes(targetModule.id)) {
@@ -146,7 +146,7 @@ module.exports = {
             completed = true;
           }
           if (inProgress || completed) {
-            const index = allModules.indexOf(targetModule.id);
+            const index = allModules.indexOf(targetModule);
             allModules.splice(index, 1);
           }
           inProgress = false;
