@@ -195,6 +195,10 @@ module.exports = gql`
     getSavedAnswerByQuestion(questionId: String!): String! # done checked
     getModulePointsByStudent(studentId: String!, moduleId: String!): Int # done checked
     getTotalPossibleModulePoints(moduleId: String!): Int # done checked
+    getCompletedQuestionsByModule(
+      moduleId: String!
+      studentId: String!
+    ): [Question] # done checked
   }
 
   # actions

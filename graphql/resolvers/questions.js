@@ -8,6 +8,7 @@ const Question = require("../../models/Question");
 const Admin = require("../../models/Admin");
 const Student = require("../../models/Student");
 const StringStringDict = require("../../models/StringStringDict");
+const Module = require("../../models/Module");
 
 module.exports = {
   Query: {
@@ -55,6 +56,42 @@ module.exports = {
         return questions;
       }
     },
+    async getCompletedQuestionsByModule(_, { moduleId, studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      const targetModule = await Module.findById(moduleId);
+
+      var allModuleQuestions = targetModule.questions;
+      if (!targetStudent || !allModuleQuestions || !targetModule) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const allQuesAnsPairs = targetStudent.quesAnsDict;
+        var completedQuestions = [];
+        var currentQuestion;
+        allQuesAnsPairs.forEach(async function (currentQuesAnsPair) {
+          if (
+            allModuleQuestions.includes(currentQuesAnsPair.key) &&
+            currentQuesAnsPair.value !== ""
+          ) {
+            currentQuestion = await Question.findById(currentQuesAnsPair.key);
+            completedQuestions.push(currentQuestion);
+          }
+        });
+        return completedQuestions;
+      }
+    },
+
     async getHintByQuestion(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);
