@@ -340,6 +340,11 @@ module.exports = gql`
       numToIncrement: Int!
       studentId: String!
     ): Int! # done checked
+    handleAnswerPoints(
+      answer: String
+      studentId: String!
+      questionId: String!
+    ): Int! # done checked
   }
   # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin
 `;

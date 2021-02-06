@@ -16,6 +16,8 @@ const Answer = require("../../models/Answer");
 const checkStudentAuth = require("../../util/checkStudentAuth");
 const checkAdminAuth = require("../../util/checkAdminAuth");
 const checkMentorAuth = require("../../util/checkMentorAuth");
+const answerResolvers = require("./answers");
+const moduleResolvers = require("./modules");
 
 function generateToken(student) {
   return jwt.sign(
@@ -237,14 +239,82 @@ module.exports = {
         return updatedStarredQuestions;
       }
     },
+    async handleAnswerPoints(_, { answer, studentId, questionId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetQuestion = await Question.findById(questionId);
+      const moduleId = targetQuestion.moduleId;
+      const numToIncrement = targetQuestion.points;
+      var answerCorrect;
+      if (
+        !targetQuestion ||
+        (targetQuestion.type !== "Skill" && targetQuestion.type !== "Question")
+      ) {
+        throw new UserInputError("Invalid input");
+      } else if (targetQuestion.type === "Skill") {
+        answerCorrect = true;
+        const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
+          _,
+          { moduleId, answerCorrect, numToIncrement, studentId },
+          context
+        );
+        return updatedPoints;
+      } else {
+        if (targetQuestion.expectedAnswer === "") {
+          await answerResolvers.Mutation.saveAnswer(
+            _,
+            { answer, studentId, questionId },
+            context
+          );
+          answerCorrect = true;
+          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
+            _,
+            { moduleId, answerCorrect, numToIncrement, studentId },
+            context
+          );
+          return updatedPoints;
+        } else {
+          const savedAnswer = await answerResolvers.Mutation.saveAnswer(
+            _,
+            { answer, studentId, questionId },
+            context
+          );
+          const answerId = savedAnswer.id;
+          answerCorrect = await module.exports.Mutation.verifyAnswer(
+            _,
+            { answerId, questionId },
+            context
+          );
+          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
+            _,
+            { moduleId, answerCorrect, numToIncrement, studentId },
+            context
+          );
+          return updatedPoints;
+        }
+      }
+    },
     async verifyAnswer(_, { answerId, questionId }, context) {
       try {
         const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new AuthenticationError();
       }
-      // will be called after submitAnswer()
+
+      // await module.exports.Mutation.
+      // FOR QUESTIONS WHERE EXPECTED ANS !null --> saveAnswer() --> verifyAnswer() --> incrementModulePoints w/ previous' returned value
+      // FOR QUESTIONS WHERE EXPECTED ANS =null (no right ans) --> saveAnswer() --> incrementModulePoints w/ true
+      // FOR SKILLS --> incrementModulePoints w/ true
       const targetQuestion = await Question.findById(questionId);
       const targetAnswer = await Answer.findById(answerId);
       const expectedAnswer = targetQuestion.expectedAnswer;
