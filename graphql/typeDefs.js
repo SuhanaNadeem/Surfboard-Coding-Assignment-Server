@@ -198,7 +198,7 @@ module.exports = gql`
     getCompletedQuestionsByModule(
       moduleId: String!
       studentId: String!
-    ): [Question] # done checked
+    ): [String] # done checked
   }
 
   # actions

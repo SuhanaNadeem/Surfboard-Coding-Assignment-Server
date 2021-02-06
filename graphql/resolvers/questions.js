@@ -78,16 +78,16 @@ module.exports = {
       } else {
         const allQuesAnsPairs = targetStudent.quesAnsDict;
         var completedQuestions = [];
-        var currentQuestion;
-        allQuesAnsPairs.forEach(async function (currentQuesAnsPair) {
+        // var currentQuestion;
+        for (var currentQuesAnsPair of allQuesAnsPairs) {
           if (
             allModuleQuestions.includes(currentQuesAnsPair.key) &&
             currentQuesAnsPair.value !== ""
           ) {
-            currentQuestion = await Question.findById(currentQuesAnsPair.key);
-            completedQuestions.push(currentQuestion);
+            // currentQuestion = await Question.findById(currentQuesAnsPair.key);
+            completedQuestions.push(currentQuesAnsPair.key);
           }
-        });
+        }
         return completedQuestions;
       }
     },
