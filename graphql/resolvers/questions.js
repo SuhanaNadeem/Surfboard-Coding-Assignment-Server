@@ -9,6 +9,7 @@ const Admin = require("../../models/Admin");
 const Student = require("../../models/Student");
 const StringStringDict = require("../../models/StringStringDict");
 const Module = require("../../models/Module");
+const StringIntDict = require("../../models/StringIntDict");
 
 module.exports = {
   Query: {
@@ -76,20 +77,37 @@ module.exports = {
       if (!targetStudent || !allModuleQuestions || !targetModule) {
         throw new UserInputError("Invalid input");
       } else {
-        const allQuesAnsPairs = targetStudent.quesAnsDict;
+        var quesAnsPair;
         var completedQuestions = [];
-        // var currentQuestion;
-        for (var currentQuesAnsPair of allQuesAnsPairs) {
-          if (
-            allModuleQuestions.includes(currentQuesAnsPair.key) &&
-            currentQuesAnsPair.value !== ""
-          ) {
-            // currentQuestion = await Question.findById(currentQuesAnsPair.key);
-            completedQuestions.push(currentQuesAnsPair.key);
+        const modulePointsPair = await StringIntDict.find({
+          studentId,
+          key: moduleId,
+        });
+        var pointsTally = 0;
+        for (var currentQuestionId of allModuleQuestions) {
+          currentQuestion = await Question.findById(currentQuestionId);
+          if (currentQuestion && currentQuestion.type === "Question") {
+            // console.log("question");
+            quesAnsPair = await StringStringDict.find({
+              studentId,
+              key: currentQuestionId,
+            });
+
+            if (quesAnsPair && quesAnsPair.value !== "") {
+              pointsTally += currentQuestion.points;
+              completedQuestions.push(currentQuestionId);
+            }
+          } else if (currentQuestion && currentQuestion.type === "Skill") {
+            // console.log("skill");
+            var check = currentQuestion.points + pointsTally;
+            if (modulePointsPair && check <= modulePointsPair[0].value) {
+              pointsTally += currentQuestion.points;
+              completedQuestions.push(currentQuestionId);
+            }
           }
         }
-        return completedQuestions;
       }
+      return completedQuestions;
     },
 
     async getHintByQuestion(_, { questionId }, context) {

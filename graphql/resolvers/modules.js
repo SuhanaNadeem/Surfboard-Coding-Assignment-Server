@@ -320,6 +320,48 @@ module.exports = {
         return points;
       }
     },
+    async decrementModulePoints(
+      _,
+      { moduleId, numToDecrement, studentId },
+      context
+    ) {
+      try {
+        const student = checkStudentAuth(context);
+        var targetStudent = await Student.findById(student.id);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetModulePointsPair = await StringIntDict.find({
+        key: moduleId,
+        studentId,
+      });
+
+      if (!targetModulePointsPair || targetModulePointsPair.length == 0) {
+        throw new UserInputError("Invalid input");
+      } else {
+        var points = targetModulePointsPair[0].value;
+        points = points - numToDecrement;
+        const index = targetStudent.modulePointsDict.indexOf({
+          key: moduleId,
+          studentId,
+        });
+        targetStudent.modulePointsDict.splice(index, 1);
+        await targetStudent.save();
+
+        await StringIntDict.deleteOne({ key: moduleId, studentId });
+        const newPair = new StringIntDict({
+          key: moduleId,
+          value: points,
+          studentId,
+          createdAt: new Date(),
+        });
+        await newPair.save();
+        targetStudent.modulePointsDict.push(newPair);
+        await targetStudent.save();
+        return points;
+      }
+    },
+
     async addCompletedModule(_, { moduleId }, context) {
       // add to students module list
       try {

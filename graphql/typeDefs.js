@@ -340,6 +340,11 @@ module.exports = gql`
       numToIncrement: Int!
       studentId: String!
     ): Int! # done checked
+    decrementModulePoints(
+      moduleId: String!
+      numToDecrement: Int!
+      studentId: String!
+    ): Int! # done checked
     handleAnswerPoints(
       answer: String
       studentId: String!
