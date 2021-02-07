@@ -297,6 +297,7 @@ module.exports = {
 
           if (
             answerObject &&
+            answerObject[0] &&
             targetQuestion.expectedAnswer === answerObject[0].answer
           ) {
             return targetModulePointsPair[0].value;

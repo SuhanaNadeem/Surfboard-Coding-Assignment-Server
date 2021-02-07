@@ -93,15 +93,22 @@ module.exports = {
               studentId,
               key: currentQuestionId,
             });
-
-            if (quesAnsPair && quesAnsPair.value !== "") {
+            // console.log("ques");
+            // console.log(quesAnsPair);
+            if (
+              quesAnsPair &&
+              quesAnsPair.length > 0 &&
+              quesAnsPair.value !== ""
+            ) {
               pointsTally += currentQuestion.points;
               completedQuestions.push(currentQuestionId);
             }
           } else if (currentQuestion && currentQuestion.type === "Skill") {
             // console.log("skill");
             var check = currentQuestion.points + pointsTally;
+            // console.log(modulePointsPair[0].value);
             if (modulePointsPair && check <= modulePointsPair[0].value) {
+              // console.log(currentQuestionId);
               pointsTally += currentQuestion.points;
               completedQuestions.push(currentQuestionId);
             }
@@ -181,7 +188,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetQuestion = await Question.findById(questionId);
-      const targetQuesAnsPair = await StringStringDict.find({
+      const targetQuesAnsPair = await StringStringDict.findOne({
         key: questionId,
         studentId,
       });
@@ -192,10 +199,7 @@ module.exports = {
       //     includes = true;
       //   }
       // });
-      if (
-        targetQuestion &&
-        (!targetQuesAnsPair || targetQuesAnsPair.length == 0)
-      ) {
+      if (targetQuestion && !targetQuesAnsPair) {
         const newPair = new StringStringDict({
           key: questionId,
           value: "",
@@ -206,6 +210,8 @@ module.exports = {
         targetStudent.quesAnsDict.push(newPair);
         await targetStudent.save();
         return newPair;
+      } else if (targetQuestion) {
+        return targetQuesAnsPair;
       } else {
         throw new UserInputError("Invalid input");
       }

@@ -413,7 +413,6 @@ module.exports = {
         targetQuestion.expectedAnswer = newExpectedAnswer;
         targetQuestion.hint = newHint;
         targetQuestion.points = newPoints;
-
         targetQuestion.videoLink = newVideoLink;
         targetQuestion.articleLink = newArticleLink;
         targetQuestion.type = newType;

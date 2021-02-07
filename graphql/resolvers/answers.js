@@ -90,20 +90,14 @@ module.exports = {
       }
 
       const targetQuestion = await Question.findById(questionId);
-      const targetAnswer = await Answer.findOne({
-        answer,
+      var quesAnsPair = await StringStringDict.findOne({
+        key: questionId,
         studentId,
-        questionId,
       });
-      if (!targetQuestion || targetAnswer) {
-        //submitted previously submitted answer or question DNE
+      if (!targetQuestion || !quesAnsPair) {
+        //hasnt started q or question DNE
         throw new UserInputError("Invalid input");
       } else {
-        var quesAnsPair = await StringStringDict.findOne({
-          key: questionId,
-          studentId,
-        });
-
         const newAnswer = new Answer({
           answer,
           studentId,
@@ -111,27 +105,21 @@ module.exports = {
           createdAt: new Date(),
         });
         await newAnswer.save();
-
-        if (!quesAnsPair) {
-          // hasnt been added to in progress question
-          throw new UserInputError("Invalid input");
-        } else {
-          const index = targetStudent.quesAnsDict.indexOf({
-            key: questionId,
-            studentId,
-          });
-          targetStudent.quesAnsDict.splice(index, 1);
-          await targetStudent.save();
-          await quesAnsPair.delete();
-          const newPair = new StringStringDict({
-            key: questionId,
-            value: newAnswer.id,
-            studentId,
-            createdAt: new Date(),
-          });
-          await newPair.save();
-          targetStudent.quesAnsDict.push(newPair);
-        }
+        const index = targetStudent.quesAnsDict.indexOf({
+          key: questionId,
+          studentId,
+        });
+        targetStudent.quesAnsDict.splice(index, 1);
+        await targetStudent.save();
+        await quesAnsPair.delete();
+        const newPair = new StringStringDict({
+          key: questionId,
+          value: newAnswer.id,
+          studentId,
+          createdAt: new Date(),
+        });
+        await newPair.save();
+        targetStudent.quesAnsDict.push(newPair);
 
         await targetStudent.save();
         return newAnswer;
