@@ -247,7 +247,7 @@ module.exports = gql`
       moduleId: String!
       questionDescription: String!
       expectedAnswer: String
-      hint: String!
+      hint: String
       questionTemplateId: String!
       points: Int
       videoLink: String
