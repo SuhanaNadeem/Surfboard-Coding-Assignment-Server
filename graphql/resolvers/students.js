@@ -18,6 +18,7 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 const checkMentorAuth = require("../../util/checkMentorAuth");
 const answerResolvers = require("./answers");
 const moduleResolvers = require("./modules");
+const StringIntDict = require("../../models/StringIntDict");
 
 function generateToken(student) {
   return jwt.sign(
@@ -288,10 +289,15 @@ module.exports = {
           );
           return updatedPoints;
         } else {
-          const answerObject = await Answer.find({ studentId, answer });
+          const answerObject = await Answer.find({
+            studentId,
+            answer,
+            questionId,
+          });
+
           if (
             answerObject &&
-            targetQuestion.expectedAnswer === answerObject.answer
+            targetQuestion.expectedAnswer === answerObject[0].answer
           ) {
             return targetModulePointsPair[0].value;
           } else {
