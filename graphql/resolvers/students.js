@@ -255,6 +255,10 @@ module.exports = {
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
+      const targetModulePointsPair = await StringIntDict.find({
+        studentId,
+        key: moduleId,
+      });
       var answerCorrect;
       if (
         !targetQuestion ||
@@ -284,23 +288,31 @@ module.exports = {
           );
           return updatedPoints;
         } else {
-          const savedAnswer = await answerResolvers.Mutation.saveAnswer(
-            _,
-            { answer, studentId, questionId },
-            context
-          );
-          const answerId = savedAnswer.id;
-          answerCorrect = await module.exports.Mutation.verifyAnswer(
-            _,
-            { answerId, questionId },
-            context
-          );
-          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
-            _,
-            { moduleId, answerCorrect, numToIncrement, studentId },
-            context
-          );
-          return updatedPoints;
+          const answerObject = await Answer.find({ studentId, answer });
+          if (
+            answerObject &&
+            targetQuestion.expectedAnswer === answerObject.answer
+          ) {
+            return targetModulePointsPair[0].value;
+          } else {
+            const savedAnswer = await answerResolvers.Mutation.saveAnswer(
+              _,
+              { answer, studentId, questionId },
+              context
+            );
+            const answerId = savedAnswer.id;
+            answerCorrect = await module.exports.Mutation.verifyAnswer(
+              _,
+              { answerId, questionId },
+              context
+            );
+            const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
+              _,
+              { moduleId, answerCorrect, numToIncrement, studentId },
+              context
+            );
+            return updatedPoints;
+          }
         }
       }
     },

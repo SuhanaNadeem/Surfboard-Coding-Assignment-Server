@@ -10,6 +10,7 @@ const Student = require("../../models/Student");
 const StringStringDict = require("../../models/StringStringDict");
 const Module = require("../../models/Module");
 const StringIntDict = require("../../models/StringIntDict");
+const Answer = require("../../models/Answer");
 
 module.exports = {
   Query: {
@@ -132,14 +133,14 @@ module.exports = {
         return targetHint;
       }
     },
-    async getSavedAnswerByQuestion(_, { questionId }, context) {
+    async getSavedAnswerByQuestion(_, { questionId, studentId }, context) {
       try {
         const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new AuthenticationError();
       }
-      // const targetQuestion = await Question.findById(questionId);
+
+      const targetQuestion = await Question.findById(questionId);
       // const allQuesAnsPairs = targetStudent.quesAnsDict;
 
       // var quesAnsPair;
@@ -154,10 +155,18 @@ module.exports = {
         studentId,
       });
 
-      if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
+      if (
+        !targetQuesAnsPair ||
+        targetQuesAnsPair.length == 0 ||
+        targetQuestion.type !== "Question"
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        const savedAnswer = targetQuesAnsPair[0].value;
+        const savedAnswerId = targetQuesAnsPair[0].value;
+        // console.log(savedAnswerId);
+        // console.log(await Answer.find());
+        const savedAnswerObject = await Answer.findById(savedAnswerId);
+        const savedAnswer = savedAnswerObject.answer;
         return savedAnswer;
       }
     },

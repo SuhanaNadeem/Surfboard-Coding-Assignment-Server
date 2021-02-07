@@ -192,7 +192,7 @@ module.exports = gql`
     getCommentsByModule(moduleId: String!): [String]! # done checked
     getModulesBySearch(search: String!): [String]! # started
     getHintByQuestion(questionId: String!): String! # done checked
-    getSavedAnswerByQuestion(questionId: String!): String! # done checked
+    getSavedAnswerByQuestion(questionId: String!, studentId: String!): String! # done checked
     getModulePointsByStudent(studentId: String!, moduleId: String!): Int # done checked
     getTotalPossibleModulePoints(moduleId: String!): Int # done checked
     getCompletedQuestionsByModule(
