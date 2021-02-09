@@ -98,6 +98,7 @@ module.exports = {
             if (
               quesAnsPair &&
               quesAnsPair.length > 0 &&
+              quesAnsPair.value &&
               quesAnsPair.value !== ""
             ) {
               pointsTally += currentQuestion.points;

@@ -253,6 +253,7 @@ module.exports = {
           }
         }
       }
+      console.log("hihihi");
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
@@ -267,6 +268,8 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
+        console.log("object");
+        // TODO cant keep getting points for skill, completed
         answerCorrect = true;
         const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
           _,
@@ -275,7 +278,10 @@ module.exports = {
         );
         return updatedPoints;
       } else {
-        if (targetQuestion.expectedAnswer === "") {
+        if (
+          targetQuestion.expectedAnswer === "" ||
+          !targetQuestion.expectedAnswer
+        ) {
           await answerResolvers.Mutation.saveAnswer(
             _,
             { answer, studentId, questionId },

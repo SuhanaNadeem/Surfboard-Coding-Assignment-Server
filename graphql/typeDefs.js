@@ -243,7 +243,7 @@ module.exports = gql`
       criteria: String
     ): Badge! # done checked
     createNewQuestion(
-      image: String!
+      image: String
       moduleId: String!
       questionDescription: String!
       expectedAnswer: String

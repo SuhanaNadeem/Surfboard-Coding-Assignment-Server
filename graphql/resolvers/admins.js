@@ -191,9 +191,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      if (!hint) {
-        hint = "";
-      }
+
       const targetQuestion = await Question.findOne({
         questionDescription,
       });
