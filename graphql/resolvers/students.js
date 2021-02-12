@@ -132,6 +132,8 @@ module.exports = {
         badges: [],
         starredModules: [],
         starredQuestions: [],
+        completedQuestions: [],
+        completedSkills: [],
         mentors: [],
         quesAnsDict: [],
         modulePointsDict: [],
@@ -253,7 +255,6 @@ module.exports = {
           }
         }
       }
-      console.log("hihihi");
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
@@ -261,22 +262,29 @@ module.exports = {
         studentId,
         key: moduleId,
       });
+      const targetStudent = await Student.findById(studentId);
       var answerCorrect;
       if (
         !targetQuestion ||
-        (targetQuestion.type !== "Skill" && targetQuestion.type !== "Question")
+        (targetQuestion.type !== "Skill" &&
+          targetQuestion.type !== "Question") ||
+        !targetStudent
       ) {
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
-        console.log("object");
-        // TODO cant keep getting points for skill, completed
-        answerCorrect = true;
-        const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
-          _,
-          { moduleId, answerCorrect, numToIncrement, studentId },
-          context
-        );
-        return updatedPoints;
+        if (!targetStudent.completedSkills.includes(questionId)) {
+          answerCorrect = true;
+          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
+            _,
+            { moduleId, answerCorrect, numToIncrement, studentId },
+            context
+          );
+          targetStudent.completedSkills.push(questionId);
+          targetStudent.save();
+          return updatedPoints;
+        } else {
+          return targetModulePointsPair[0].value;
+        }
       } else {
         if (
           targetQuestion.expectedAnswer === "" ||
@@ -293,6 +301,9 @@ module.exports = {
             { moduleId, answerCorrect, numToIncrement, studentId },
             context
           );
+          // push to completedquestions
+          targetStudent.completedQuestions.push(questionId);
+          targetStudent.save();
           return updatedPoints;
         } else {
           const answerObject = await Answer.find({
@@ -316,14 +327,20 @@ module.exports = {
             const answerId = savedAnswer.id;
             answerCorrect = await module.exports.Mutation.verifyAnswer(
               _,
-              { answerId, questionId },
+              { answerId, questionId, studentId },
               context
             );
+            // (if answerCorrect, push to completedQuestions)
             const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
               _,
               { moduleId, answerCorrect, numToIncrement, studentId },
               context
             );
+
+            if (answerCorrect) {
+              targetStudent.completedQuestions.push(questionId);
+              targetStudent.save();
+            }
             return updatedPoints;
           }
         }
@@ -331,9 +348,16 @@ module.exports = {
     },
     async verifyAnswer(_, { answerId, questionId }, context) {
       try {
-        const student = checkStudentAuth(context);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
 
       // await module.exports.Mutation.

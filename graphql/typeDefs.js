@@ -43,6 +43,9 @@ module.exports = gql`
     badges: [String]
     starredModules: [String]
     starredQuestions: [String]
+    
+    completedQuestions:[String]
+    completedSkills:[String]
 
     mentors: [String]
 
@@ -327,7 +330,11 @@ module.exports = gql`
       questionId: String!
       studentId: String!
     ): Answer! # done checked
-    verifyAnswer(answerId: String!, questionId: String!): Boolean! # done checked
+    verifyAnswer(
+      answerId: String!
+      questionId: String!
+      studentId: String!
+    ): Boolean! # done checked
     starModule(moduleId: String!): [String]! # done checked
     unstarModule(moduleId: String!): [String]! # done checked
     starQuestion(questionId: String!): [String]! # done checked

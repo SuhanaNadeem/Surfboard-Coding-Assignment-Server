@@ -25,6 +25,8 @@ const studentSchema = new Schema({
     { _id: String, key: String, value: Number, studentId: String },
   ],
   mentors: [String],
+  completedQuestions: [String],
+  completedSkills: [String],
   createdAt: Date,
 });
 

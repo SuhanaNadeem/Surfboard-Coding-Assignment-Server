@@ -73,50 +73,63 @@ module.exports = {
       }
       const targetStudent = await Student.findById(studentId);
       const targetModule = await Module.findById(moduleId);
-
-      var allModuleQuestions = targetModule.questions;
-      if (!targetStudent || !allModuleQuestions || !targetModule) {
-        throw new UserInputError("Invalid input");
-      } else {
-        var quesAnsPair;
-        var completedQuestions = [];
-        const modulePointsPair = await StringIntDict.find({
-          studentId,
-          key: moduleId,
-        });
-        var pointsTally = 0;
-        for (var currentQuestionId of allModuleQuestions) {
-          currentQuestion = await Question.findById(currentQuestionId);
-          if (currentQuestion && currentQuestion.type === "Question") {
-            // console.log("question");
-            quesAnsPair = await StringStringDict.find({
-              studentId,
-              key: currentQuestionId,
-            });
-            // console.log("ques");
-            // console.log(quesAnsPair);
-            if (
-              quesAnsPair &&
-              quesAnsPair.length > 0 &&
-              quesAnsPair.value &&
-              quesAnsPair.value !== ""
-            ) {
-              pointsTally += currentQuestion.points;
-              completedQuestions.push(currentQuestionId);
-            }
-          } else if (currentQuestion && currentQuestion.type === "Skill") {
-            // console.log("skill");
-            var check = currentQuestion.points + pointsTally;
-            // console.log(modulePointsPair[0].value);
-            if (modulePointsPair && check <= modulePointsPair[0].value) {
-              // console.log(currentQuestionId);
-              pointsTally += currentQuestion.points;
-              completedQuestions.push(currentQuestionId);
-            }
-          }
+      var allCompletedQuestions = [];
+      for (var questionId of targetStudent.completedQuestions) {
+        if (targetModule.questions.includes(questionId)) {
+          allCompletedQuestions.push(questionId);
         }
       }
-      return completedQuestions;
+      for (var skillId of targetStudent.completedSkills) {
+        if (targetModule.questions.includes(skillId)) {
+          allCompletedQuestions.push(skillId);
+        }
+      }
+      // console.log(allCompletedQuestions);
+      return allCompletedQuestions;
+
+      // var allModuleQuestions = targetModule.questions;
+      // if (!targetStudent || !allModuleQuestions || !targetModule) {
+      //   throw new UserInputError("Invalid input");
+      // } else {
+      //   var quesAnsPair;
+      //   var completedQuestions = [];
+      //   const modulePointsPair = await StringIntDict.find({
+      //     studentId,
+      //     key: moduleId,
+      //   });
+      //   var pointsTally = 0;
+      //   for (var currentQuestionId of allModuleQuestions) {
+      //     currentQuestion = await Question.findById(currentQuestionId);
+      //     if (currentQuestion && currentQuestion.type === "Question") {
+      //       // console.log("question");
+      //       quesAnsPair = await StringStringDict.find({
+      //         studentId,
+      //         key: currentQuestionId,
+      //       });
+      //       // console.log("ques");
+      //       // console.log(quesAnsPair);
+      //       if (
+      //         quesAnsPair &&
+      //         quesAnsPair.length > 0 &&
+      //         quesAnsPair.value &&
+      //         quesAnsPair.value !== ""
+      //       ) {
+      //         pointsTally += currentQuestion.points;
+      //         completedQuestions.push(currentQuestionId);
+      //       }
+      //     } else if (currentQuestion && currentQuestion.type === "Skill") {
+      //       // console.log("skill");
+      //       var check = currentQuestion.points + pointsTally;
+      //       // console.log(modulePointsPair[0].value);
+      //       if (modulePointsPair && check <= modulePointsPair[0].value) {
+      //         // console.log(currentQuestionId);
+      //         pointsTally += currentQuestion.points;
+      //         completedQuestions.push(currentQuestionId);
+      //       }
+      //     }
+      //   }
+      // }
+      // return completedQuestions;
     },
 
     async getHintByQuestion(_, { questionId }, context) {
