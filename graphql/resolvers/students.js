@@ -18,7 +18,9 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 const checkMentorAuth = require("../../util/checkMentorAuth");
 const answerResolvers = require("./answers");
 const moduleResolvers = require("./modules");
+const questionResolvers = require("./questions");
 const StringIntDict = require("../../models/StringIntDict");
+const StringStringDict = require("../../models/StringStringDict");
 
 function generateToken(student) {
   return jwt.sign(
@@ -255,6 +257,8 @@ module.exports = {
           }
         }
       }
+      console.log("entered function");
+
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
@@ -262,8 +266,22 @@ module.exports = {
         studentId,
         key: moduleId,
       });
-      const targetStudent = await Student.findById(studentId);
+      var targetQuesAnsPair = await StringStringDict.find({
+        studentId,
+        key: questionId,
+      });
+      // console.log("opaur");
+      // console.log(targetQuesAnsPair);
+      var targetStudent = await Student.findById(studentId);
       var answerCorrect;
+      if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
+        // console.log("didnt exist, but about to");
+        targetQuesAnsPair = await questionResolvers.Mutation.startQuestion(
+          _,
+          { questionId, studentId },
+          context
+        );
+      }
       if (
         !targetQuestion ||
         (targetQuestion.type !== "Skill" &&
@@ -272,6 +290,9 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
+        console.log("skill passed");
+        console.log(questionId);
+        // console.log(targetStudent.completedSkills);
         if (!targetStudent.completedSkills.includes(questionId)) {
           answerCorrect = true;
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
@@ -280,7 +301,7 @@ module.exports = {
             context
           );
           targetStudent.completedSkills.push(questionId);
-          targetStudent.save();
+          await targetStudent.save();
           return updatedPoints;
         } else {
           return targetModulePointsPair[0].value;
@@ -303,20 +324,24 @@ module.exports = {
           );
           // push to completedquestions
           targetStudent.completedQuestions.push(questionId);
-          targetStudent.save();
+          await targetStudent.save();
           return updatedPoints;
         } else {
-          const answerObject = await Answer.find({
-            studentId,
-            answer,
-            questionId,
-          });
+          // const answerObject = await Answer.find({
+          //   studentId,
+          //   answer,
+          //   questionId,
+          // });
 
-          if (
-            answerObject &&
-            answerObject[0] &&
-            targetQuestion.expectedAnswer === answerObject[0].answer
-          ) {
+          // if (
+          //   answerObject &&
+          //   answerObject[0] &&
+          //   targetQuestion.expectedAnswer === answerObject[0].answer
+          // ) {
+          //   return targetModulePointsPair[0].value;
+          // }
+          if (targetStudent.completedQuestions.includes(questionId)) {
+            console.log("already submitted");
             return targetModulePointsPair[0].value;
           } else {
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(
@@ -339,8 +364,21 @@ module.exports = {
 
             if (answerCorrect) {
               targetStudent.completedQuestions.push(questionId);
-              targetStudent.save();
+              await targetStudent.save();
             }
+            // else {
+            //   console.log("splicing");
+            //   const index = targetStudent.completedQuestions.indexOf(
+            //     questionId
+            //   );
+            //   console.log(targetStudent.completedQuestions);
+            //   targetStudent.completedQuestions.splice(index, 1);
+            //   // var studentBoy = await Student.findById(studentId);
+            //   // studentBoy.completedQuestions = targetStudent.completedQuestions;
+            //   // await studentBoy.save();
+            //   await targetStudent.save();
+            // }
+            // console.log("yo mmMA");
             return updatedPoints;
           }
         }
@@ -367,8 +405,13 @@ module.exports = {
       const targetQuestion = await Question.findById(questionId);
       const targetAnswer = await Answer.findById(answerId);
       const expectedAnswer = targetQuestion.expectedAnswer;
-      if (!targetAnswer || !targetQuestion || !expectedAnswer) {
-        throw new AuthenticationError();
+      if (
+        !targetAnswer ||
+        !targetQuestion ||
+        !expectedAnswer ||
+        expectedAnswer == ""
+      ) {
+        throw new UserInputError("Invalid input");
       } else if (targetAnswer.answer === expectedAnswer) {
         return true;
       } else {

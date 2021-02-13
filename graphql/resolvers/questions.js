@@ -225,6 +225,7 @@ module.exports = {
         await targetStudent.save();
         return newPair;
       } else if (targetQuestion) {
+        // console.log("already started");
         return targetQuesAnsPair;
       } else {
         throw new UserInputError("Invalid input");
