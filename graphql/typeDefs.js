@@ -231,8 +231,8 @@ module.exports = gql`
     ): Student! # done checked
     deleteStudent(studentId: String!): String # done checked
     loginStudent(email: String!, password: String!): Student! # done checked
-    addCompletedModule(moduleId: String!): [String] # done checked
-    addInProgressModule(moduleId: String!): [String] # done checked
+    addCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
+    addInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     addBadge(badgeId: String!): [String] # done checked

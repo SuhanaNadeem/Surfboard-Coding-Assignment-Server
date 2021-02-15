@@ -299,6 +299,11 @@ module.exports = {
         studentId,
         key: questionId,
       });
+      const totalPossiblePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
+        _,
+        { moduleId },
+        context
+      );
       // console.log("opaur");
       // console.log(targetQuesAnsPair);
       var targetStudent = await Student.findById(studentId);
@@ -331,6 +336,13 @@ module.exports = {
           );
           targetStudent.completedSkills.push(questionId);
           await targetStudent.save();
+          if (totalPossiblePoints === updatedPoints) {
+            await moduleResolvers.Mutation.addCompletedModule(
+              _,
+              { moduleId, studentId },
+              context
+            );
+          }
           return updatedPoints;
         } else {
           return targetModulePointsPair[0].value;
@@ -354,6 +366,14 @@ module.exports = {
           // push to completedquestions
           targetStudent.completedQuestions.push(questionId);
           await targetStudent.save();
+
+          if (totalPossiblePoints === updatedPoints) {
+            await moduleResolvers.Mutation.addCompletedModule(
+              _,
+              { moduleId, studentId },
+              context
+            );
+          }
           return updatedPoints;
         } else {
           // const answerObject = await Answer.find({
@@ -395,19 +415,20 @@ module.exports = {
               targetStudent.completedQuestions.push(questionId);
               await targetStudent.save();
             }
-            // else {
-            //   console.log("splicing");
-            //   const index = targetStudent.completedQuestions.indexOf(
-            //     questionId
-            //   );
-            //   console.log(targetStudent.completedQuestions);
-            //   targetStudent.completedQuestions.splice(index, 1);
-            //   // var studentBoy = await Student.findById(studentId);
-            //   // studentBoy.completedQuestions = targetStudent.completedQuestions;
-            //   // await studentBoy.save();
-            //   await targetStudent.save();
-            // }
-            // console.log("yo mmMA");
+            // console.log("right loop");
+            // console.log(totalPossiblePoints);
+            // console.log(updatedPoints);
+            if (totalPossiblePoints === updatedPoints) {
+              // console.log("adding");
+              await moduleResolvers.Mutation.addCompletedModule(
+                _,
+                { moduleId, studentId },
+                context
+              );
+              // console.log("after");
+              // console.log(targetStudent.completedModules);
+            }
+
             return updatedPoints;
           }
         }

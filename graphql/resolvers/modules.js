@@ -362,47 +362,69 @@ module.exports = {
       }
     },
 
-    async addCompletedModule(_, { moduleId }, context) {
+    async addCompletedModule(_, { moduleId, studentId }, context) {
       // add to students module list
       try {
-        var user = checkStudentAuth(context);
-        var targetUser = await Student.findById(user.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
         try {
-          var user = checkMentorAuth(context);
-          var targetUser = await Mentor.findById(user.id);
+          const mentor = checkMentorAuth(context);
         } catch (error) {
-          throw new Error(error);
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
         }
       }
+
+      const targetStudent = await Student.findById(studentId);
       const targetModule = await Module.findById(moduleId);
-      if (!targetModule || !targetUser.inProgressModules.includes(moduleId)) {
+      // console.log("inside info");
+      // console.log(targetModule);
+      // console.log(targetStudent.completedModules);
+      if (
+        !targetStudent ||
+        !targetModule ||
+        !targetStudent.inProgressModules.includes(moduleId)
+      ) {
         throw new UserInputError("Invalid input");
-      } else if (!targetUser.completedModules.includes(moduleId)) {
-        const index = targetUser.inProgressModules.indexOf(moduleId);
-        targetUser.inProgressModules.splice(index, 1);
-        await targetUser.save();
-        await targetUser.completedModules.push(moduleId);
-        await targetUser.save();
-        const updatedCompletedModules = targetUser.completedModules;
+      } else if (!targetStudent.completedModules.includes(moduleId)) {
+        // console.log("entered right loop");
+        const index = targetStudent.inProgressModules.indexOf(moduleId);
+        targetStudent.inProgressModules.splice(index, 1);
+        await targetStudent.save();
+        await targetStudent.completedModules.push(moduleId);
+        await targetStudent.save();
+        const updatedCompletedModules = targetStudent.completedModules;
+        // console.log("updated");
+        // console.log(updatedCompletedModules);
         return updatedCompletedModules;
       }
     },
 
-    async addInProgressModule(_, { moduleId }, context) {
+    async addInProgressModule(_, { moduleId, studentId }, context) {
       // add to students module list
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new Error(error);
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
+
+      const targetStudent = await Student.findById(studentId);
       const targetModulePointsPair = await StringIntDict.find({
         key: moduleId,
         studentId: targetStudent.id,
       });
       const targetModule = await Module.findById(moduleId);
       if (
+        !targetStudent ||
         !targetModule ||
         !targetModulePointsPair ||
         targetModulePointsPair.length === 0 ||
@@ -439,7 +461,7 @@ module.exports = {
         const index = targetStudent.inProgressModules.indexOf(moduleId);
         targetStudent.inProgressModules.splice(index, 1);
         await targetStudent.save();
-        const targetModulePointsPair = await StringIntDict.find({
+        const targetModulePointsPair = await StringIntDict.findById({
           key: moduleId,
           studentId,
         });
@@ -472,13 +494,13 @@ module.exports = {
         const index = targetStudent.completedModules.indexOf(moduleId);
         targetStudent.completedModules.splice(index, 1);
         await targetStudent.save();
-        const targetModulePointsPair = await StringIntDict.find({
-          key: moduleId,
-          studentId,
-        });
-        await targetModulePointsPair.delete();
-        const updatedcompletedModules = targetStudent.completedModules;
-        return updatedcompletedModules;
+        // const targetModulePointsPair = await StringIntDict.find({
+        //   key: moduleId,
+        //   studentId,
+        // });
+        // await targetModulePointsPair.delete();
+        const updatedCompletedModules = targetStudent.completedModules;
+        return updatedCompletedModules;
       } else {
         throw new UserInputError("Invalid input");
       }
