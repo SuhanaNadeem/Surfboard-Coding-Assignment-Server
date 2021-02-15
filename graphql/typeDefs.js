@@ -43,9 +43,9 @@ module.exports = gql`
     badges: [String]
     starredModules: [String]
     starredQuestions: [String]
-    
-    completedQuestions:[String]
-    completedSkills:[String]
+
+    completedQuestions: [String]
+    completedSkills: [String]
 
     mentors: [String]
 
@@ -357,6 +357,8 @@ module.exports = gql`
       studentId: String!
       questionId: String!
     ): Int! # done checked
+    handleStarQuestion(questionId: String!): [String] # done checked
+    handleStarModule(moduleId: String!): [String] # done checked
   }
   # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin
 `;

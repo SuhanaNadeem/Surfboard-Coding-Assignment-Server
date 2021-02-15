@@ -497,10 +497,10 @@ module.exports = {
         }
       }
       const targetModule = await Module.findById(moduleId);
-      if (!targetModule) {
+      if (!targetModule || targetUser.starredModules.includes(moduleId)) {
         throw new UserInputError("Invalid input");
-      } else if (!targetUser.starredModules.includes(moduleId)) {
-        await targetUser.starredModules.push(moduleId);
+      } else {
+        targetUser.starredModules.push(moduleId);
         await targetUser.save();
         const updatedStarredModules = targetUser.starredModules;
         return updatedStarredModules;
@@ -511,7 +511,6 @@ module.exports = {
       try {
         var user = checkStudentAuth(context);
         var targetUser = await Student.findById(user.id);
-        // TODO MIGHT have to change this targetuser stuff
       } catch (error) {
         try {
           var user = checkMentorAuth(context);
@@ -522,9 +521,9 @@ module.exports = {
       }
       const targetModule = await Module.findById(moduleId);
 
-      if (!targetModule) {
+      if (!targetModule || !targetUser.starredModules.includes(moduleId)) {
         throw new UserInputError("Invalid input");
-      } else if (targetUser.starredModules.includes(moduleId)) {
+      } else {
         const index = targetUser.starredModules.indexOf(moduleId);
         targetUser.starredModules.splice(index, 1);
         await targetUser.save();
@@ -532,6 +531,36 @@ module.exports = {
         return updatedStarredModules;
       }
     },
+
+    async handleStarModule(_, { moduleId }, context) {
+      try {
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      var updatedStarredModules;
+      if (!targetUser.starredModules.includes(moduleId)) {
+        updatedStarredModules = await module.exports.Mutation.starModule(
+          _,
+          { moduleId },
+          context
+        );
+      } else {
+        updatedStarredModules = await module.exports.Mutation.unstarModule(
+          _,
+          { moduleId },
+          context
+        );
+      }
+      return updatedStarredModules;
+    },
+
     async startModule(_, { moduleId, studentId }, context) {
       try {
         const admin = checkAdminAuth(context);

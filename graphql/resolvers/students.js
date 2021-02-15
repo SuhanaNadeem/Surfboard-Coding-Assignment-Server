@@ -230,7 +230,7 @@ module.exports = {
           throw new Error(error);
         }
       }
-      const targetQuestion = Question.findById(questionId);
+      const targetQuestion = await Question.findById(questionId);
       if (
         !targetQuestion ||
         !targetUser.starredQuestions.includes(questionId)
@@ -244,6 +244,36 @@ module.exports = {
         return updatedStarredQuestions;
       }
     },
+    async handleStarQuestion(_, { questionId }, context) {
+      try {
+        var user = checkStudentAuth(context);
+        var targetUser = await Student.findById(user.id);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+          var targetUser = await Mentor.findById(user.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+
+      var updatedStarredQuestions;
+      if (!targetUser.starredQuestions.includes(questionId)) {
+        updatedStarredQuestions = await module.exports.Mutation.starQuestion(
+          _,
+          { questionId },
+          context
+        );
+      } else {
+        updatedStarredQuestions = await module.exports.Mutation.unstarQuestion(
+          _,
+          { questionId },
+          context
+        );
+      }
+      return updatedStarredQuestions;
+    },
+
     async handleAnswerPoints(_, { answer, studentId, questionId }, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -257,7 +287,6 @@ module.exports = {
           }
         }
       }
-      console.log("entered function");
 
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
@@ -290,8 +319,8 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
-        console.log("skill passed");
-        console.log(questionId);
+        // console.log("skill passed");
+        // console.log(questionId);
         // console.log(targetStudent.completedSkills);
         if (!targetStudent.completedSkills.includes(questionId)) {
           answerCorrect = true;
@@ -341,7 +370,7 @@ module.exports = {
           //   return targetModulePointsPair[0].value;
           // }
           if (targetStudent.completedQuestions.includes(questionId)) {
-            console.log("already submitted");
+            // console.log("already submitted");
             return targetModulePointsPair[0].value;
           } else {
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(
