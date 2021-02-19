@@ -9,7 +9,8 @@ const challengeSchema = new Schema({
     default: () => nanoid(),
   },
   image: String,
-  questionDescription: String,
+  name: String,
+  challengeDescription: String,
   createdAt: Date,
   categoryId: String,
 });

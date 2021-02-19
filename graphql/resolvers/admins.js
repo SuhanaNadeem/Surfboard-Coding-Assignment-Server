@@ -387,7 +387,7 @@ module.exports = {
 
     async createNewChallenge(
       _,
-      { questionDescription, categoryId, image },
+      { name, challengeDescription, categoryId, image },
       context
     ) {
       try {
@@ -396,13 +396,14 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetChallenge = await Challenge.findOne({ questionDescription });
+      const targetChallenge = await Challenge.findOne({ challengeDescription });
       const targetCategory = await Category.findById(categoryId);
       if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else if (!targetChallenge) {
         const newChallenge = new Challenge({
-          questionDescription,
+          name,
+          challengeDescription,
           categoryId,
           image,
           createdAt: new Date(),
@@ -542,7 +543,7 @@ module.exports = {
 
     async editChallenge(
       _,
-      { challengeId, newCategoryId, newQuestionDescription, newImage },
+      { challengeId, newName, newCategoryId, newChallengeDescription, newImage },
       context
     ) {
       try {
@@ -556,7 +557,8 @@ module.exports = {
         throw new UserInputError("Invalid input");
       } else {
         targetChallenge.categoryId = newCategoryId;
-        targetChallenge.questionDescription = newQuestionDescription;
+        targetChallenge.name = newName;
+        targetChallenge.challengeDescription = newChallengeDescription;
         targetChallenge.image = newImage;
         targetChallenge.categoryId = newCategoryId;
 
