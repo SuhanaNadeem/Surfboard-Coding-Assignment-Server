@@ -442,7 +442,11 @@ module.exports = {
         return targetCategory;
       }
     },
-    async editModule(_, { moduleId, newName, newCategoryId }, context) {
+    async editModule(
+      _,
+      { moduleId, newName, newCategoryId, newAdminId },
+      context
+    ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -450,11 +454,35 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetModule = await Module.findById(moduleId);
-      if (!targetModule) {
+      var newNameModule = await Module.findOne({
+        name: newName,
+      });
+      var newCategory = await Category.findById(newCategoryId);
+      var newAdmin = await Admin.findById(newAdminId);
+
+      if (
+        !targetModule ||
+        (newName !== undefined &&
+          newName !== targetModule.name &&
+          newNameModule) ||
+        (newCategoryId !== undefined &&
+          newCategoryId !== targetModule.categoryId &&
+          !newCategory) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetModule.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetModule.name = newName;
-        targetModule.categoryId = newCategoryId;
+        if (newName !== undefined) {
+          targetModule.name = newName;
+        }
+        if (newCategoryId !== undefined) {
+          targetModule.categoryId = newCategoryId;
+        }
+        if (newAdminId !== undefined) {
+          targetModule.adminId = newAdminId;
+        }
 
         await targetModule.save();
         return targetModule;
@@ -477,6 +505,7 @@ module.exports = {
         newSkillDescription,
         newQuestionName,
         newType,
+        newAdminId,
       },
       context
     ) {
@@ -489,27 +518,72 @@ module.exports = {
       var targetQuestion = await Question.findById(questionId);
       var currentModule = await Module.findById(moduleId);
       var newModule = await Module.findById(newModuleId);
-      if (!targetQuestion || !currentModule || !newModule) {
+      var newNameQuestion = await Question.findOne({
+        questionName: newQuestionName,
+      });
+      var newDescriptionQuestion = await Question.findOne({
+        questionDescription: newQuestionDescription,
+      });
+      var newAdmin = await Admin.findById(newAdminId);
+
+      if (
+        !targetQuestion ||
+        !currentModule ||
+        (newQuestionName !== undefined &&
+          newQuestionName !== targetQuestion.name &&
+          newNameQuestion) ||
+        (newQuestionDescription !== undefined &&
+          newQuestionDescription !== targetQuestion.questionDescription &&
+          newDescriptionQuestion) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetQuestion.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetQuestion.image = newImage;
-        targetQuestion.questionDescription = newQuestionDescription;
-        targetQuestion.expectedAnswer = newExpectedAnswer;
-        targetQuestion.hint = newHint;
-        targetQuestion.points = newPoints;
-        targetQuestion.videoLink = newVideoLink;
-        targetQuestion.articleLink = newArticleLink;
-        targetQuestion.type = newType;
-        targetQuestion.skillDescription = newSkillDescription;
-        targetQuestion.questionName = newQuestionName;
+        if (newImage !== undefined) {
+          targetQuestion.image = newImage;
+        }
+        if (newQuestionDescription !== undefined) {
+          targetQuestion.questionDescription = newQuestionDescription;
+        }
+        if (newExpectedAnswer !== undefined) {
+          targetQuestion.expectedAnswer = newExpectedAnswer;
+        }
+        if (newHint !== undefined) {
+          targetQuestion.hint = newHint;
+        }
+        if (newPoints !== undefined) {
+          targetQuestion.points = newPoints;
+        }
+        if (newVideoLink !== undefined) {
+          targetQuestion.videoLink = newVideoLink;
+        }
+        if (newArticleLink !== undefined) {
+          targetQuestion.articleLink = newArticleLink;
+        }
+        if (newType !== undefined) {
+          targetQuestion.type = newType;
+        }
+        if (newSkillDescription !== undefined) {
+          targetQuestion.skillDescription = newSkillDescription;
+        }
+        if (newQuestionName !== undefined) {
+          targetQuestion.questionName = newQuestionName;
+        }
+        if (newAdminId !== undefined) {
+          targetQuestion.adminId = newAdminId;
+        }
 
-        if (newModuleId != moduleId) {
+        if (newModuleId !== undefined && newModuleId != moduleId && newModule) {
           const index = currentModule.questions.indexOf(questionId);
           currentModule.questions.splice(index, 1);
           await currentModule.save();
           await newModule.questions.push(questionId);
           await newModule.save();
           targetQuestion.moduleId = newModuleId;
+        } else if (newModuleId != moduleId && newModuleId !== undefined) {
+          throw new UserInputError("Invalid input");
         }
         await targetQuestion.save();
         return targetQuestion;
@@ -518,7 +592,13 @@ module.exports = {
 
     async editQuestionTemplate(
       _,
-      { questionTemplateId, newName, newCategoryId, newInputFields },
+      {
+        questionTemplateId,
+        newName,
+        newCategoryId,
+        newInputFields,
+        newAdminId,
+      },
       context
     ) {
       try {
@@ -530,13 +610,37 @@ module.exports = {
       var targetQuestionTemplate = await QuestionTemplate.findById(
         questionTemplateId
       );
-      if (!targetQuestionTemplate) {
+      var newNameQuestionTemplate = await QuestionTemplate.findOne({
+        name: newName,
+      });
+      var newCategory = await Category.findById(newCategoryId);
+      var newAdmin = await Admin.findById(newAdminId);
+      if (
+        !targetQuestionTemplate ||
+        (newName !== undefined &&
+          newName !== targetQuestionTemplate.name &&
+          newNameQuestionTemplate) ||
+        (newCategoryId !== undefined &&
+          newCategoryId !== targetQuestionTemplate.categoryId &&
+          !newCategory) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetQuestionTemplate.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetQuestionTemplate.categoryId = newCategoryId;
-        targetQuestionTemplate.inputFields = newInputFields;
-        targetQuestionTemplate.name = newName;
-
+        if (newName !== undefined) {
+          targetQuestionTemplate.name = newName;
+        }
+        if (newInputFields !== undefined) {
+          targetQuestionTemplate.inputFields = newinputFields;
+        }
+        if (newCategoryId !== undefined) {
+          targetQuestionTemplate.categoryId = newCategoryId;
+        }
+        if (newAdminId !== undefined) {
+          targetQuestionTemplate.adminId = newAdminId;
+        }
         await targetQuestionTemplate.save();
         return targetQuestionTemplate;
       }
@@ -550,6 +654,7 @@ module.exports = {
         newCategoryId,
         newChallengeDescription,
         newImage,
+        newAdminId,
       },
       context
     ) {
@@ -560,20 +665,49 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetChallenge = await Challenge.findById(challengeId);
-      if (!targetChallenge) {
+      var newNameChallenge = await Challenge.findOne({
+        name: newName,
+      });
+      var newCategory = await Category.findById(newCategoryId);
+      var newAdmin = await Admin.findById(newAdminId);
+      if (
+        !targetChallenge ||
+        (newName !== undefined &&
+          newName !== targetChallenge.name &&
+          newNameChallenge) ||
+        (newCategoryId !== undefined &&
+          newCategoryId !== targetChallenge.categoryId &&
+          !newCategory) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetChallenge.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetChallenge.categoryId = newCategoryId;
-        targetChallenge.name = newName;
-        targetChallenge.challengeDescription = newChallengeDescription;
-        targetChallenge.image = newImage;
-        targetChallenge.categoryId = newCategoryId;
+        if (newCategoryId !== undefined) {
+          targetChallenge.categoryId = newCategoryId;
+        }
+        if (newName !== undefined) {
+          targetChallenge.name = newName;
+        }
+        if (newCategoryId !== undefined) {
+          targetChallenge.categoryId = newCategoryId;
+        }
+        if (newChallengeDescription !== undefined) {
+          targetChallenge.challengeDescription = newChallengeDescription;
+        }
+        if (newImage !== undefined) {
+          targetChallenge.image = newImage;
+        }
+        if (newAdminId !== undefined) {
+          targetChallenge.adminId = newAdminId;
+        }
 
         await targetChallenge.save();
         return targetChallenge;
       }
     },
-    async editCategory(_, { categoryId, newName }, context) {
+    async editCategory(_, { categoryId, newName, newAdminId }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -581,10 +715,28 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetCategory = await Category.findById(categoryId);
-      if (!targetCategory) {
+      var newNameCategory = await Category.findOne({
+        name: newName,
+      });
+      var newAdmin = await Admin.findById(newAdminId);
+
+      if (
+        !targetCategory ||
+        (newName !== undefined &&
+          newName !== targetCategory.name &&
+          newNameCategory) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetCategory.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetCategory.name = newName;
+        if (newName !== undefined) {
+          targetCategory.name = newName;
+        }
+        if (newAdminId !== undefined) {
+          targetCategory.adminId = newAdminId;
+        }
         await targetCategory.save();
         return targetCategory;
       }
@@ -688,7 +840,7 @@ module.exports = {
         await targetQuestion.delete();
         await targetModule.save();
         const updatedQuestions = await Question.find();
-        console.log(targetModule.questions);
+        // console.log(targetModule.questions);
         return updatedQuestions;
       }
     },

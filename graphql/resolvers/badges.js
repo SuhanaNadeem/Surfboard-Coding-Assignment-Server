@@ -77,7 +77,7 @@ module.exports = {
 
     async editBadge(
       _,
-      { badgeId, newImage, newName, newCriteria, newDescription },
+      { badgeId, newImage, newName, newCriteria, newDescription, newAdminId },
       context
     ) {
       try {
@@ -87,14 +87,37 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetBadge = await Badge.findById(badgeId);
-      if (!targetBadge) {
+      var newNameBadge = await Badge.findOne({
+        name: newName,
+      });
+      var newAdmin = await Admin.findById(newAdminId);
+
+      if (
+        !targetBadge ||
+        (newName !== undefined &&
+          newName !== targetBadge.name &&
+          newNameBadge) ||
+        (newAdminId !== undefined &&
+          newAdminId !== targetBadge.adminId &&
+          !newAdmin)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
-        targetBadge.name = newName;
-        targetBadge.criteria = newCriteria;
-        targetBadge.description = newDescription;
-        targetBadge.image = newImage;
-
+        if (newName !== undefined) {
+          targetBadge.name = newName;
+        }
+        if (newCriteria !== undefined) {
+          targetBadge.criteria = newCriteria;
+        }
+        if (newDescription !== undefined) {
+          targetBadge.description = newDescription;
+        }
+        if (newImage !== undefined) {
+          targetBadge.image = newImage;
+        }
+        if (newAdminId !== undefined) {
+          targetBadge.adminId = newAdminId;
+        }
         await targetBadge.save();
         return targetBadge;
       }

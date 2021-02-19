@@ -286,23 +286,25 @@ module.exports = gql`
     ): QuestionTemplate! # done checked
     editModule(
       moduleId: String!
-      newName: String!
-      newCategoryId: String!
+      newName: String
+      newCategoryId: String
+      newAdminId: String
     ): Module! # done checked
     editBadge(
       badgeId: String!
-      newName: String!
-      newImage: String!
-      newCriteria: String!
-      newDescription: String!
+      newName: String
+      newImage: String
+      newCriteria: String
+      newDescription: String
+      newAdminId: String
     ): Badge! # done checked
     editQuestion(
       questionId: String!
       moduleId: String!
-      newModuleId: String!
-      newImage: String!
-      newQuestionDescription: String!
-      newHint: String!
+      newModuleId: String
+      newImage: String
+      newQuestionDescription: String
+      newHint: String
       newExpectedAnswer: String
       newPoints: Int
       newVideoLink: String
@@ -310,12 +312,14 @@ module.exports = gql`
       newSkillDescription: String
       newQuestionName: String
       newType: String
+      newAdminId: String
     ): Question! # done checked
     editQuestionTemplate(
-      newName: String!
+      newName: String
       questionTemplateId: String!
-      newCategoryId: String!
-      newInputFields: [String]!
+      newCategoryId: String
+      newInputFields: [String]
+      newAdminId: String
     ): QuestionTemplate! # done checked
     deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
     deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked
@@ -325,7 +329,11 @@ module.exports = gql`
     deleteAnswer(answerId: String!, studentId: String!): String! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked
-    editCategory(categoryId: String!, newName: String!): Category! # done checked
+    editCategory(
+      categoryId: String!
+      newName: String
+      newAdminId: String
+    ): Category! # done checked
     deleteCategory(categoryId: String!): [String]! # done checked
     createNewChallenge(
       name: String
@@ -335,10 +343,11 @@ module.exports = gql`
     ): Challenge! # done checked
     editChallenge(
       challengeId: String!
-      newCategoryId: String!
-      newChallengeDescription: String!
-      newName: String!
+      newCategoryId: String
+      newChallengeDescription: String
+      newName: String
       newImage: String
+      newAdminId: String
     ): Challenge! # done checked
     deleteChallenge(challengeId: String!): [String]! # done checked
     # createHint(questionId: String!, hintDescription: String!): Hint! # done
@@ -382,5 +391,5 @@ module.exports = gql`
     handleStarQuestion(questionId: String!): [String] # done checked
     handleStarModule(moduleId: String!): [String] # done checked
   }
-  # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin, replace signupAdmin
+  # TODO giveBadgeToStudent, editStudent, editMentor, editAdmin
 `;
