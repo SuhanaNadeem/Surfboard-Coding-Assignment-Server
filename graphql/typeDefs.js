@@ -15,6 +15,9 @@ module.exports = gql`
     challenges: [String]!
     categories: [String]!
 
+    questions: [String]
+    badges: [String]
+
     createdAt: DateTime!
     token: String
   }
@@ -156,6 +159,12 @@ module.exports = gql`
   type Query {
     getAdmin: Admin! # done checked
     getAdmins: [Admin]! # done checked
+    getQuestionsByAdmin(adminId: String!): [String]! # done checked
+    getQuestionTemplatesByAdmin(adminId: String!): [String]! # done checked
+    getModulesByAdmin(adminId: String!): [String]! # done checked
+    getChallengesByAdmin(adminId: String!): [String]! # done checked
+    getBadgesByAdmin(adminId: String!): [String]! # done checked
+    getCategoriesByAdmin(adminId: String!): [String]! # done checked
     getMentor: Mentor! # done checked
     getMentors: [Mentor]! # done checked
     getStudent: Student! # done checked

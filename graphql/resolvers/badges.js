@@ -63,6 +63,10 @@ module.exports = {
         });
 
         await newBadge.save();
+
+        targetAdmin.badges.push(newBadge.id);
+        await targetAdmin.save();
+
         return newBadge;
       } else {
         return targetBadge;

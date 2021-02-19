@@ -39,6 +39,7 @@ module.exports = {
         throw new AuthenticationError();
       }
     },
+
     async getAdmins(_, {}, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -50,6 +51,90 @@ module.exports = {
         throw new UserInputError("invalid input");
       } else {
         return admins;
+      }
+    },
+    async getQuestionsByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const questions = admin.questions;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return questions;
+      }
+    },
+    async getQuestionTemplatesByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const questionTemplates = admin.questionTemplates;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return questionTemplates;
+      }
+    },
+    async getBadgesByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const badges = admin.badges;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return badges;
+      }
+    },
+    async getModulesByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const modules = admin.modules;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return modules;
+      }
+    },
+    async getCategoriesByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const categories = admin.categories;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return categories;
+      }
+    },
+    async getChallengesByAdmin(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const admin = await Admin.findById(adminId);
+      const challenges = admin.challenges;
+      if (!admin) {
+        throw new UserInputError("invalid input");
+      } else {
+        return challenges;
       }
     },
     async getStringStringDicts(_, {}, context) {
@@ -96,19 +181,16 @@ module.exports = {
 
       password = await bcrypt.hash(password, 12);
 
-      const modules = [];
-      const questionTemplates = [];
-      const challenges = [];
-      const categories = [];
-
       const newAdmin = new Admin({
         name,
         email,
         password,
-        modules,
-        questionTemplates,
-        challenges,
-        categories,
+        modules: [],
+        questionTemplates: [],
+        challenges: [],
+        categories: [],
+        questions: [],
+        badges: [],
         createdAt: new Date(),
       });
 
@@ -220,10 +302,11 @@ module.exports = {
         await newQuestion.save();
 
         targetModule.questions.push(newQuestion.id);
-
         await targetModule.save();
 
+        targetAdmin.questions.push(newQuestion.id);
         await targetAdmin.save();
+
         return newQuestion;
       } else {
         return targetQuestion;
@@ -258,6 +341,7 @@ module.exports = {
         });
 
         await newQuestionTemplate.save();
+
         targetAdmin.questionTemplates.push(newQuestionTemplate.id);
         await targetAdmin.save();
 

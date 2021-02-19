@@ -15,6 +15,8 @@ const adminSchema = new Schema({
   questionTemplates: [String],
   challenges: [String],
   categories: [String],
+  questions: [String],
+  badges: [String],
   createdAt: Date,
 });
 
