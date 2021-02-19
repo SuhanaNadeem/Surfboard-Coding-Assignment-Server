@@ -59,13 +59,15 @@ module.exports = {
           image,
           criteria,
           description,
+          adminId: targetAdmin.id,
+
           createdAt: new Date(),
         });
 
         await newBadge.save();
 
-        targetAdmin.badges.push(newBadge.id);
-        await targetAdmin.save();
+        // targetAdmin.badges.push(newBadge.id);
+        // await targetAdmin.save();
 
         return newBadge;
       } else {

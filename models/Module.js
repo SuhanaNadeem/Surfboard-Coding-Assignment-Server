@@ -14,6 +14,7 @@ const moduleSchema = new Schema({
   questions: [String],
   createdAt: Date,
   learningObjectives: [String],
+  adminId: String,
 });
 
 module.exports = model("Module", moduleSchema);

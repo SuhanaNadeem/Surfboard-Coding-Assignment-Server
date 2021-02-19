@@ -11,6 +11,7 @@ const questionTemplateSchema = new Schema({
   inputFields: [String],
   createdAt: Date,
   name: String,
+  adminId: String,
 });
 
 module.exports = model("Question Template", questionTemplateSchema);

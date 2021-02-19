@@ -18,6 +18,7 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 const StringStringDict = require("../../models/StringStringDict");
 const Student = require("../../models/Student");
 const StringIntDict = require("../../models/StringIntDict");
+const Badge = require("../../models/Badge");
 function generateToken(admin) {
   return jwt.sign(
     {
@@ -60,7 +61,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const questions = admin.questions;
+      const questions = await Question.find({ adminId });
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -74,7 +75,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const questionTemplates = admin.questionTemplates;
+      const questionTemplates = await QuestionTemplate.find({ adminId });
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -88,7 +89,8 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const badges = admin.badges;
+      var badges = await Badge.find({ adminId });
+
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -102,7 +104,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const modules = admin.modules;
+      const modules = await Module.find({ adminId });
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -116,7 +118,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const categories = admin.categories;
+      const categories = await Category.find({ adminId });
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -130,7 +132,7 @@ module.exports = {
         throw new AuthenticationError();
       }
       const admin = await Admin.findById(adminId);
-      const challenges = admin.challenges;
+      const challenges = await Challenge.find({ adminId });
       if (!admin) {
         throw new UserInputError("invalid input");
       } else {
@@ -185,12 +187,6 @@ module.exports = {
         name,
         email,
         password,
-        modules: [],
-        questionTemplates: [],
-        challenges: [],
-        categories: [],
-        questions: [],
-        badges: [],
         createdAt: new Date(),
       });
 
@@ -237,7 +233,7 @@ module.exports = {
         try {
           var user = checkMentorAuth(context);
         } catch (error) {
-          throw new Error(error);
+          throw new AuthenticationError(error);
         }
       }
       const targetAdmin = await Admin.findById(adminId);
@@ -297,6 +293,7 @@ module.exports = {
           skillDescription,
           questionName,
           type,
+          adminId: targetAdmin.id,
           createdAt: new Date(),
         });
         await newQuestion.save();
@@ -304,8 +301,8 @@ module.exports = {
         targetModule.questions.push(newQuestion.id);
         await targetModule.save();
 
-        targetAdmin.questions.push(newQuestion.id);
-        await targetAdmin.save();
+        // targetAdmin.questions.push(newQuestion.id);
+        // await targetAdmin.save();
 
         return newQuestion;
       } else {
@@ -337,13 +334,14 @@ module.exports = {
           categoryId,
           name,
           inputFields,
+          adminId: targetAdmin.id,
           createdAt: new Date(),
         });
 
         await newQuestionTemplate.save();
 
-        targetAdmin.questionTemplates.push(newQuestionTemplate.id);
-        await targetAdmin.save();
+        // targetAdmin.questionTemplates.push(newQuestionTemplate.id);
+        // await targetAdmin.save();
 
         return newQuestionTemplate;
       } else {
@@ -373,12 +371,13 @@ module.exports = {
           categoryId,
           questions,
           comments,
+          adminId: targetAdmin.id,
           createdAt: new Date(),
         });
 
         await newModule.save();
-        targetAdmin.modules.push(newModule.id);
-        await targetAdmin.save();
+        // targetAdmin.modules.push(newModule.id);
+        // await targetAdmin.save();
         return newModule;
       } else {
         return targetModule;
@@ -406,12 +405,13 @@ module.exports = {
           challengeDescription,
           categoryId,
           image,
+          adminId: targetAdmin.id,
           createdAt: new Date(),
         });
 
         await newChallenge.save();
-        await targetAdmin.challenges.push(newChallenge.id);
-        await targetAdmin.save();
+        // await targetAdmin.challenges.push(newChallenge.id);
+        // await targetAdmin.save();
         return newChallenge;
       } else {
         return targetChallenge;
@@ -431,11 +431,12 @@ module.exports = {
       if (!targetCategory) {
         const newCategory = new Category({
           name,
+          adminId: targetAdmin.id,
           createdAt: new Date(),
         });
         await newCategory.save();
-        targetAdmin.categories.push(newCategory.id);
-        await targetAdmin.save();
+        // targetAdmin.categories.push(newCategory.id);
+        // await targetAdmin.save();
         return newCategory;
       } else {
         return targetCategory;
@@ -543,7 +544,13 @@ module.exports = {
 
     async editChallenge(
       _,
-      { challengeId, newName, newCategoryId, newChallengeDescription, newImage },
+      {
+        challengeId,
+        newName,
+        newCategoryId,
+        newChallengeDescription,
+        newImage,
+      },
       context
     ) {
       try {

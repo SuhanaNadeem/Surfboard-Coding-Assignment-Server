@@ -10,6 +10,7 @@ const categorySchema = new Schema({
   },
   name: String,
   createdAt: Date,
+  adminId: String,
 });
 
 module.exports = model("Category", categorySchema);

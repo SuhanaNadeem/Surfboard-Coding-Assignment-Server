@@ -13,6 +13,7 @@ const badgeSchema = new Schema({
   criteria: String,
   image: String,
   createdAt: Date,
+  adminId: String,
 });
 
 module.exports = model("Badge", badgeSchema);

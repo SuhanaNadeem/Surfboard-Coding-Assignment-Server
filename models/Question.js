@@ -20,6 +20,7 @@ const questionSchema = new Schema({
   videoLink: String,
   articleLink: String,
   questionName: String,
+  adminId: String,
 });
 
 module.exports = model("Question", questionSchema);

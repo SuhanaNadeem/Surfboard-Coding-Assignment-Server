@@ -13,6 +13,7 @@ const challengeSchema = new Schema({
   challengeDescription: String,
   createdAt: Date,
   categoryId: String,
+  adminId: String,
 });
 
 module.exports = model("Challenge", challengeSchema);

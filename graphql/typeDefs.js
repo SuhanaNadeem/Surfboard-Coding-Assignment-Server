@@ -81,12 +81,15 @@ module.exports = gql`
     comments: [String]!
     questions: [String]!
     createdAt: DateTime!
+    adminId: String
     learningObjectives: [String]
   }
 
   type Category {
     id: String!
     name: String! # CAD, elec, prog
+    adminId: String
+
     createdAt: DateTime!
   }
 
@@ -96,6 +99,7 @@ module.exports = gql`
     image: String!
     description: String
     createdAt: DateTime!
+    adminId: String
     criteria: String!
   }
 
@@ -120,6 +124,8 @@ module.exports = gql`
     name: String!
     categoryId: String! # CAD, electrical, programming
     inputFields: [String]! # diff things you can enter
+    adminId: String
+
     createdAt: DateTime!
   }
   type Question {
@@ -136,6 +142,8 @@ module.exports = gql`
     moduleId: String
     videoLink: String
     articleLink: String
+    adminId: String
+
     skillDescription: String
   }
 
@@ -145,6 +153,8 @@ module.exports = gql`
     image: String
     challengeDescription: String
     createdAt: DateTime!
+    adminId: String
+
     categoryId: String!
   }
 
@@ -160,12 +170,12 @@ module.exports = gql`
   type Query {
     getAdmin: Admin! # done checked
     getAdmins: [Admin]! # done checked
-    getQuestionsByAdmin(adminId: String!): [String]! # done checked
-    getQuestionTemplatesByAdmin(adminId: String!): [String]! # done checked
-    getModulesByAdmin(adminId: String!): [String]! # done checked
-    getChallengesByAdmin(adminId: String!): [String]! # done checked
-    getBadgesByAdmin(adminId: String!): [String]! # done checked
-    getCategoriesByAdmin(adminId: String!): [String]! # done checked
+    getQuestionsByAdmin(adminId: String!): [Question]! # done checked
+    getQuestionTemplatesByAdmin(adminId: String!): [QuestionTemplate]! # done checked
+    getModulesByAdmin(adminId: String!): [Module]! # done checked
+    getChallengesByAdmin(adminId: String!): [Challenge]! # done checked
+    getBadgesByAdmin(adminId: String!): [Badge]! # done checked
+    getCategoriesByAdmin(adminId: String!): [Category]! # done checked
     getMentor: Mentor! # done checked
     getMentors: [Mentor]! # done checked
     getStudent: Student! # done checked
@@ -326,7 +336,8 @@ module.exports = gql`
     editChallenge(
       challengeId: String!
       newCategoryId: String!
-      newQuestionDescription: String!
+      newChallengeDescription: String!
+      newName: String!
       newImage: String
     ): Challenge! # done checked
     deleteChallenge(challengeId: String!): [String]! # done checked
