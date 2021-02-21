@@ -170,6 +170,7 @@ module.exports = gql`
   type Query {
     getAdmin: Admin! # done checked
     getAdmins: [Admin]! # done checked
+    getAdminById(adminId: String!): Admin! # done checked
     getQuestionsByAdmin(adminId: String!): [Question]! # done checked
     getQuestionTemplatesByAdmin(adminId: String!): [QuestionTemplate]! # done checked
     getModulesByAdmin(adminId: String!): [Module]! # done checked

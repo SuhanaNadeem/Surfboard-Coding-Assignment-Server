@@ -54,6 +54,24 @@ module.exports = {
         return admins;
       }
     },
+    async getAdminById(_, { adminId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          throw new AuthenticationError();
+        }
+      }
+      const targetAdmin = await Admin.findById(adminId);
+      if (!targetAdmin) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetAdmin;
+      }
+    },
+
     async getQuestionsByAdmin(_, { adminId }, context) {
       try {
         const admin = checkAdminAuth(context);
