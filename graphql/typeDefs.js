@@ -100,7 +100,10 @@ module.exports = gql`
     description: String
     createdAt: DateTime!
     adminId: String
-    criteria: String!
+    questionId: String
+    moduleId: String
+    categoryId: String
+    points: Int
   }
 
   type Answer {
@@ -271,7 +274,10 @@ module.exports = gql`
       name: String!
       image: String!
       description: String!
-      criteria: String
+      moduleId: String
+      categoryId: String
+      questionId: String
+      points: Int
     ): Badge! # done checked
     createNewQuestion(
       image: String
@@ -307,7 +313,10 @@ module.exports = gql`
       badgeId: String!
       newName: String
       newImage: String
-      newCriteria: String
+      newQuestionId: String
+      newModuleId: String
+      newCategoryId: String
+      newPoints: Int
       newDescription: String
       newAdminId: String
     ): Badge! # done checked

@@ -8,6 +8,9 @@ const Mentor = require("../../models/Mentor");
 
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const Badge = require("../../models/Badge");
+const Question = require("../../models/Question");
+const Module = require("../../models/Module");
+const Category = require("../../models/Category");
 
 module.exports = {
   Query: {
@@ -64,7 +67,11 @@ module.exports = {
   },
 
   Mutation: {
-    async createNewBadge(_, { image, name, description, criteria }, context) {
+    async createNewBadge(
+      _,
+      { image, name, description, questionId, moduleId, categoryId, points },
+      context
+    ) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -73,12 +80,18 @@ module.exports = {
       }
 
       const targetBadge = await Badge.findOne({ name });
+      const targetQuestion = await Question.findById(questionId);
+      const targetModule = await Module.findById(moduleId);
+      const targetCategory = await Category.findById(categoryId);
 
-      if (!targetBadge) {
+      if (!targetBadge && (targetQuestion || targetModule || targetCategory)) {
         const newBadge = new Badge({
           name,
           image,
-          criteria,
+          questionId,
+          moduleId,
+          categoryId,
+          points,
           description,
           adminId: targetAdmin.id,
 
@@ -98,7 +111,17 @@ module.exports = {
 
     async editBadge(
       _,
-      { badgeId, newImage, newName, newCriteria, newDescription, newAdminId },
+      {
+        badgeId,
+        newImage,
+        newName,
+        newPoints,
+        newDescription,
+        newAdminId,
+        newModuleId,
+        newCategoryId,
+        newQuestionId,
+      },
       context
     ) {
       try {
@@ -112,23 +135,40 @@ module.exports = {
         name: newName,
       });
       var newAdmin = await Admin.findById(newAdminId);
+      const targetQuestion = await Question.findById(newQuestionId);
+      const targetModule = await Module.findById(newModuleId);
+      const targetCategory = await Category.findById(newCategoryId);
 
       if (
         !targetBadge ||
         (newName !== undefined &&
+          newName !== "" &&
           newName !== targetBadge.name &&
-          newNameBadge) ||
+          newNameBadge) === true ||
         (newAdminId !== undefined &&
           newAdminId !== targetBadge.adminId &&
-          !newAdmin)
+          !newAdmin &&
+          newAdminId !== "") === true ||
+        (newQuestionId !== undefined &&
+          newQuestionId !== targetBadge.questionId &&
+          !targetQuestion &&
+          newQuestionId !== "") === true ||
+        (newModuleId !== undefined &&
+          newModuleId !== targetBadge.moduleId &&
+          !targetModule &&
+          newModuleId !== "") === true ||
+        (newCategoryId !== undefined &&
+          newCategoryId !== targetBadge.categoryId &&
+          !targetCategory &&
+          newCategoryId !== "") === true
       ) {
         throw new UserInputError("Invalid input");
       } else {
-        if (newName !== undefined) {
+        if (newName !== undefined && newAdminId !== "") {
           targetBadge.name = newName;
         }
-        if (newCriteria !== undefined) {
-          targetBadge.criteria = newCriteria;
+        if (newPoints !== undefined) {
+          targetBadge.points = newPoints;
         }
         if (newDescription !== undefined) {
           targetBadge.description = newDescription;
@@ -136,8 +176,17 @@ module.exports = {
         if (newImage !== undefined) {
           targetBadge.image = newImage;
         }
-        if (newAdminId !== undefined) {
+        if (newAdminId !== undefined && newAdminId !== "") {
           targetBadge.adminId = newAdminId;
+        }
+        if (newQuestionId !== undefined && newQuestionId !== "") {
+          targetBadge.questionId = newQuestionId;
+        }
+        if (newModuleId !== undefined && newModuleId !== "") {
+          targetBadge.moduleId = newModuleId;
+        }
+        if (newCategoryId !== undefined && newCategoryId !== "") {
+          targetBadge.categoryId = newCategoryId;
         }
         await targetBadge.save();
         return targetBadge;
@@ -173,6 +222,15 @@ module.exports = {
       if (!targetBadge) {
         throw new UserInputError("Invalid input");
       } else {
+        const students = await Student.find();
+        var index;
+        for (var targetStudent of students) {
+          if (targetStudent.badges.includes(badgeId)) {
+            index = targetStudent.badges.indexOf(badgeId);
+            targetStudent.badges.splice(index, 1);
+            targetStudent.save();
+          }
+        }
         await targetBadge.delete();
         const updatedBadges = await Badge.find();
         return updatedBadges;
