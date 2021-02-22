@@ -137,14 +137,18 @@ module.exports = gql`
     expectedAnswer: String
     createdAt: DateTime!
     hint: String
-    questionTemplateId: String!
+    questionFormat: String # only needed for questions
     points: Int
     moduleId: String
     videoLink: String
     articleLink: String
     adminId: String
-
     skillDescription: String
+    extraLink: String
+    optionA: String
+    optionB: String
+    optionC: String
+    optionD: String
   }
 
   type Challenge {
@@ -275,13 +279,18 @@ module.exports = gql`
       questionDescription: String!
       expectedAnswer: String
       hint: String
-      questionTemplateId: String!
+      questionFormat: String
       points: Int
       videoLink: String
       articleLink: String
       skillDescription: String
       questionName: String
       type: String
+      extraLink: String
+      optionA: String
+      optionB: String
+      optionC: String
+      optionD: String
     ): Question! # done checked
     createNewQuestionTemplate(
       name: String!
@@ -317,6 +326,11 @@ module.exports = gql`
       newQuestionName: String
       newType: String
       newAdminId: String
+      newExtraLink: String
+      newOptionA: String
+      newOptionB: String
+      newOptionC: String
+      newOptionD: String
     ): Question! # done checked
     editQuestionTemplate(
       newName: String

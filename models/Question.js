@@ -12,7 +12,7 @@ const questionSchema = new Schema({
   expectedAnswer: String,
   createdAt: Date,
   hint: String,
-  questionTemplateId: String,
+  questionFormat: String,
   moduleId: String,
   points: Number,
   type: String,
@@ -21,6 +21,11 @@ const questionSchema = new Schema({
   articleLink: String,
   questionName: String,
   adminId: String,
+  extraLink: String,
+  optionA: String,
+  optionB: String,
+  optionC: String,
+  optionD: String,
 });
 
 module.exports = model("Question", questionSchema);

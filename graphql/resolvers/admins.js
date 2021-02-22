@@ -271,13 +271,18 @@ module.exports = {
         moduleId,
         questionDescription,
         expectedAnswer,
-        questionTemplateId,
+        questionFormat,
         points,
         videoLink,
         articleLink,
         skillDescription,
         questionName,
         type,
+        extraLink,
+        optionA,
+        optionB,
+        optionC,
+        optionD,
       },
       context
     ) {
@@ -291,11 +296,25 @@ module.exports = {
       const targetQuestion = await Question.findOne({
         questionDescription,
       });
-      const targetQuestionTemplate = await QuestionTemplate.findById(
-        questionTemplateId
-      );
+
       var targetModule = await Module.findById(moduleId);
-      if (!targetQuestionTemplate || !targetModule) {
+      if (
+        !targetModule ||
+        (type === "Question" && (!questionFormat || questionFormat === "")) ||
+        (questionFormat === "Multiple Choice" &&
+          (optionA === "" ||
+            !optionA ||
+            optionB === "" ||
+            !optionB ||
+            optionC === "" ||
+            !optionC ||
+            optionD === "" ||
+            !optionD ||
+            (expectedAnswer !== "A" &&
+              expectedAnswer !== "B" &&
+              expectedAnswer !== "C" &&
+              expectedAnswer !== "D")))
+      ) {
         throw new UserInputError("Invalid input");
       } else if (!targetQuestion) {
         const newQuestion = new Question({
@@ -303,7 +322,7 @@ module.exports = {
           questionDescription,
           expectedAnswer,
           hint,
-          questionTemplateId,
+          questionFormat,
           points,
           moduleId,
           videoLink,
@@ -312,6 +331,11 @@ module.exports = {
           questionName,
           type,
           adminId: targetAdmin.id,
+          extraLink,
+          optionA,
+          optionB,
+          optionC,
+          optionD,
           createdAt: new Date(),
         });
         await newQuestion.save();
@@ -524,6 +548,11 @@ module.exports = {
         newQuestionName,
         newType,
         newAdminId,
+        newExtraLink,
+        newOptionA,
+        newOptionB,
+        newOptionC,
+        newOptionD,
       },
       context
     ) {
@@ -534,6 +563,10 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetQuestion = await Question.findById(questionId);
+      // var targetQuestionTemplate = await QuestionTemplate.findById(
+      //   targetQuestion.questionTemplateId
+      // );
+
       var currentModule = await Module.findById(moduleId);
       var newModule = await Module.findById(newModuleId);
       var newNameQuestion = await Question.findOne({
@@ -558,7 +591,18 @@ module.exports = {
         (newAdminId !== undefined &&
           newAdminId !== "" &&
           newAdminId !== targetQuestion.adminId &&
-          !newAdmin) === true
+          !newAdmin) === true ||
+        (targetQuestion.questionFormat === "Multiple Choice" &&
+          (newOptionA === "" ||
+            newOptionA === undefined ||
+            newOptionB === "" ||
+            newOptionB === undefined ||
+            newOptionC === "" ||
+            newOptionC === undefined ||
+            newOptionD === "" ||
+            newOptionD === undefined)) ||
+        (targetQuestion.questionFormat === "Multiple Choice" &&
+          (!newExpectedAnswer || newExpectedAnswer === ""))
       ) {
         throw new UserInputError("Invalid input");
       } else {
@@ -597,6 +641,21 @@ module.exports = {
         }
         if (newAdminId !== undefined && newAdminId !== "") {
           targetQuestion.adminId = newAdminId;
+        }
+        if (newOptionA !== undefined) {
+          targetQuestion.optionA = newOptionA;
+        }
+        if (newOptionB !== undefined) {
+          targetQuestion.optionB = newOptionB;
+        }
+        if (newOptionC !== undefined) {
+          targetQuestion.optionC = newOptionC;
+        }
+        if (newOptionD !== undefined) {
+          targetQuestion.optionD = newOptionD;
+        }
+        if (newExtraLink !== undefined) {
+          targetQuestion.extraLink = newExtraLink;
         }
 
         if (newModuleId !== undefined && newModuleId != moduleId && newModule) {
