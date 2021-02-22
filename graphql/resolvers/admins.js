@@ -548,21 +548,27 @@ module.exports = {
         !targetQuestion ||
         !currentModule ||
         (newQuestionName !== undefined &&
+          newQuestionName !== "" &&
           newQuestionName !== targetQuestion.name &&
-          newNameQuestion) ||
+          newNameQuestion) === true ||
         (newQuestionDescription !== undefined &&
+          newQuestionDescription !== "" &&
           newQuestionDescription !== targetQuestion.questionDescription &&
-          newDescriptionQuestion) ||
+          newDescriptionQuestion) === true ||
         (newAdminId !== undefined &&
+          newAdminId !== "" &&
           newAdminId !== targetQuestion.adminId &&
-          !newAdmin)
+          !newAdmin) === true
       ) {
         throw new UserInputError("Invalid input");
       } else {
         if (newImage !== undefined) {
           targetQuestion.image = newImage;
         }
-        if (newQuestionDescription !== undefined) {
+        if (
+          newQuestionDescription !== undefined &&
+          newQuestionDescription !== ""
+        ) {
           targetQuestion.questionDescription = newQuestionDescription;
         }
         if (newExpectedAnswer !== undefined) {
@@ -580,16 +586,16 @@ module.exports = {
         if (newArticleLink !== undefined) {
           targetQuestion.articleLink = newArticleLink;
         }
-        if (newType !== undefined) {
+        if (newType !== undefined && newType !== "") {
           targetQuestion.type = newType;
         }
         if (newSkillDescription !== undefined) {
           targetQuestion.skillDescription = newSkillDescription;
         }
-        if (newQuestionName !== undefined) {
+        if (newQuestionName !== undefined && newQuestionName !== "") {
           targetQuestion.questionName = newQuestionName;
         }
-        if (newAdminId !== undefined) {
+        if (newAdminId !== undefined && newAdminId !== "") {
           targetQuestion.adminId = newAdminId;
         }
 
@@ -600,7 +606,11 @@ module.exports = {
           await newModule.questions.push(questionId);
           await newModule.save();
           targetQuestion.moduleId = newModuleId;
-        } else if (newModuleId != moduleId && newModuleId !== undefined) {
+        } else if (
+          newModuleId != moduleId &&
+          newModuleId !== undefined &&
+          newModuleId !== ""
+        ) {
           throw new UserInputError("Invalid input");
         }
         await targetQuestion.save();
@@ -636,27 +646,30 @@ module.exports = {
       if (
         !targetQuestionTemplate ||
         (newName !== undefined &&
+          newName !== "" &&
           newName !== targetQuestionTemplate.name &&
           newNameQuestionTemplate) ||
         (newCategoryId !== undefined &&
+          newCategoryId !== "" &&
           newCategoryId !== targetQuestionTemplate.categoryId &&
           !newCategory) ||
         (newAdminId !== undefined &&
+          newAdminId !== "" &&
           newAdminId !== targetQuestionTemplate.adminId &&
           !newAdmin)
       ) {
         throw new UserInputError("Invalid input");
       } else {
-        if (newName !== undefined) {
+        if (newName !== undefined && newName !== "") {
           targetQuestionTemplate.name = newName;
         }
         if (newInputFields !== undefined) {
-          targetQuestionTemplate.inputFields = newinputFields;
+          targetQuestionTemplate.inputFields = newInputFields;
         }
-        if (newCategoryId !== undefined) {
+        if (newCategoryId !== undefined && newCategoryId !== "") {
           targetQuestionTemplate.categoryId = newCategoryId;
         }
-        if (newAdminId !== undefined) {
+        if (newAdminId !== undefined && newAdminId !== "") {
           targetQuestionTemplate.adminId = newAdminId;
         }
         await targetQuestionTemplate.save();

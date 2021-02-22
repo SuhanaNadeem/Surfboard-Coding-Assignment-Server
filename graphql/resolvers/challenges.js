@@ -29,5 +29,26 @@ module.exports = {
         return challenges;
       }
     },
+    async getChallengeById(_, { challengeId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const targetChallenge = await Challenge.findById(challengeId);
+      if (!targetChallenge) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetChallenge;
+      }
+    },
   },
 };

@@ -40,6 +40,27 @@ module.exports = {
 
       return badges;
     },
+    async getBadgeById(_, { badgeId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const targetBadge = await Badge.findById(badgeId);
+      if (!targetBadge) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetBadge;
+      }
+    },
   },
 
   Mutation: {
