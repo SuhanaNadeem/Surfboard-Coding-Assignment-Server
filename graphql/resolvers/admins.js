@@ -428,7 +428,7 @@ module.exports = {
 
     async createNewChallenge(
       _,
-      { name, challengeDescription, categoryId, image },
+      { name, challengeDescription, categoryId, image, extraLink, dueDate },
       context
     ) {
       try {
@@ -447,6 +447,8 @@ module.exports = {
           challengeDescription,
           categoryId,
           image,
+          dueDate,
+          extraLink,
           adminId: targetAdmin.id,
           createdAt: new Date(),
         });
@@ -745,6 +747,8 @@ module.exports = {
         newChallengeDescription,
         newImage,
         newAdminId,
+        newExtraLink,
+    newDueDate,
       },
       context
     ) {
@@ -764,23 +768,23 @@ module.exports = {
         !targetChallenge ||
         (newName !== undefined &&
           newName !== targetChallenge.name &&
-          newNameChallenge) ||
+          newNameChallenge&& newName!=="") ||
         (newCategoryId !== undefined &&
           newCategoryId !== targetChallenge.categoryId &&
-          !newCategory) ||
+          !newCategory&& newCategoryId!=="") ||
         (newAdminId !== undefined &&
           newAdminId !== targetChallenge.adminId &&
-          !newAdmin)
+          !newAdmin&& newAdminId!=="")
       ) {
         throw new UserInputError("Invalid input");
       } else {
         if (newCategoryId !== undefined) {
           targetChallenge.categoryId = newCategoryId;
         }
-        if (newName !== undefined) {
+        if (newName !== undefined && newName !=="") {
           targetChallenge.name = newName;
         }
-        if (newCategoryId !== undefined) {
+        if (newCategoryId !== undefined && newCategoryId!=="") {
           targetChallenge.categoryId = newCategoryId;
         }
         if (newChallengeDescription !== undefined) {
@@ -789,10 +793,15 @@ module.exports = {
         if (newImage !== undefined) {
           targetChallenge.image = newImage;
         }
-        if (newAdminId !== undefined) {
+        if (newAdminId !== undefined && newAdminId !=="") {
           targetChallenge.adminId = newAdminId;
         }
-
+        if (newExtraLink !== undefined) {
+          targetChallenge.extraLink = newExtraLink;
+        }
+        if (newDueDate !== undefined) {
+          targetChallenge.dueDate = newDueDate;
+        }
         await targetChallenge.save();
         return targetChallenge;
       }

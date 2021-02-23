@@ -14,6 +14,8 @@ const challengeSchema = new Schema({
   createdAt: Date,
   categoryId: String,
   adminId: String,
+  extraLink: String,
+  dueDate: String,
 });
 
 module.exports = model("Challenge", challengeSchema);

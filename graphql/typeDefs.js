@@ -161,7 +161,8 @@ module.exports = gql`
     challengeDescription: String
     createdAt: DateTime!
     adminId: String
-
+    extraLink: String
+    dueDate: String
     categoryId: String!
   }
 
@@ -367,6 +368,8 @@ module.exports = gql`
       categoryId: String!
       challengeDescription: String
       image: String
+      extraLink: String
+      dueDate: String
     ): Challenge! # done checked
     editChallenge(
       challengeId: String!
@@ -374,6 +377,8 @@ module.exports = gql`
       newChallengeDescription: String
       newName: String
       newImage: String
+      newExtraLink: String
+      newDueDate: String
       newAdminId: String
     ): Challenge! # done checked
     deleteChallenge(challengeId: String!): [String]! # done checked
