@@ -269,14 +269,13 @@ module.exports = {
         image,
         hint,
         moduleId,
-        questionDescription,
+        description,
         expectedAnswer,
         questionFormat,
         points,
         videoLink,
         articleLink,
-        skillDescription,
-        questionName,
+        name,
         type,
         extraLink,
         optionA,
@@ -294,7 +293,7 @@ module.exports = {
       }
 
       const targetQuestion = await Question.findOne({
-        questionDescription,
+        description,
       });
 
       var targetModule = await Module.findById(moduleId);
@@ -319,7 +318,7 @@ module.exports = {
       } else if (!targetQuestion) {
         const newQuestion = new Question({
           image,
-          questionDescription,
+          description,
           expectedAnswer,
           hint,
           questionFormat,
@@ -327,8 +326,7 @@ module.exports = {
           moduleId,
           videoLink,
           articleLink,
-          skillDescription,
-          questionName,
+          name,
           type,
           adminId: targetAdmin.id,
           extraLink,
@@ -540,14 +538,13 @@ module.exports = {
         moduleId,
         newImage,
         newHint,
-        newQuestionDescription,
+        newDescription,
         newExpectedAnswer,
         newModuleId,
         newPoints,
         newVideoLink,
         newArticleLink,
-        newSkillDescription,
-        newQuestionName,
+        newName,
         newType,
         newAdminId,
         newExtraLink,
@@ -572,23 +569,23 @@ module.exports = {
       var currentModule = await Module.findById(moduleId);
       var newModule = await Module.findById(newModuleId);
       var newNameQuestion = await Question.findOne({
-        questionName: newQuestionName,
+        name: newName,
       });
       var newDescriptionQuestion = await Question.findOne({
-        questionDescription: newQuestionDescription,
+        description: newDescription,
       });
       var newAdmin = await Admin.findById(newAdminId);
 
       if (
         !targetQuestion ||
         !currentModule ||
-        (newQuestionName !== undefined &&
-          newQuestionName !== "" &&
-          newQuestionName !== targetQuestion.name &&
+        (newName !== undefined &&
+          newName !== "" &&
+          newName !== targetQuestion.name &&
           newNameQuestion) === true ||
-        (newQuestionDescription !== undefined &&
-          newQuestionDescription !== "" &&
-          newQuestionDescription !== targetQuestion.questionDescription &&
+        (newDescription !== undefined &&
+          newDescription !== "" &&
+          newDescription !== targetQuestion.description &&
           newDescriptionQuestion) === true ||
         (newAdminId !== undefined &&
           newAdminId !== "" &&
@@ -611,11 +608,8 @@ module.exports = {
         if (newImage !== undefined) {
           targetQuestion.image = newImage;
         }
-        if (
-          newQuestionDescription !== undefined &&
-          newQuestionDescription !== ""
-        ) {
-          targetQuestion.questionDescription = newQuestionDescription;
+        if (newDescription !== undefined && newDescription !== "") {
+          targetQuestion.description = newDescription;
         }
         if (newExpectedAnswer !== undefined) {
           targetQuestion.expectedAnswer = newExpectedAnswer;
@@ -635,11 +629,9 @@ module.exports = {
         if (newType !== undefined && newType !== "") {
           targetQuestion.type = newType;
         }
-        if (newSkillDescription !== undefined) {
-          targetQuestion.skillDescription = newSkillDescription;
-        }
-        if (newQuestionName !== undefined && newQuestionName !== "") {
-          targetQuestion.questionName = newQuestionName;
+
+        if (newName !== undefined && newName !== "") {
+          targetQuestion.name = newName;
         }
         if (newAdminId !== undefined && newAdminId !== "") {
           targetQuestion.adminId = newAdminId;
@@ -748,7 +740,7 @@ module.exports = {
         newImage,
         newAdminId,
         newExtraLink,
-    newDueDate,
+        newDueDate,
       },
       context
     ) {
@@ -768,23 +760,26 @@ module.exports = {
         !targetChallenge ||
         (newName !== undefined &&
           newName !== targetChallenge.name &&
-          newNameChallenge&& newName!=="") ||
+          newNameChallenge &&
+          newName !== "") ||
         (newCategoryId !== undefined &&
           newCategoryId !== targetChallenge.categoryId &&
-          !newCategory&& newCategoryId!=="") ||
+          !newCategory &&
+          newCategoryId !== "") ||
         (newAdminId !== undefined &&
           newAdminId !== targetChallenge.adminId &&
-          !newAdmin&& newAdminId!=="")
+          !newAdmin &&
+          newAdminId !== "")
       ) {
         throw new UserInputError("Invalid input");
       } else {
         if (newCategoryId !== undefined) {
           targetChallenge.categoryId = newCategoryId;
         }
-        if (newName !== undefined && newName !=="") {
+        if (newName !== undefined && newName !== "") {
           targetChallenge.name = newName;
         }
-        if (newCategoryId !== undefined && newCategoryId!=="") {
+        if (newCategoryId !== undefined && newCategoryId !== "") {
           targetChallenge.categoryId = newCategoryId;
         }
         if (newChallengeDescription !== undefined) {
@@ -793,7 +788,7 @@ module.exports = {
         if (newImage !== undefined) {
           targetChallenge.image = newImage;
         }
-        if (newAdminId !== undefined && newAdminId !=="") {
+        if (newAdminId !== undefined && newAdminId !== "") {
           targetChallenge.adminId = newAdminId;
         }
         if (newExtraLink !== undefined) {

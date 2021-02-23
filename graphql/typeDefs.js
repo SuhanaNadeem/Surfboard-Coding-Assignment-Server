@@ -135,8 +135,8 @@ module.exports = gql`
     id: String!
     type: String
     image: String
-    questionName: String
-    questionDescription: String! # ASSUMING THIS IS UNIQUE
+    name: String
+    description: String # ASSUMING THIS IS UNIQUE TODO: make this required when redoing questions
     expectedAnswer: String
     createdAt: DateTime!
     hint: String
@@ -146,7 +146,6 @@ module.exports = gql`
     videoLink: String
     articleLink: String
     adminId: String
-    skillDescription: String
     extraLink: String
     optionA: String
     optionB: String
@@ -283,15 +282,14 @@ module.exports = gql`
     createNewQuestion(
       image: String
       moduleId: String!
-      questionDescription: String!
+      description: String
       expectedAnswer: String
       hint: String
       questionFormat: String
       points: Int
       videoLink: String
       articleLink: String
-      skillDescription: String
-      questionName: String
+      name: String
       type: String
       extraLink: String
       optionA: String
@@ -326,14 +324,13 @@ module.exports = gql`
       moduleId: String!
       newModuleId: String
       newImage: String
-      newQuestionDescription: String
+      newDescription: String
       newHint: String
       newExpectedAnswer: String
       newPoints: Int
       newVideoLink: String
       newArticleLink: String
-      newSkillDescription: String
-      newQuestionName: String
+      newName: String
       newType: String
       newAdminId: String
       newExtraLink: String
