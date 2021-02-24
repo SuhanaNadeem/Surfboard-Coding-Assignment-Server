@@ -101,13 +101,21 @@ module.exports = {
       }
     },
 
-    async getCompletedModulesByStudent(_, {}, context) {
+    async getCompletedModulesByStudent(_, { studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
+      var targetStudent = await Student.findById(studentId);
+
       const completedModuleIds = targetStudent.completedModules;
 
       const completedModules = await Module.find({
@@ -461,11 +469,11 @@ module.exports = {
         const index = targetStudent.inProgressModules.indexOf(moduleId);
         targetStudent.inProgressModules.splice(index, 1);
         await targetStudent.save();
-        const targetModulePointsPair = await StringIntDict.findById({
-          key: moduleId,
-          studentId,
-        });
-        await targetModulePointsPair.delete();
+        // const targetModulePointsPair = await StringIntDict.findById({
+        //   key: moduleId,
+        //   studentId,
+        // });
+        // await targetModulePointsPair.delete();
         const updatedInProgressModules = targetStudent.inProgressModules;
         return updatedInProgressModules;
       } else {

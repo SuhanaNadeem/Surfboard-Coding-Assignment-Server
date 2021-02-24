@@ -52,8 +52,8 @@ module.exports = gql`
 
     mentors: [String]
 
-    quesAnsDict: [StringStringDict] # {questionsAttempted: submittedAnswers}
-    modulePointsDict: [StringIntDict] # {studentId + module: points}
+    quesAnsDict: [StringStringDict] # {studentId + questionId: answerId}
+    modulePointsDict: [StringIntDict] # {studentId + moduleId: points}
     createdAt: DateTime!
     token: String
   }
@@ -192,7 +192,7 @@ module.exports = gql`
     getStringStringDicts: [StringStringDict]! # done checked
     getStringIntDicts: [StringIntDict]! # done checked
     # for dashboard
-    getCompletedModulesByStudent: [Module]! # done checked
+    getCompletedModulesByStudent(studentId: String!): [Module]! # done checked
     getInProgressModulesByStudent: [Module]! # done checked
     getBadgesByStudent: [String]! # done checked
     getStudentsByMentor: [String]! # done checked
