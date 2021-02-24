@@ -89,7 +89,6 @@ module.exports = gql`
     id: String!
     name: String! # CAD, elec, prog
     adminId: String
-
     createdAt: DateTime!
   }
 
@@ -348,7 +347,7 @@ module.exports = gql`
     ): QuestionTemplate! # done checked
     deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
     deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked
-    deleteModule(moduleId: String!): [String]! # done checked
+    deleteModule(moduleId: String!): [Module]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [Question]! # done checked
     deleteAnswer(answerId: String!, studentId: String!): String! # done checked
@@ -359,9 +358,9 @@ module.exports = gql`
       newName: String
       newAdminId: String
     ): Category! # done checked
-    deleteCategory(categoryId: String!): [String]! # done checked
+    deleteCategory(categoryId: String!): [Category]! # done checked
     createNewChallenge(
-      name: String
+      name: String!
       categoryId: String!
       challengeDescription: String
       image: String
@@ -378,7 +377,7 @@ module.exports = gql`
       newDueDate: String
       newAdminId: String
     ): Challenge! # done checked
-    deleteChallenge(challengeId: String!): [String]! # done checked
+    deleteChallenge(challengeId: String!): [Challenge]! # done checked
     # createHint(questionId: String!, hintDescription: String!): Hint! # done
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done

@@ -846,11 +846,8 @@ module.exports = {
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.modules.indexOf(moduleId);
-        targetAdmin.modules.splice(index, 1);
-        await targetAdmin.save();
         await targetModule.delete();
-        const updatedModules = targetAdmin.modules;
+        const updatedModules = await Module.find();
         return updatedModules;
       }
     },
@@ -971,11 +968,8 @@ module.exports = {
       if (!targetChallenge) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.challenges.indexOf(challengeId);
-        targetAdmin.challenges.splice(index, 1);
-        await targetAdmin.save();
         await targetChallenge.delete();
-        const updatedChallenges = targetAdmin.challenges;
+        const updatedChallenges = await Challenge.find();
         return updatedChallenges;
       }
     },
@@ -991,15 +985,9 @@ module.exports = {
       if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else {
-        const index = targetAdmin.categories.indexOf(categoryId);
-        targetAdmin.categories.splice(index, 1);
-        await targetAdmin.save();
         await targetCategory.delete();
-        const updatedCategories = targetAdmin.categories;
+        const updatedCategories = await Category.find();
         return updatedCategories;
-
-        // TODO delete AFTER
-        //TODO Splice from admin  getcategories query and new = save
       }
     },
   },
