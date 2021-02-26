@@ -114,28 +114,40 @@ module.exports = {
           }
         }
       }
-      var targetStudent = await Student.findById(studentId);
-
+      const targetStudent = await Student.findById(studentId);
       const completedModuleIds = targetStudent.completedModules;
-
-      const completedModules = await Module.find({
-        _id: { $in: completedModuleIds },
-      });
-      return completedModules;
-    },
-    async getInProgressModulesByStudent(_, {}, context) {
-      try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
-      } catch (error) {
-        throw new AuthenticationError();
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const completedModules = await Module.find({
+          _id: { $in: completedModuleIds },
+        });
+        return completedModules;
       }
+    },
+    async getInProgressModulesByStudent(_, { studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
       const inProgressModuleIds = targetStudent.inProgressModules;
-
-      const inProgressModules = await Module.find({
-        _id: { $in: inProgressModuleIds },
-      });
-      return inProgressModules;
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const inProgressModules = await Module.find({
+          _id: { $in: inProgressModuleIds },
+        });
+        return inProgressModules;
+      }
     },
     async getModulesBySearch(_, { search }, context) {
       //   try {
@@ -426,16 +438,17 @@ module.exports = {
       }
 
       const targetStudent = await Student.findById(studentId);
-      const targetModulePointsPair = await StringIntDict.find({
+      const targetModulePointsPair = await StringIntDict.findOne({
         key: moduleId,
-        studentId: targetStudent.id,
+        studentId,
       });
       const targetModule = await Module.findById(moduleId);
+
       if (
         !targetStudent ||
         !targetModule ||
         !targetModulePointsPair ||
-        targetModulePointsPair.length === 0 ||
+        // targetModulePointsPair.length === 0 ||
         targetStudent.inProgressModules.includes(moduleId)
       ) {
         throw new UserInputError("Invalid input");

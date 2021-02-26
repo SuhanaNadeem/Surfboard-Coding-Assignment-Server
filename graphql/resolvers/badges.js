@@ -32,17 +32,31 @@ module.exports = {
 
       return badges;
     },
-    async getBadgesByStudent(_, {}, context) {
+    async getBadgesByStudent(_, { studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
-      const badges = targetStudent.badges;
-
-      return badges;
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const badgeIds = targetStudent.badges;
+        const badges = await Badge.find({
+          _id: { $in: badgeIds },
+        });
+        return badges;
+      }
     },
+
     async getBadgeById(_, { badgeId }, context) {
       try {
         const admin = checkAdminAuth(context);
@@ -192,13 +206,13 @@ module.exports = {
         return targetBadge;
       }
     },
-    async addBadge(_, { badgeId }, context) {
+    async handleAddBadge(_, { badgeId, studentId }, context) {
       try {
         const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new Error(error);
       }
+      var targetStudent = await Student.findById(studentId);
 
       const targetBadge = await Badge.findById(badgeId);
       if (!targetBadge) {
@@ -234,6 +248,32 @@ module.exports = {
         await targetBadge.delete();
         const updatedBadges = await Badge.find();
         return updatedBadges;
+      }
+    },
+    async addBadge(_, { studentId, badgeId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent || targetStudent.badges.includes(badgeId)) {
+        throw new UserInputError("Invalid input");
+      } else {
+        targetStudent.badges.push(badgeId);
+        await targetStudent.save();
+        const badgeIds = targetStudent.badges;
+        const badges = await Badge.find({
+          _id: { $in: badgeIds },
+        });
+        return badges;
       }
     },
   },
