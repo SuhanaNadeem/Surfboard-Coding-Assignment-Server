@@ -86,15 +86,29 @@ module.exports = {
       }
     },
 
-    async getMentorsByStudent(_, {}, context) {
+    async getMentorsByStudent(_, { studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
-      const mentors = targetStudent.mentors;
-      return mentors;
+      const targetStudent = await Student.findById(studentId);
+      if (targetStudent) {
+        const mentorIds = targetStudent.mentors;
+        const mentors = await Mentor.find({
+          _id: { $in: mentorIds },
+        });
+        return mentors;
+      } else {
+        throw new UserInputError("Invalid input");
+      }
     },
   },
 
@@ -468,16 +482,26 @@ module.exports = {
         return false;
       }
     },
-    async addMentor(_, { mentorId }, context) {
+    async addMentor(_, { mentorId, studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new Error(error);
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
-
+      const targetStudent = await Student.findById(studentId);
       const targetMentor = await Mentor.findById(mentorId);
-      if (!targetMentor || targetStudent.mentors.includes(mentorId)) {
+      if (
+        !targetMentor ||
+        !targetStudent ||
+        targetStudent.mentors.includes(mentorId)
+      ) {
         throw new UserInputError("Invalid input");
       } else {
         await targetStudent.mentors.push(mentorId);

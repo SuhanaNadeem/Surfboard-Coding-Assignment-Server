@@ -13,6 +13,28 @@ const StringStringDict = require("../../models/StringStringDict");
 
 module.exports = {
   Query: {
+    async getAnswerById(_, { answerId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+
+      const targetAnswer = await Answer.findById(answerId);
+      if (!targetAnswer) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetAnswer;
+      }
+    },
+
     async getAnswers(_, {}, context) {
       try {
         var user = checkAdminAuth(context);
@@ -120,7 +142,7 @@ module.exports = {
         });
         await newPair.save();
         targetStudent.quesAnsDict.push(newPair);
-
+        // there's always only one quesAnsPair for a certain question
         await targetStudent.save();
         return newAnswer;
       }

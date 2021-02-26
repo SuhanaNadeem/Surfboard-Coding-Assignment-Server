@@ -161,9 +161,33 @@ module.exports = {
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
       const stringStringDicts = await StringStringDict.find();
+
+      return stringStringDicts;
+    },
+    async getStringStringDictsByStudent(_, { studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const stringStringDicts = await StringStringDict.find({ studentId });
 
       return stringStringDicts;
     },

@@ -190,17 +190,19 @@ module.exports = gql`
     getStudents: [Student]! # done checked
     getBadges: [Badge]! # done checked
     getStringStringDicts: [StringStringDict]! # done checked
+    getStringStringDictsByStudent(studentId: String!): [StringStringDict]! # done checked
     getStringIntDicts: [StringIntDict]! # done checked
     # for dashboard
     getCompletedModulesByStudent(studentId: String!): [Module]! # done checked
     getInProgressModulesByStudent(studentId: String!): [Module]! # done checked
     getBadgesByStudent(studentId: String!): [Badge]! # done checked
     getStudentsByMentor: [String]! # done checked
-    getMentorsByStudent: [String]! # done checked
+    getMentorsByStudent(studentId: String!): [Mentor]! # done checked
     getCategories: [Category]! # done checked
     getModuleById(moduleId: String!): Module! # done checked
     getCategoryById(categoryId: String!): Category! # done checked
     getQuestionById(questionId: String!): Question! # done checked
+    getAnswerById(answerId: String!): Answer! # done checked
     getQuestionTemplateById(questionTemplateId: String!): QuestionTemplate! # done checked
     getBadgeById(badgeId: String!): Badge! # done checked
     getChallengeById(challengeId: String!): Challenge! # done checked
@@ -266,7 +268,7 @@ module.exports = gql`
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     handleAddBadge(badgeId: String!, studentId: String!): [String] # done checked
-    addMentor(mentorId: String!): [String] # done checked
+    addMentor(mentorId: String!, studentId: String!): [String] # done checked
     # For admin
     createNewModule(name: String!, categoryId: String!): Module! # done checked
     createNewBadge(
