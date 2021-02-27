@@ -39,3 +39,28 @@ module.exports.validateUserRegisterInput = (
     valid: Object.keys(errors).length < 1,
   };
 };
+
+module.exports.validateUserEditInput = (
+  newEmail,
+  newPassword,
+  newConfirmPassword
+) => {
+  const errors = {};
+
+  // // neither pass or email was given
+  // if ((!newEmail || newEmail === "") && (!newPassword || newPassword === "")) {
+  //   errors.newEmail = "New email or password must be provided";
+  // }
+  // email given but DNE
+  if (newEmail && newEmail !== "" && !validator.isEmail(newEmail)) {
+    errors.newEmail = newEmail;
+  }
+  // pass given but do not match
+  if (newPassword && newPassword !== "" && newPassword != newConfirmPassword) {
+    errors.password = "Passwords don't match";
+  }
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1,
+  };
+};

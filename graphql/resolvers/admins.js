@@ -4,6 +4,7 @@ const { UserInputError, AuthenticationError } = require("apollo-server");
 
 const {
   validateUserRegisterInput,
+  validateUserEditInput,
   validateUserLoginInput,
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_ADMIN_KEY;
@@ -233,6 +234,54 @@ module.exports = {
       });
 
       const res = await newAdmin.save();
+
+      const token = generateToken(res);
+
+      return { ...res._doc, id: res._id, token };
+    },
+
+    async editAdmin(
+      _,
+      { adminId, newName, newEmail, newPassword, confirmNewPassword },
+      context
+    ) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError(error);
+      }
+
+      const targetAdmin = await Admin.findById(adminId);
+      if (!targetAdmin) {
+        throw new UserInputError("Admin does not exist", {
+          errors: {
+            email: "Admin does not exist",
+          },
+        });
+      }
+
+      var { valid, errors } = validateUserEditInput(
+        newEmail,
+        newPassword,
+        confirmNewPassword
+      );
+
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
+      newPassword = await bcrypt.hash(newPassword, 12);
+      if (newName !== undefined && newName !== "") {
+        targetAdmin.name = newName;
+      }
+      if (newEmail !== undefined && newEmail !== "") {
+        targetAdmin.email = newEmail;
+      }
+      if (newPassword !== undefined && newPassword !== "") {
+        targetAdmin.password = newPassword;
+      }
+
+      const res = await targetAdmin.save();
 
       const token = generateToken(res);
 

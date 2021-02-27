@@ -10,13 +10,13 @@ module.exports = gql`
     password: String!
     email: String!
 
-    modules: [String]!
-    questionTemplates: [String]!
-    challenges: [String]!
-    categories: [String]!
+    # modules: [String]!
+    # questionTemplates: [String]!
+    # challenges: [String]!
+    # categories: [String]!
 
-    questions: [String]
-    badges: [String]
+    # questions: [String]
+    # badges: [String]
 
     createdAt: DateTime!
     token: String
@@ -185,6 +185,7 @@ module.exports = gql`
     getCategoriesByAdmin(adminId: String!): [Category]! # done checked
     getMentor: Mentor! # done checked
     getMentors: [Mentor]! # done checked
+    getMentorById(mentorId: String!): Mentor! # done checked
     getStudent: Student! # done checked
     getStudentById(studentId: String!): Student! # done checked
     getStudents: [Student]! # done checked
@@ -196,7 +197,7 @@ module.exports = gql`
     getCompletedModulesByStudent(studentId: String!): [Module]! # done checked
     getInProgressModulesByStudent(studentId: String!): [Module]! # done checked
     getBadgesByStudent(studentId: String!): [Badge]! # done checked
-    getStudentsByMentor: [String]! # done checked
+    getStudentsByMentor(mentorId: String!): [Student]! # done checked
     getMentorsByStudent(studentId: String!): [Mentor]! # done checked
     getCategories: [Category]! # done checked
     getModuleById(moduleId: String!): Module! # done checked
@@ -263,6 +264,29 @@ module.exports = gql`
     ): Student! # done checked
     deleteStudent(studentId: String!): String # done checked
     loginStudent(email: String!, password: String!): Student! # done checked
+    editAdmin(
+      adminId: String!
+      newName: String
+      newEmail: String
+      newPassword: String
+      confirmNewPassword: String
+    ): Admin! # done checked
+    editStudent(
+      studentId: String!
+      newName: String
+      newOrgName: String
+      newEmail: String
+      newPassword: String
+      confirmNewPassword: String
+    ): Student! # done checked
+    editMentor(
+      mentorId: String!
+      newName: String
+      newOrgName: String
+      newEmail: String
+      newPassword: String
+      confirmNewPassword: String
+    ): Mentor! # done checked
     addCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     addInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked

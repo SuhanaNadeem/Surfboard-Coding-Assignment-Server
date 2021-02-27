@@ -5,6 +5,7 @@ const { UserInputError, AuthenticationError } = require("apollo-server");
 const {
   validateUserRegisterInput,
   validateUserLoginInput,
+  validateUserEditInput,
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_STUDENT_KEY;
 const Student = require("../../models/Student");
@@ -163,6 +164,68 @@ module.exports = {
       return { ...res._doc, id: res._id, token };
     },
 
+    async editStudent(
+      _,
+      {
+        studentId,
+        newName,
+        newOrgName,
+        newEmail,
+        newPassword,
+        confirmNewPassword,
+      },
+      context
+    ) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          var user = checkStudentAuth(context);
+        } catch (error) {
+          throw new AuthenticationError(error);
+        }
+      }
+
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent) {
+        throw new UserInputError("Student does not exist", {
+          errors: {
+            email: "Student does not exist",
+          },
+        });
+      }
+
+      var { valid, errors } = validateUserEditInput(
+        newEmail,
+        newPassword,
+        confirmNewPassword
+      );
+
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
+      newPassword = await bcrypt.hash(newPassword, 12);
+      if (newName !== undefined && newName !== "") {
+        targetStudent.name = newName;
+      }
+      if (newOrgName !== undefined && newOrgName !== "") {
+        targetStudent.orgName = newOrgName;
+      }
+      if (newEmail !== undefined && newEmail !== "") {
+        targetStudent.email = newEmail;
+      }
+      if (newPassword !== undefined && newPassword !== "") {
+        targetStudent.password = newPassword;
+      }
+
+      const res = await targetStudent.save();
+
+      const token = generateToken(res);
+
+      return { ...res._doc, id: res._id, token };
+    },
+
     async loginStudent(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
       if (!valid) {
@@ -201,6 +264,7 @@ module.exports = {
           throw new Error(error);
         }
       }
+      console.log("arrived here");
       const targetStudent = await Student.findById(studentId);
       if (targetStudent) {
         await targetStudent.delete();

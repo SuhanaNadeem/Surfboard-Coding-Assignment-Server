@@ -5,6 +5,7 @@ const { UserInputError, AuthenticationError } = require("apollo-server");
 const {
   validateUserRegisterInput,
   validateUserLoginInput,
+  validateUserEditInput,
 } = require("../../util/validators");
 const SECRET_KEY = process.env.SECRET_MENTOR_KEY;
 const Mentor = require("../../models/Mentor");
@@ -54,21 +55,49 @@ module.exports = {
         return mentors;
       }
     },
-
-    async getStudentsByMentor(_, {}, context) {
+    async getMentorById(_, { mentorId }, context) {
       try {
-        const mentor = checkMentorAuth(context);
-        var targetMentor = await Mentor.findById(mentor.id);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkAdminAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
+      const targetMentor = await Mentor.findById(mentorId);
+      if (!targetMentor) {
+        throw new UserInputError("Invalid input");
+      } else {
+        return targetMentor;
+      }
+    },
+
+    async getStudentsByMentor(_, { mentorId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          throw new AuthenticationError(error);
+        }
+      }
+
       var allStudents = await Student.find();
       var students = [];
-      allStudents.forEach(function (targetStudent) {
-        if (targetStudent.mentors.includes(targetMentor.id)) {
-          students.push(targetStudent.id);
+      var student;
+      for (var targetStudent of allStudents) {
+        if (targetStudent.mentors.includes(mentorId)) {
+          console.log(targetStudent.id);
+          student = await Student.findById(targetStudent.id);
+          students.push(student);
+          // console.log(stud);
         }
-      });
+      }
       return students;
     },
   },
@@ -114,6 +143,69 @@ module.exports = {
       return { ...res._doc, id: res._id, token };
     },
 
+    async editMentor(
+      _,
+      {
+        mentorId,
+        newName,
+        newEmail,
+        newOrgName,
+        newPassword,
+        confirmNewPassword,
+      },
+      context
+    ) {
+      try {
+        var user = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          var user = checkMentorAuth(context);
+        } catch (error) {
+          throw new AuthenticationError(error);
+        }
+      }
+
+      const targetMentor = await Mentor.findById(mentorId);
+      if (!targetMentor) {
+        throw new UserInputError("Mentor does not exist", {
+          errors: {
+            email: "Mentor does not exist",
+          },
+        });
+      }
+
+      var { valid, errors } = validateUserEditInput(
+        newEmail,
+        newPassword,
+        confirmNewPassword
+      );
+
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
+      newPassword = await bcrypt.hash(newPassword, 12);
+      if (newName !== undefined && newName !== "") {
+        targetMentor.name = newName;
+      }
+      if (newOrgName !== undefined && newOrgName !== "") {
+        console.log(targetMentor.orgName);
+        targetMentor.orgName = newOrgName;
+      }
+      if (newEmail !== undefined && newEmail !== "") {
+        targetMentor.email = newEmail;
+      }
+      if (newPassword !== undefined && newPassword !== "") {
+        targetMentor.password = newPassword;
+      }
+
+      const res = await targetMentor.save();
+
+      const token = generateToken(res);
+
+      return { ...res._doc, id: res._id, token };
+    },
+
     async loginMentor(_, { email, password }, context) {
       const { errors, valid } = validateUserLoginInput(email, password);
 
@@ -142,6 +234,7 @@ module.exports = {
       const token = generateToken(mentor);
       return { ...mentor._doc, id: mentor._id, token };
     },
+
     async deleteMentor(_, { mentorId }, context) {
       try {
         var user = checkAdminAuth(context);
@@ -149,7 +242,7 @@ module.exports = {
         try {
           var user = checkMentorAuth(context);
         } catch (error) {
-          throw new Error(error);
+          throw new AuthenticationError(error);
         }
       }
       const targetMentor = await Mentor.findById(mentorId);
