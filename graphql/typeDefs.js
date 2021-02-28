@@ -83,6 +83,7 @@ module.exports = gql`
     createdAt: DateTime!
     adminId: String
     learningObjectives: [String]
+    image: String
   }
 
   type Category {
@@ -317,7 +318,11 @@ module.exports = gql`
     handleAddBadge(badgeId: String!, studentId: String!): [String] # done checked
     addMentor(mentorId: String!, studentId: String!): [String] # done checked
     # For admin
-    createNewModule(name: String!, categoryId: String!): Module! # done checked
+    createNewModule(
+      name: String!
+      categoryId: String!
+      imageFile: Upload
+    ): Module! # done checked
     createNewBadge(
       name: String!
       imageFile: Upload
@@ -355,6 +360,7 @@ module.exports = gql`
       newName: String
       newCategoryId: String
       newAdminId: String
+      newImageFile: Upload
     ): Module! # done checked
     editBadge(
       badgeId: String!
@@ -371,7 +377,7 @@ module.exports = gql`
       questionId: String!
       moduleId: String!
       newModuleId: String
-      newImage: String
+      newImageFile: Upload
       newDescription: String
       newHint: String
       newExpectedAnswer: String
@@ -412,7 +418,7 @@ module.exports = gql`
       name: String!
       categoryId: String!
       challengeDescription: String
-      image: String
+      imageFile: Upload
       extraLink: String
       dueDate: String
     ): Challenge! # done checked
@@ -421,7 +427,7 @@ module.exports = gql`
       newCategoryId: String
       newChallengeDescription: String
       newName: String
-      newImage: String
+      newImageFile: Upload
       newExtraLink: String
       newDueDate: String
       newAdminId: String

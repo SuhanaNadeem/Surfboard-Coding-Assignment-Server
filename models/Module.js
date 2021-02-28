@@ -15,6 +15,7 @@ const moduleSchema = new Schema({
   createdAt: Date,
   learningObjectives: [String],
   adminId: String,
+  image: String,
 });
 
 module.exports = model("Module", moduleSchema);

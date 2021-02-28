@@ -15,12 +15,13 @@ const QuestionTemplate = require("../../models/QuestionTemplate");
 const Module = require("../../models/Module");
 const Challenge = require("../../models/Challenge");
 const Category = require("../../models/Category");
-
 const checkAdminAuth = require("../../util/checkAdminAuth");
 const StringStringDict = require("../../models/StringStringDict");
 const Student = require("../../models/Student");
 const StringIntDict = require("../../models/StringIntDict");
 const Badge = require("../../models/Badge");
+const { doesS3URLExist } = require("../../util/handleFileUpload");
+const AmazonS3URI = require("amazon-s3-uri");
 function generateToken(admin) {
   return jwt.sign(
     {
@@ -485,7 +486,7 @@ module.exports = {
       }
     },
 
-    async createNewModule(_, { name, categoryId }, context) {
+    async createNewModule(_, { name, categoryId, imageFile }, context) {
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -502,11 +503,35 @@ module.exports = {
       if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else if (!targetModule) {
+        var calculatedLynxImgUrl = "";
+        if (imageFile != null) {
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: imageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+        }
+
         const newModule = new Module({
           name,
           categoryId,
           questions,
           comments,
+          image: calculatedLynxImgUrl,
+
           adminId: targetAdmin.id,
           createdAt: new Date(),
         });
@@ -522,7 +547,7 @@ module.exports = {
 
     async createNewChallenge(
       _,
-      { name, challengeDescription, categoryId, image, extraLink, dueDate },
+      { name, challengeDescription, categoryId, imageFile, extraLink, dueDate },
       context
     ) {
       try {
@@ -536,11 +561,33 @@ module.exports = {
       if (!targetCategory) {
         throw new UserInputError("Invalid input");
       } else if (!targetChallenge) {
+        var calculatedLynxImgUrl = "";
+        if (imageFile != null) {
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: imageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+        }
+
         const newChallenge = new Challenge({
           name,
           challengeDescription,
           categoryId,
-          image,
+          image: calculatedLynxImgUrl,
           dueDate,
           extraLink,
           adminId: targetAdmin.id,
@@ -582,7 +629,7 @@ module.exports = {
     },
     async editModule(
       _,
-      { moduleId, newName, newCategoryId, newAdminId },
+      { moduleId, newName, newCategoryId, newAdminId, newImageFile },
       context
     ) {
       try {
@@ -621,6 +668,39 @@ module.exports = {
         if (newAdminId !== undefined) {
           targetModule.adminId = newAdminId;
         }
+        if (newImageFile != null) {
+          var calculatedLynxImgUrl = "";
+          const targetImageUrl = targetModule.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+          }
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: newImageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+          targetModule.image = calculatedLynxImgUrl;
+        }
 
         await targetModule.save();
         return targetModule;
@@ -632,7 +712,7 @@ module.exports = {
       {
         questionId,
         moduleId,
-        newImage,
+        newImageFile,
         newHint,
         newDescription,
         newExpectedAnswer,
@@ -701,9 +781,6 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else {
-        if (newImage !== undefined) {
-          targetQuestion.image = newImage;
-        }
         if (newDescription !== undefined && newDescription !== "") {
           targetQuestion.description = newDescription;
         }
@@ -762,6 +839,41 @@ module.exports = {
         ) {
           throw new UserInputError("Invalid input");
         }
+
+        if (newImageFile != null) {
+          var calculatedLynxImgUrl = "";
+          const targetImageUrl = targetQuestion.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+          }
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: newImageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+          targetQuestion.image = calculatedLynxImgUrl;
+        }
+
         await targetQuestion.save();
         return targetQuestion;
       }
@@ -833,7 +945,7 @@ module.exports = {
         newName,
         newCategoryId,
         newChallengeDescription,
-        newImage,
+        newImageFile,
         newAdminId,
         newExtraLink,
         newDueDate,
@@ -881,9 +993,7 @@ module.exports = {
         if (newChallengeDescription !== undefined) {
           targetChallenge.challengeDescription = newChallengeDescription;
         }
-        if (newImage !== undefined) {
-          targetChallenge.image = newImage;
-        }
+
         if (newAdminId !== undefined && newAdminId !== "") {
           targetChallenge.adminId = newAdminId;
         }
@@ -892,6 +1002,40 @@ module.exports = {
         }
         if (newDueDate !== undefined) {
           targetChallenge.dueDate = newDueDate;
+        }
+
+        if (newImageFile != null) {
+          var calculatedLynxImgUrl = "";
+          const targetImageUrl = targetChallenge.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+          }
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: newImageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+          targetChallenge.image = calculatedLynxImgUrl;
         }
         await targetChallenge.save();
         return targetChallenge;
