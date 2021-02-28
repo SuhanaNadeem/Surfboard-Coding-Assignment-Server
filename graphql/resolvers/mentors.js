@@ -92,7 +92,7 @@ module.exports = {
       var student;
       for (var targetStudent of allStudents) {
         if (targetStudent.mentors.includes(mentorId)) {
-          console.log(targetStudent.id);
+          // console.log(targetStudent.id);
           student = await Student.findById(targetStudent.id);
           students.push(student);
           // console.log(stud);
@@ -189,7 +189,7 @@ module.exports = {
         targetMentor.name = newName;
       }
       if (newOrgName !== undefined && newOrgName !== "") {
-        console.log(targetMentor.orgName);
+        // console.log(targetMentor.orgName);
         targetMentor.orgName = newOrgName;
       }
       if (newEmail !== undefined && newEmail !== "") {

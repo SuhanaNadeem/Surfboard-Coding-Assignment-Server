@@ -365,7 +365,7 @@ module.exports = {
           }
         }
       }
-
+      console.log("th");
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
@@ -388,6 +388,7 @@ module.exports = {
       var answerCorrect;
       if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
         // console.log("didnt exist, but about to");
+        console.log(1);
         targetQuesAnsPair = await questionResolvers.Mutation.startQuestion(
           _,
           { questionId, studentId },
@@ -400,12 +401,18 @@ module.exports = {
           targetQuestion.type !== "Question") ||
         !targetStudent
       ) {
+        console.log(2);
+
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
         // console.log("skill passed");
         // console.log(questionId);
         // console.log(targetStudent.completedSkills);
+        console.log(3);
+
         if (!targetStudent.completedSkills.includes(questionId)) {
+          console.log(4);
+
           answerCorrect = true;
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
             _,
@@ -415,6 +422,8 @@ module.exports = {
           targetStudent.completedSkills.push(questionId);
           await targetStudent.save();
           if (totalPossiblePoints === updatedPoints) {
+            console.log(5);
+
             await moduleResolvers.Mutation.addCompletedModule(
               _,
               { moduleId, studentId },
@@ -423,19 +432,25 @@ module.exports = {
           }
           return updatedPoints;
         } else {
+          console.log(6);
+
           return targetModulePointsPair[0].value;
         }
       } else {
+        console.log(7);
+
         if (
           targetQuestion.expectedAnswer === "" ||
           !targetQuestion.expectedAnswer
         ) {
+          console.log(8);
           await answerResolvers.Mutation.saveAnswer(
             _,
             { answer, studentId, questionId },
             context
           );
           answerCorrect = true;
+          console.log(11);
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
             _,
             { moduleId, answerCorrect, numToIncrement, studentId },
@@ -446,6 +461,8 @@ module.exports = {
           await targetStudent.save();
 
           if (totalPossiblePoints === updatedPoints) {
+            console.log(10);
+
             await moduleResolvers.Mutation.addCompletedModule(
               _,
               { moduleId, studentId },
@@ -454,6 +471,8 @@ module.exports = {
           }
           return updatedPoints;
         } else {
+          console.log(9);
+
           // const answerObject = await Answer.find({
           //   studentId,
           //   answer,
@@ -468,28 +487,33 @@ module.exports = {
           //   return targetModulePointsPair[0].value;
           // }
           if (targetStudent.completedQuestions.includes(questionId)) {
-            // console.log("already submitted");
+            console.log("already submitted");
+
             return targetModulePointsPair[0].value;
           } else {
+            console.log(13);
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(
               _,
               { answer, studentId, questionId },
               context
             );
             const answerId = savedAnswer.id;
+            console.log(14);
             answerCorrect = await module.exports.Mutation.verifyAnswer(
               _,
               { answerId, questionId, studentId },
               context
             );
+            console.log(15);
             // (if answerCorrect, push to completedQuestions)
             const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
               _,
               { moduleId, answerCorrect, numToIncrement, studentId },
               context
             );
-
+            console.log(16);
             if (answerCorrect) {
+              console.log(17);
               targetStudent.completedQuestions.push(questionId);
               await targetStudent.save();
             }
@@ -497,6 +521,7 @@ module.exports = {
             // console.log(totalPossiblePoints);
             // console.log(updatedPoints);
             if (totalPossiblePoints === updatedPoints) {
+              console.log(18);
               // console.log("adding");
               await moduleResolvers.Mutation.addCompletedModule(
                 _,
@@ -506,7 +531,7 @@ module.exports = {
               // console.log("after");
               // console.log(targetStudent.completedModules);
             }
-
+            console.log(updatedPoints);
             return updatedPoints;
           }
         }

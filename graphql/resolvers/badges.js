@@ -12,6 +12,8 @@ const Question = require("../../models/Question");
 const Module = require("../../models/Module");
 const Category = require("../../models/Category");
 
+const fileResolvers = require("./files");
+
 module.exports = {
   Query: {
     async getBadges(_, {}, context) {
@@ -83,7 +85,15 @@ module.exports = {
   Mutation: {
     async createNewBadge(
       _,
-      { image, name, description, questionId, moduleId, categoryId, points },
+      {
+        imageFile,
+        name,
+        description,
+        questionId,
+        moduleId,
+        categoryId,
+        points,
+      },
       context
     ) {
       try {
@@ -99,9 +109,29 @@ module.exports = {
       const targetCategory = await Category.findById(categoryId);
 
       if (!targetBadge && (targetQuestion || targetModule || targetCategory)) {
+        var calculatedLynxImgUrl = "";
+        const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+          _,
+          {
+            file: imageFile,
+          },
+          context
+        );
+
+        if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+          valid = false;
+          throw new UserInputError("Lynx S3 Object was not valid", {
+            errors: {
+              lynxImgLogo: "Lynx upload error, try again",
+            },
+          });
+        }
+
+        calculatedLynxImgUrl = lynxImgS3Object.Location;
+
         const newBadge = new Badge({
           name,
-          image,
+          image: calculatedLynxImgUrl,
           questionId,
           moduleId,
           categoryId,

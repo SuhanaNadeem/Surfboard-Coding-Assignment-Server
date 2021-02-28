@@ -171,9 +171,32 @@ module.exports = gql`
     createdAt: DateTime!
     personId: String!
   }
-
+  "THIS OBJECT IS DEPRECATED because url links to files are stored in stores, products, etc. Files store a url link to files uploaded to S3."
+  type File {
+    # "Unique identifier for the object."
+    # id: String!
+    "The file's name."
+    filename: String!
+    "The file extension."
+    mimetype: String!
+    "The encoding format."
+    encoding: String!
+    # "The S3 url of the file."
+    url: String!
+    # "The date and time when this file was created."
+    createdAt: DateTime!
+  }
+  "This is a return type that helps in formatting the returns statements of file upload functions."
+  type S3Object {
+    ETag: String
+    "The URL of the file."
+    Location: String!
+    Key: String!
+    Bucket: String!
+  }
   # retrieve information
   type Query {
+    getFiles: [File]
     getAdmin: Admin! # done checked
     getAdmins: [Admin]! # done checked
     getAdminById(adminId: String!): Admin! # done checked
@@ -297,7 +320,7 @@ module.exports = gql`
     createNewModule(name: String!, categoryId: String!): Module! # done checked
     createNewBadge(
       name: String!
-      image: String!
+      imageFile: Upload!
       description: String!
       moduleId: String
       categoryId: String
@@ -445,6 +468,9 @@ module.exports = gql`
     handleStarQuestion(questionId: String!): [String] # done checked
     handleStarModule(moduleId: String!): [String] # done checked
     addBadge(studentId: String!, badgeId: String!): [Badge]! # done checked
+    # File Mutations
+    uploadLynxFile(file: Upload!): S3Object!
+    deleteLynxFile(fileKey: String!): String!
   }
   # TODO addBadge, editStudent, editMentor, editAdmin
 `;
