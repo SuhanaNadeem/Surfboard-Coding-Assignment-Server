@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { UserInputError, AuthenticationError } = require("apollo-server");
+const fileResolvers = require("./files");
 
 const {
   validateUserRegisterInput,
@@ -339,7 +340,7 @@ module.exports = {
     async createNewQuestion(
       _,
       {
-        image,
+        imageFile,
         hint,
         moduleId,
         description,
@@ -389,8 +390,30 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else if (!targetQuestion) {
+        var calculatedLynxImgUrl = "";
+        if (imageFile != null) {
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: imageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+        }
+
         const newQuestion = new Question({
-          image,
+          image: calculatedLynxImgUrl,
           description,
           expectedAnswer,
           hint,

@@ -102,7 +102,6 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-
       const targetBadge = await Badge.findOne({ name });
       const targetQuestion = await Question.findById(questionId);
       const targetModule = await Module.findById(moduleId);
@@ -110,24 +109,26 @@ module.exports = {
 
       if (!targetBadge && (targetQuestion || targetModule || targetCategory)) {
         var calculatedLynxImgUrl = "";
-        const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
-          _,
-          {
-            file: imageFile,
-          },
-          context
-        );
-
-        if (!lynxImgS3Object || !lynxImgS3Object.Location) {
-          valid = false;
-          throw new UserInputError("Lynx S3 Object was not valid", {
-            errors: {
-              lynxImgLogo: "Lynx upload error, try again",
+        if (imageFile != null) {
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: imageFile,
             },
-          });
-        }
+            context
+          );
 
-        calculatedLynxImgUrl = lynxImgS3Object.Location;
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+        }
 
         const newBadge = new Badge({
           name,

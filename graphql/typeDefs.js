@@ -320,7 +320,7 @@ module.exports = gql`
     createNewModule(name: String!, categoryId: String!): Module! # done checked
     createNewBadge(
       name: String!
-      imageFile: Upload!
+      imageFile: Upload
       description: String!
       moduleId: String
       categoryId: String
@@ -328,7 +328,7 @@ module.exports = gql`
       points: Int
     ): Badge! # done checked
     createNewQuestion(
-      image: String
+      imageFile: Upload
       moduleId: String!
       description: String
       expectedAnswer: String
