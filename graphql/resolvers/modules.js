@@ -66,10 +66,13 @@ module.exports = {
           }
         }
       }
+      console.log(studentId);
+      console.log(moduleId);
       const targetModulePointsPair = await StringIntDict.find({
         key: moduleId,
         studentId,
       });
+      console.log(targetModulePointsPair);
       if (!targetModulePointsPair || targetModulePointsPair.length == 0) {
         throw new UserInputError("Invalid input");
       } else {

@@ -11,6 +11,7 @@ const Badge = require("../../models/Badge");
 const Question = require("../../models/Question");
 const Module = require("../../models/Module");
 const Category = require("../../models/Category");
+const moduleResolvers = require("./modules");
 
 const fileResolvers = require("./files");
 
@@ -85,15 +86,7 @@ module.exports = {
   Mutation: {
     async createNewBadge(
       _,
-      {
-        imageFile,
-        name,
-        description,
-        questionId,
-        moduleId,
-        categoryId,
-        points,
-      },
+      { imageFile, name, description, type, requiredAmount },
       context
     ) {
       try {
@@ -103,11 +96,12 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetBadge = await Badge.findOne({ name });
-      const targetQuestion = await Question.findById(questionId);
-      const targetModule = await Module.findById(moduleId);
-      const targetCategory = await Category.findById(categoryId);
 
-      if (!targetBadge && (targetQuestion || targetModule || targetCategory)) {
+      if (
+        !targetBadge &&
+        (type === "Question" || type === "Module") &&
+        requiredAmount > 0
+      ) {
         var calculatedLynxImgUrl = "";
         if (imageFile != null) {
           const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
@@ -133,10 +127,8 @@ module.exports = {
         const newBadge = new Badge({
           name,
           image: calculatedLynxImgUrl,
-          questionId,
-          moduleId,
-          categoryId,
-          points,
+          type,
+          requiredAmount,
           description,
           adminId: targetAdmin.id,
 
@@ -158,14 +150,12 @@ module.exports = {
       _,
       {
         badgeId,
-        newImage,
+        newImageFile,
         newName,
-        newPoints,
+        newRequiredAmount,
         newDescription,
         newAdminId,
-        newModuleId,
-        newCategoryId,
-        newQuestionId,
+        newType,
       },
       context
     ) {
@@ -180,9 +170,6 @@ module.exports = {
         name: newName,
       });
       var newAdmin = await Admin.findById(newAdminId);
-      const targetQuestion = await Question.findById(newQuestionId);
-      const targetModule = await Module.findById(newModuleId);
-      const targetCategory = await Category.findById(newCategoryId);
 
       if (
         !targetBadge ||
@@ -194,64 +181,121 @@ module.exports = {
           newAdminId !== targetBadge.adminId &&
           !newAdmin &&
           newAdminId !== "") === true ||
-        (newQuestionId !== undefined &&
-          newQuestionId !== targetBadge.questionId &&
-          !targetQuestion &&
-          newQuestionId !== "") === true ||
-        (newModuleId !== undefined &&
-          newModuleId !== targetBadge.moduleId &&
-          !targetModule &&
-          newModuleId !== "") === true ||
-        (newCategoryId !== undefined &&
-          newCategoryId !== targetBadge.categoryId &&
-          !targetCategory &&
-          newCategoryId !== "") === true
+        (newType !== "" &&
+          newType &&
+          newType !== "Question" &&
+          newType !== "Module") === true
       ) {
         throw new UserInputError("Invalid input");
       } else {
         if (newName !== undefined && newAdminId !== "") {
           targetBadge.name = newName;
         }
-        if (newPoints !== undefined) {
-          targetBadge.points = newPoints;
+        if (newRequiredAmount !== undefined) {
+          targetBadge.requiredAmount = newRequiredAmount;
         }
         if (newDescription !== undefined) {
           targetBadge.description = newDescription;
         }
-        if (newImage !== undefined) {
-          targetBadge.image = newImage;
-        }
         if (newAdminId !== undefined && newAdminId !== "") {
           targetBadge.adminId = newAdminId;
         }
-        if (newQuestionId !== undefined && newQuestionId !== "") {
-          targetBadge.questionId = newQuestionId;
+        if (newType !== undefined && newType !== "") {
+          targetBadge.type = newType;
         }
-        if (newModuleId !== undefined && newModuleId !== "") {
-          targetBadge.moduleId = newModuleId;
+
+        if (newImageFile != null) {
+          var calculatedLynxImgUrl = "";
+          const targetImageUrl = targetBadge.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+          }
+          const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
+            _,
+            {
+              file: newImageFile,
+            },
+            context
+          );
+
+          if (!lynxImgS3Object || !lynxImgS3Object.Location) {
+            valid = false;
+            throw new UserInputError("Lynx S3 Object was not valid", {
+              errors: {
+                lynxImgLogo: "Lynx upload error, try again",
+              },
+            });
+          }
+
+          calculatedLynxImgUrl = lynxImgS3Object.Location;
+          targetBadge.image = calculatedLynxImgUrl;
         }
-        if (newCategoryId !== undefined && newCategoryId !== "") {
-          targetBadge.categoryId = newCategoryId;
-        }
+
         await targetBadge.save();
         return targetBadge;
       }
     },
+    // Add a new badge if the required amount of questions or modules has been completed.
     async handleAddBadge(_, { badgeId, studentId }, context) {
       try {
-        const student = checkStudentAuth(context);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        throw new Error(error);
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
       }
-      var targetStudent = await Student.findById(studentId);
+      const targetStudent = await Student.findById(studentId);
 
       const targetBadge = await Badge.findById(badgeId);
-      if (!targetBadge) {
+
+      if (
+        !targetBadge ||
+        targetStudent.badges.includes(badgeId) ||
+        !targetStudent
+      ) {
         throw new UserInputError("Invalid input");
-      } else if (!targetStudent.badges.includes(badgeId)) {
-        await targetStudent.badges.push(badgeId);
-        await targetStudent.save();
       }
+      const requiredAmount = targetBadge.requiredAmount;
+      var studentAmount;
+      if (targetBadge.type === "Module") {
+        studentAmount = targetStudent.completedModules.length;
+        if (studentAmount === requiredAmount) {
+          await module.exports.Mutation.addBadge(
+            _,
+            { badgeId, studentId },
+            context
+          );
+          return "Badge Added";
+        } else {
+          return "Badge Not Added";
+        }
+      } else if (targetBadge.type === "Question") {
+        studentAmount = targetStudent.quesAndDict.length;
+        if (studentAmount === requiredAmount) {
+          await module.exports.Mutation.addBadge(
+            _,
+            { badgeId, studentId },
+            context
+          );
+          return "Badge Added";
+        } else {
+          return "Badge Not Added";
+        }
+      }
+      await targetStudent.save();
+
       const updatedBadges = targetStudent.badges;
       return updatedBadges;
     },

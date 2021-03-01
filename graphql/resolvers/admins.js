@@ -721,7 +721,6 @@ module.exports = {
         newVideoLink,
         newArticleLink,
         newName,
-        newType,
         newAdminId,
         newExtraLink,
         newOptionA,
@@ -738,9 +737,6 @@ module.exports = {
         throw new AuthenticationError();
       }
       var targetQuestion = await Question.findById(questionId);
-      // var targetQuestionTemplate = await QuestionTemplate.findById(
-      //   targetQuestion.questionTemplateId
-      // );
 
       var currentModule = await Module.findById(moduleId);
       var newModule = await Module.findById(newModuleId);
@@ -798,9 +794,6 @@ module.exports = {
         }
         if (newArticleLink !== undefined) {
           targetQuestion.articleLink = newArticleLink;
-        }
-        if (newType !== undefined && newType !== "") {
-          targetQuestion.type = newType;
         }
 
         if (newName !== undefined && newName !== "") {

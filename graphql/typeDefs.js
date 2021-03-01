@@ -97,13 +97,12 @@ module.exports = gql`
     id: String!
     name: String!
     image: String
-    description: String
+    description: String!
     createdAt: DateTime!
     adminId: String
-    questionId: String
-    moduleId: String
-    categoryId: String
-    points: Int
+    type: String
+    # TODO: make type, req amt, and all adminIds !
+    requiredAmount: Int
   }
 
   type Answer {
@@ -259,6 +258,7 @@ module.exports = gql`
       moduleId: String!
       studentId: String!
     ): [String] # done checked
+    getTotalStudentPoints(studentId: String!): Int!
   }
 
   # actions
@@ -315,7 +315,7 @@ module.exports = gql`
     addInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
-    handleAddBadge(badgeId: String!, studentId: String!): [String] # done checked
+    handleAddBadge(badgeId: String!, studentId: String!): String # done checked
     addMentor(mentorId: String!, studentId: String!): [String] # done checked
     # For admin
     createNewModule(
@@ -327,10 +327,8 @@ module.exports = gql`
       name: String!
       imageFile: Upload
       description: String!
-      moduleId: String
-      categoryId: String
-      questionId: String
-      points: Int
+      type: String!
+      requiredAmount: Int!
     ): Badge! # done checked
     createNewQuestion(
       imageFile: Upload
@@ -365,11 +363,9 @@ module.exports = gql`
     editBadge(
       badgeId: String!
       newName: String
-      newImage: String
-      newQuestionId: String
-      newModuleId: String
-      newCategoryId: String
-      newPoints: Int
+      newImageFile: Upload
+      newType: String
+      newRequiredAmount: Int
       newDescription: String
       newAdminId: String
     ): Badge! # done checked
@@ -385,7 +381,6 @@ module.exports = gql`
       newVideoLink: String
       newArticleLink: String
       newName: String
-      newType: String
       newAdminId: String
       newExtraLink: String
       newOptionA: String
@@ -477,6 +472,11 @@ module.exports = gql`
     # File Mutations
     uploadLynxFile(file: Upload!): S3Object!
     deleteLynxFile(fileKey: String!): String!
+    changeStudentIcon(studentId: String!): String
   }
+
+  # TYPES OF BADGES: (1) For completing a certain number of modules/categories/questions.
+  # Student icon changes whenever they cross a certain number of points.
+  # badge needs type (module or question) and points has to change to requiredAmount
   # TODO addBadge, editStudent, editMentor, editAdmin
 `;
