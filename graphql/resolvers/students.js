@@ -19,6 +19,8 @@ const checkAdminAuth = require("../../util/checkAdminAuth");
 const checkMentorAuth = require("../../util/checkMentorAuth");
 const answerResolvers = require("./answers");
 const moduleResolvers = require("./modules");
+const badgeResolvers = require("./badges");
+
 const questionResolvers = require("./questions");
 const StringIntDict = require("../../models/StringIntDict");
 const StringStringDict = require("../../models/StringStringDict");
@@ -408,7 +410,7 @@ module.exports = {
           }
         }
       }
-
+      const badges = await Badge.find();
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
@@ -459,6 +461,13 @@ module.exports = {
               context
             );
           }
+          for (var targetBadge of badges) {
+            await badgeResolvers.Mutation.handleAddBadge(
+              _,
+              { badgeId: targetBadge.id, studentId },
+              context
+            );
+          }
           return updatedPoints;
         } else {
           return targetModulePointsPair[0].value;
@@ -488,6 +497,13 @@ module.exports = {
             await moduleResolvers.Mutation.addCompletedModule(
               _,
               { moduleId, studentId },
+              context
+            );
+          }
+          for (var targetBadge of badges) {
+            await badgeResolvers.Mutation.handleAddBadge(
+              _,
+              { badgeId: targetBadge.id, studentId },
               context
             );
           }
@@ -541,7 +557,13 @@ module.exports = {
                 context
               );
             }
-
+            for (var targetBadge of badges) {
+              await badgeResolvers.Mutation.handleAddBadge(
+                _,
+                { badgeId: targetBadge.id, studentId },
+                context
+              );
+            }
             return updatedPoints;
           }
         }

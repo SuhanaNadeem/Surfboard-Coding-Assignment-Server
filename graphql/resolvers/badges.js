@@ -260,18 +260,17 @@ module.exports = {
 
       const targetBadge = await Badge.findById(badgeId);
 
-      if (
-        !targetBadge ||
-        targetStudent.badges.includes(badgeId) ||
-        !targetStudent
-      ) {
+      if (!targetBadge || !targetStudent) {
         throw new UserInputError("Invalid input");
       }
       const requiredAmount = targetBadge.requiredAmount;
       var studentAmount;
       if (targetBadge.type === "Module") {
         studentAmount = targetStudent.completedModules.length;
-        if (studentAmount === requiredAmount) {
+        if (
+          studentAmount === requiredAmount &&
+          !targetStudent.badges.includes(badgeId)
+        ) {
           await module.exports.Mutation.addBadge(
             _,
             { badgeId, studentId },
@@ -282,8 +281,11 @@ module.exports = {
           return "Badge Not Added";
         }
       } else if (targetBadge.type === "Question") {
-        studentAmount = targetStudent.quesAndDict.length;
-        if (studentAmount === requiredAmount) {
+        studentAmount = targetStudent.completedQuestions.length;
+        if (
+          studentAmount === requiredAmount &&
+          !targetStudent.badges.includes(badgeId)
+        ) {
           await module.exports.Mutation.addBadge(
             _,
             { badgeId, studentId },
