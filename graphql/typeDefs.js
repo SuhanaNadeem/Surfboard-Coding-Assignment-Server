@@ -96,7 +96,7 @@ module.exports = gql`
   type Badge {
     id: String!
     name: String!
-    image: String!
+    image: String
     description: String
     createdAt: DateTime!
     adminId: String

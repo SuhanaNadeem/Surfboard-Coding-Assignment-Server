@@ -267,6 +267,17 @@ module.exports = {
       if (!targetBadge) {
         throw new UserInputError("Invalid input");
       } else {
+        const targetImageUrl = targetBadge.image;
+        if (targetImageUrl && targetImageUrl !== "") {
+          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+          await fileResolvers.Mutation.deleteLynxFile(
+            _,
+            {
+              fileKey: key,
+            },
+            context
+          );
+        }
         const students = await Student.find();
         var index;
         for (var targetStudent of students) {

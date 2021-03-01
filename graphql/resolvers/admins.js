@@ -1086,6 +1086,17 @@ module.exports = {
       if (!targetModule) {
         throw new UserInputError("Invalid input");
       } else {
+        const targetImageUrl = targetModule.image;
+        if (targetImageUrl && targetImageUrl !== "") {
+          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+          await fileResolvers.Mutation.deleteLynxFile(
+            _,
+            {
+              fileKey: key,
+            },
+            context
+          );
+        }
         await targetModule.delete();
         const updatedModules = await Module.find();
         return updatedModules;
@@ -1165,6 +1176,17 @@ module.exports = {
       if (!targetQuestion || !targetModule) {
         throw new UserInputError("Invalid input");
       } else {
+        const targetImageUrl = targetQuestion.image;
+        if (targetImageUrl && targetImageUrl !== "") {
+          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+          await fileResolvers.Mutation.deleteLynxFile(
+            _,
+            {
+              fileKey: key,
+            },
+            context
+          );
+        }
         const index = targetModule.questions.indexOf(questionId);
         targetModule.questions.splice(index, 1);
         await targetModule.save();
@@ -1208,6 +1230,17 @@ module.exports = {
       if (!targetChallenge) {
         throw new UserInputError("Invalid input");
       } else {
+        const targetImageUrl = targetChallenge.image;
+        if (targetImageUrl && targetImageUrl !== "") {
+          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+          await fileResolvers.Mutation.deleteLynxFile(
+            _,
+            {
+              fileKey: key,
+            },
+            context
+          );
+        }
         await targetChallenge.delete();
         const updatedChallenges = await Challenge.find();
         return updatedChallenges;
