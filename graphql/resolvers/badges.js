@@ -14,6 +14,7 @@ const Category = require("../../models/Category");
 const moduleResolvers = require("./modules");
 
 const fileResolvers = require("./files");
+const AmazonS3URI = require("amazon-s3-uri");
 
 module.exports = {
   Query: {
