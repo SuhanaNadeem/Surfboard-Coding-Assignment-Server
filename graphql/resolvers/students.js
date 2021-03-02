@@ -631,6 +631,37 @@ module.exports = {
       const updatedMentors = targetStudent.mentors;
       return updatedMentors;
     },
+
+    async removeMentor(_, { mentorId, studentId }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      const targetMentor = await Mentor.findById(mentorId);
+      if (
+        !targetMentor ||
+        !targetStudent ||
+        !targetStudent.mentors.includes(mentorId)
+      ) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const index = targetStudent.mentors.indexOf(mentorId);
+
+        await targetStudent.mentors.splice(index, 1);
+        await targetStudent.save();
+      }
+      const updatedMentors = targetStudent.mentors;
+      return updatedMentors;
+    },
   },
   async changeStudentIcon(_, { studentId }, context) {
     try {

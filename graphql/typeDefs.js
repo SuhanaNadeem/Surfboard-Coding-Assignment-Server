@@ -318,6 +318,7 @@ module.exports = gql`
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     handleAddBadge(badgeId: String!, studentId: String!): String # done checked
     addMentor(mentorId: String!, studentId: String!): [String] # done checked
+    removeMentor(mentorId: String!, studentId: String!): [String] # done checked
     # organization name can be like the key... FRC TEAM_NUM
     # For admin
     createNewModule(
