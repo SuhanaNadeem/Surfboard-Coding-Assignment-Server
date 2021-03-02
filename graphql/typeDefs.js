@@ -258,6 +258,7 @@ module.exports = gql`
       studentId: String!
     ): [String] # done checked
     getTotalPointsByStudent(studentId: String!): Int!
+    getStudentsByOrgName(orgName: String!): [Student]!
   }
 
   # actions
@@ -274,7 +275,6 @@ module.exports = gql`
       email: String!
       name: String!
       orgName: String!
-
       password: String!
       confirmPassword: String!
     ): Mentor! # done checked
@@ -318,6 +318,7 @@ module.exports = gql`
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     handleAddBadge(badgeId: String!, studentId: String!): String # done checked
     addMentor(mentorId: String!, studentId: String!): [String] # done checked
+    # organization name can be like the key... FRC TEAM_NUM
     # For admin
     createNewModule(
       name: String!

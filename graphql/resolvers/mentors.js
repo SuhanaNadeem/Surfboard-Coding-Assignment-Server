@@ -100,6 +100,26 @@ module.exports = {
       }
       return students;
     },
+    async getStudentsByOrgName(_, { orgName }, context) {
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          throw new AuthenticationError(error);
+        }
+      }
+
+      var allStudents = await Student.find();
+      var students = [];
+      for (var targetStudent of allStudents) {
+        if (targetStudent.orgName === orgName) {
+          students.push(targetStudent);
+        }
+      }
+      return students;
+    },
   },
 
   Mutation: {
