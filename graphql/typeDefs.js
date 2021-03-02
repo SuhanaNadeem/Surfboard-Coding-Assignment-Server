@@ -24,8 +24,7 @@ module.exports = gql`
   type Mentor {
     id: String!
     name: String!
-
-    orgName: String
+    orgName: String!
     password: String!
     email: String!
 
@@ -258,7 +257,7 @@ module.exports = gql`
       moduleId: String!
       studentId: String!
     ): [String] # done checked
-    getTotalStudentPoints(studentId: String!): Int!
+    getTotalPointsByStudent(studentId: String!): Int!
   }
 
   # actions
@@ -274,6 +273,8 @@ module.exports = gql`
     signupMentor(
       email: String!
       name: String!
+      orgName: String!
+
       password: String!
       confirmPassword: String!
     ): Mentor! # done checked

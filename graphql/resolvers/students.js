@@ -113,7 +113,7 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
     },
-    async getTotalStudentPoints(_, { studentId }, context) {
+    async getTotalPointsByStudent(_, { studentId }, context) {
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
