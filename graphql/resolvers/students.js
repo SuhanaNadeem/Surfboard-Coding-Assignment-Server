@@ -199,6 +199,7 @@ module.exports = {
         mentors: [],
         quesAnsDict: [],
         modulePointsDict: [],
+        icon: "https://li-images.s3.amazonaws.com/3908900704/icon1.png",
         createdAt: new Date(),
       });
 
@@ -398,6 +399,8 @@ module.exports = {
     },
 
     async handleAnswerPoints(_, { answer, studentId, questionId }, context) {
+      console.log("arriving here");
+
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
@@ -427,7 +430,6 @@ module.exports = {
         { moduleId },
         context
       );
-
       var targetStudent = await Student.findById(studentId);
       var answerCorrect;
       if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
@@ -468,6 +470,13 @@ module.exports = {
               context
             );
           }
+
+          await module.exports.Mutation.changeStudentIcon(
+            _,
+            { studentId },
+            context
+          );
+
           return updatedPoints;
         } else {
           return targetModulePointsPair[0].value;
@@ -507,6 +516,12 @@ module.exports = {
               context
             );
           }
+
+          await module.exports.Mutation.changeStudentIcon(
+            _,
+            { studentId },
+            context
+          );
           return updatedPoints;
         } else {
           // const answerObject = await Answer.find({
@@ -564,6 +579,11 @@ module.exports = {
                 context
               );
             }
+            await module.exports.Mutation.changeStudentIcon(
+              _,
+              { studentId },
+              context
+            );
             return updatedPoints;
           }
         }
@@ -662,21 +682,42 @@ module.exports = {
       const updatedMentors = targetStudent.mentors;
       return updatedMentors;
     },
-  },
-  async changeStudentIcon(_, { studentId }, context) {
-    try {
-      const admin = checkAdminAuth(context);
-    } catch (error) {
+    async changeStudentIcon(_, { studentId }, context) {
       try {
-        const mentor = checkMentorAuth(context);
+        const admin = checkAdminAuth(context);
       } catch (error) {
-        const student = checkStudentAuth(context);
-        if (!student) {
-          throw new AuthenticationError();
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
         }
       }
-    }
-    const targetStudent = await Student.findById(studentId);
-    // TODO: finish this
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      }
+      var points;
+      points = await module.exports.Query.getTotalPointsByStudent(
+        _,
+        { studentId },
+        context
+      );
+
+      if (points < 1000) {
+        targetStudent.icon =
+          "https://li-images.s3.amazonaws.com/3908900704/icon1.png";
+      } else if (points >= 1000 && points <= 5000) {
+        targetStudent.icon =
+          "https://li-images.s3.amazonaws.com/9087019179/icon2.png";
+      } else if (points >= 5000) {
+        targetStudent.icon =
+          "https://li-images.s3.amazonaws.com/7894807455/icon3.png";
+      }
+      targetStudent.save();
+      return targetStudent.icon;
+    },
   },
 };

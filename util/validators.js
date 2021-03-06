@@ -64,3 +64,13 @@ module.exports.validateUserEditInput = (
     valid: Object.keys(errors).length < 1,
   };
 };
+
+// TODO radio buttons if format is MC
+// TODO do the if statements everywhere D:
+// TODO handle if there's only one question
+// TODO buy domain name
+// throw new UserInputError("Email already exists", {
+//   errors: {
+//     email: "A subscriber with this email already exists",
+//   },
+// });

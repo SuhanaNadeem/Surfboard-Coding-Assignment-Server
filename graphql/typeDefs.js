@@ -51,6 +51,7 @@ module.exports = gql`
 
     mentors: [String]
 
+    icon: String
     quesAnsDict: [StringStringDict] # {studentId + questionId: answerId}
     modulePointsDict: [StringIntDict] # {studentId + moduleId: points}
     createdAt: DateTime!

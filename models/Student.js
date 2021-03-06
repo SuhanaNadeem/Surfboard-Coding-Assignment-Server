@@ -28,6 +28,8 @@ const studentSchema = new Schema({
   completedQuestions: [String],
   completedSkills: [String],
 
+  icon: String,
+
   createdAt: Date,
 });
 
