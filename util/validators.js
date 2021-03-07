@@ -57,7 +57,7 @@ module.exports.validateUserEditInput = (
   }
   // pass given but do not match
   if (newPassword && newPassword !== "" && newPassword != newConfirmPassword) {
-    errors.password = "Passwords don't match";
+    errors.newPassword = "Passwords don't match";
   }
   return {
     errors,
@@ -65,12 +65,7 @@ module.exports.validateUserEditInput = (
   };
 };
 
-// TODO radio buttons if format is MC
 // TODO do the if statements everywhere D:
 // TODO handle if there's only one question in a module
 // TODO buy domain name
-// throw new UserInputError("Email already exists", {
-//   errors: {
-//     email: "A subscriber with this email already exists",
-//   },
-// });
+// TODO ORGNAME should be taken as FRC ___ on signup

@@ -186,21 +186,22 @@ module.exports = {
       }
 
       const targetMentor = await Mentor.findById(mentorId);
-      if (!targetMentor) {
-        throw new UserInputError("Mentor does not exist", {
-          errors: {
-            email: "Mentor does not exist",
-          },
-        });
-      }
 
       var { valid, errors } = validateUserEditInput(
         newEmail,
         newPassword,
         confirmNewPassword
       );
-
-      if (!valid) {
+      if (!targetMentor) {
+        errors.newName = "No such mentor exists";
+      }
+      if (newName === "" || !newName) {
+        errors.newName = "Mentor name must be provided";
+      }
+      if (newOrgName === "" || !newOrgName) {
+        errors.newOrgName = "Mentor organization must be provided";
+      }
+      if (!valid || Object.keys(errors).length >= 1) {
         throw new UserInputError("Errors", { errors });
       }
 

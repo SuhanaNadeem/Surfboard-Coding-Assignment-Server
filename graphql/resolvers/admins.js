@@ -282,21 +282,28 @@ module.exports = {
       }
 
       const targetAdmin = await Admin.findById(adminId);
-      if (!targetAdmin) {
-        throw new UserInputError("Admin does not exist", {
+
+      if (newName==="" || !newName) {
+        throw new UserInputError("Admin name must be provided", {
           errors: {
-            email: "Admin does not exist",
+            newName: "Admin name must be provided",
           },
         });
       }
-
       var { valid, errors } = validateUserEditInput(
         newEmail,
         newPassword,
         confirmNewPassword
       );
 
-      if (!valid) {
+      if(!targetAdmin){
+        errors.adminId = "Admin does not exist";
+
+      }
+      if (newName === "" || !newName) {
+        errors.newName = "Admin name must be provided";
+      }
+      if (!valid || Object.keys(errors).length >= 1) {
         throw new UserInputError("Errors", { errors });
       }
 

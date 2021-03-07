@@ -231,23 +231,24 @@ module.exports = {
           throw new AuthenticationError(error);
         }
       }
-
+      // var initialErrors = {};
       const targetStudent = await Student.findById(studentId);
-      if (!targetStudent) {
-        throw new UserInputError("Student does not exist", {
-          errors: {
-            email: "Student does not exist",
-          },
-        });
-      }
 
       var { valid, errors } = validateUserEditInput(
         newEmail,
         newPassword,
         confirmNewPassword
       );
-
-      if (!valid) {
+      if (!targetStudent) {
+        errors.studentId = "Student does not exist";
+      }
+      if (newName === "" || !newName) {
+        errors.newName = "Student name must be provided";
+      }
+      if (newOrgName === "" || !newOrgName) {
+        errors.newOrgName = "Student organization must be provided";
+      }
+      if (!valid || Object.keys(errors).length >= 1) {
         throw new UserInputError("Errors", { errors });
       }
 
