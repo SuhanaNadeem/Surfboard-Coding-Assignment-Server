@@ -710,10 +710,10 @@ module.exports = {
     ) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       var targetModule = await Module.findById(moduleId);
       var newNameModule = await Module.findOne({
         name: newName,
@@ -721,19 +721,35 @@ module.exports = {
       var newCategory = await Category.findById(newCategoryId);
       var newAdmin = await Admin.findById(newAdminId);
 
+      if (!targetModule) {
+        errors.moduleId = "No such module exists";
+      }
       if (
-        !targetModule ||
-        (newName !== undefined &&
-          newName !== targetModule.name &&
-          newNameModule) ||
-        (newCategoryId !== undefined &&
-          newCategoryId !== targetModule.categoryId &&
-          !newCategory) ||
-        (newAdminId !== undefined &&
-          newAdminId !== targetModule.adminId &&
-          !newAdmin)
+        newName !== undefined &&
+        newName !== targetModule.name &&
+        newNameModule
       ) {
-        throw new UserInputError("Invalid input");
+        errors.newName = "A module with this name already exists";
+      }
+      if (
+        newCategoryId !== undefined &&
+        newCategoryId !== targetModule.categoryId &&
+        !newCategory
+      ) {
+        errors.newCategoryId = "No such category exists";
+      }
+      if (
+        newAdminId !== undefined &&
+        newAdminId !== targetModule.adminId &&
+        !newAdmin
+      ) {
+        errors.newAdminId = "No such admin exists";
+      }
+      if (!newAdminId || newAdminId == "") {
+        errors.newAdminId = "Every module must have an associated admin";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         if (newName !== undefined) {
           targetModule.name = newName;
@@ -808,10 +824,10 @@ module.exports = {
     ) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       var targetQuestion = await Question.findById(questionId);
 
       var currentModule = await Module.findById(moduleId);
@@ -824,34 +840,78 @@ module.exports = {
       });
       var newAdmin = await Admin.findById(newAdminId);
 
+      if (!targetQuestion) {
+        errors.questionId = "No such question exists";
+      }
+      if (!currentModule) {
+        errors.moduleId = "No such question exists";
+      }
       if (
-        !targetQuestion ||
-        !currentModule ||
-        (newName !== undefined &&
-          newName !== "" &&
-          newName !== targetQuestion.name &&
-          newNameQuestion) === true ||
-        (newDescription !== undefined &&
-          newDescription !== "" &&
-          newDescription !== targetQuestion.description &&
-          newDescriptionQuestion) === true ||
-        (newAdminId !== undefined &&
-          newAdminId !== "" &&
-          newAdminId !== targetQuestion.adminId &&
-          !newAdmin) === true ||
-        (targetQuestion.questionFormat === "Multiple Choice" &&
-          (newOptionA === "" ||
-            newOptionA === undefined ||
-            newOptionB === "" ||
-            newOptionB === undefined ||
-            newOptionC === "" ||
-            newOptionC === undefined ||
-            newOptionD === "" ||
-            newOptionD === undefined)) ||
-        (targetQuestion.questionFormat === "Multiple Choice" &&
-          (!newExpectedAnswer || newExpectedAnswer === ""))
+        newName !== undefined &&
+        newName !== "" &&
+        newName !== targetQuestion.name &&
+        newNameQuestion
       ) {
-        throw new UserInputError("Invalid input");
+        errors.newName = "A question with this name already exists";
+      }
+      if (!newName || newName === "") {
+        errors.newName = "Every question must have a name";
+      }
+      if (
+        newDescription !== undefined &&
+        newDescription !== "" &&
+        newDescription !== targetQuestion.description &&
+        newDescriptionQuestion
+      ) {
+        errors.newDescription =
+          "A question with this description already exists";
+      }
+      if (newAdminId === "" || !newAdminId) {
+        errors.newAdminId = "An admin must be provided";
+      }
+      if (
+        newAdminId !== undefined &&
+        newAdminId !== "" &&
+        newAdminId !== targetQuestion.adminId &&
+        !newAdmin
+      ) {
+        errors.newAdminId = "No such admin exists";
+      }
+      if (
+        targetQuestion.questionFormat === "Multiple Choice" &&
+        (newOptionA === "" ||
+          newOptionA === undefined ||
+          newOptionB === "" ||
+          newOptionB === undefined ||
+          newOptionC === "" ||
+          newOptionC === undefined ||
+          newOptionD === "" ||
+          newOptionD === undefined)
+      ) {
+        errors.questionFormat =
+          "All four options must be provided for multiple choice questions";
+      }
+      if (
+        targetQuestion.questionFormat === "Multiple Choice" &&
+        (!newExpectedAnswer ||
+          newExpectedAnswer === "" ||
+          (newExpectedAnswer !== "A" &&
+            newExpectedAnswer !== "B" &&
+            newExpectedAnswer !== "C" &&
+            newExpectedAnswer !== "D"))
+      ) {
+        errors.newExpectedAnswer =
+          "Expected answer must be A, B, C, or D for multiple choice questions";
+      }
+      if (
+        newModuleId &&
+        newModuleId !== targetQuestion.moduleId &&
+        !newModule
+      ) {
+        errors.newModuleId = "A valid module must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         if (newDescription !== undefined && newDescription !== "") {
           targetQuestion.description = newDescription;
@@ -901,12 +961,6 @@ module.exports = {
           await newModule.questions.push(questionId);
           await newModule.save();
           targetQuestion.moduleId = newModuleId;
-        } else if (
-          newModuleId != moduleId &&
-          newModuleId !== undefined &&
-          newModuleId !== ""
-        ) {
-          throw new UserInputError("Invalid input");
         }
 
         if (newImageFile != null) {
@@ -1023,32 +1077,51 @@ module.exports = {
     ) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       var targetChallenge = await Challenge.findById(challengeId);
       var newNameChallenge = await Challenge.findOne({
         name: newName,
       });
       var newCategory = await Category.findById(newCategoryId);
       var newAdmin = await Admin.findById(newAdminId);
+      if (!targetChallenge) {
+        errors.challengeId = "No such challenge exists";
+      }
       if (
-        !targetChallenge ||
-        (newName !== undefined &&
-          newName !== targetChallenge.name &&
-          newNameChallenge &&
-          newName !== "") ||
-        (newCategoryId !== undefined &&
-          newCategoryId !== targetChallenge.categoryId &&
-          !newCategory &&
-          newCategoryId !== "") ||
-        (newAdminId !== undefined &&
-          newAdminId !== targetChallenge.adminId &&
-          !newAdmin &&
-          newAdminId !== "")
+        newName !== undefined &&
+        newName !== targetChallenge.name &&
+        newNameChallenge &&
+        newName !== ""
       ) {
-        throw new UserInputError("Invalid input");
+        errors.newName = "A challenge with this name already exists";
+      }
+      if (!newName || newName === "") {
+        errors.newName = "Every challenge must have a name";
+      }
+      if (!newAdminId || newAdminId === "") {
+        errors.newAdminId = "Every challenge must have an associated admin";
+      }
+      if (
+        newCategoryId !== undefined &&
+        newCategoryId !== targetChallenge.categoryId &&
+        !newCategory &&
+        newCategoryId !== ""
+      ) {
+        errors.newCategoryId = "No such category exists";
+      }
+      if (
+        newAdminId !== undefined &&
+        newAdminId !== targetChallenge.adminId &&
+        !newAdmin &&
+        newAdminId !== ""
+      ) {
+        errors.newAdminId = "No such admin exists";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         if (newCategoryId !== undefined) {
           targetChallenge.categoryId = newCategoryId;
@@ -1113,26 +1186,42 @@ module.exports = {
     async editCategory(_, { categoryId, newName, newAdminId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       var targetCategory = await Category.findById(categoryId);
       var newNameCategory = await Category.findOne({
         name: newName,
       });
       var newAdmin = await Admin.findById(newAdminId);
 
+      if (!targetCategory) {
+        errors.categoryId = "No such category exists";
+      }
       if (
-        !targetCategory ||
-        (newName !== undefined &&
-          newName !== targetCategory.name &&
-          newNameCategory) ||
-        (newAdminId !== undefined &&
-          newAdminId !== targetCategory.adminId &&
-          !newAdmin)
+        newName !== undefined &&
+        newName !== targetCategory.name &&
+        newNameCategory
       ) {
-        throw new UserInputError("Invalid input");
+        errors.newName = "A category with this name already exists";
+      }
+      if (!newName || newName == "") {
+        errors.newName = "Every category must have a name";
+      }
+      if (!newAdminId || newAdminId == "") {
+        errors.newAdminId = "Every category must have an associated admin";
+      }
+      if (
+        newAdminId !== undefined &&
+        newAdminId !== targetCategory.adminId &&
+        !newAdmin
+      ) {
+        errors.newAdminId = "No such admin exists";
+      }
+
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         if (newName !== undefined) {
           targetCategory.name = newName;

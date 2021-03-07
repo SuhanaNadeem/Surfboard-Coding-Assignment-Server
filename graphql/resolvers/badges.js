@@ -169,9 +169,9 @@ module.exports = {
       },
       context
     ) {
+      var errors = {};
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
@@ -181,22 +181,44 @@ module.exports = {
       });
       var newAdmin = await Admin.findById(newAdminId);
 
+      if (!targetBadge) {
+        errors.badgeId = "No such badge exists";
+      }
+      if (newRequiredAmount <= 0) {
+        errors.newRequiredAmount = "Required amount must be greater than 0";
+      }
       if (
-        !targetBadge ||
-        (newName !== undefined &&
-          newName !== "" &&
-          newName !== targetBadge.name &&
-          newNameBadge) === true ||
-        (newAdminId !== undefined &&
-          newAdminId !== targetBadge.adminId &&
-          !newAdmin &&
-          newAdminId !== "") === true ||
-        (newType !== "" &&
-          newType &&
-          newType !== "Question" &&
-          newType !== "Module") === true
+        newName !== undefined &&
+        newName !== "" &&
+        newName !== targetBadge.name &&
+        newNameBadge
       ) {
-        throw new UserInputError("Invalid input");
+        errors.newName = "A badge with this name already exists";
+      }
+      if (
+        newAdminId !== undefined &&
+        newAdminId !== targetBadge.adminId &&
+        !newAdmin &&
+        newAdminId !== ""
+      ) {
+        errors.newAdminId = "No such admin exists";
+      }
+      if (newAdminId === "" || !newAdminId) {
+        errors.newAdminId = "Every badge must have an associated admin";
+      }
+      if (
+        newType !== "" &&
+        newType &&
+        newType !== "Question" &&
+        newType !== "Module"
+      ) {
+        errors.newType = "Badge type must be Question or Module";
+      }
+      if (newName === "" || !newName) {
+        errors.newName = "Every badge must be named";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         if (newName !== undefined && newAdminId !== "") {
           targetBadge.name = newName;
