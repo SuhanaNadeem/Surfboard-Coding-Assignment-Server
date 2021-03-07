@@ -52,7 +52,11 @@ module.exports = {
       }
       const admins = await Admin.find();
       if (!admins) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No admins", {
+          errors: {
+            admins: "There are no admins",
+          },
+        });
       } else {
         return admins;
       }
@@ -69,7 +73,11 @@ module.exports = {
       }
       const targetAdmin = await Admin.findById(adminId);
       if (!targetAdmin) {
-        throw new UserInputError("Invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return targetAdmin;
       }
@@ -84,7 +92,11 @@ module.exports = {
       const admin = await Admin.findById(adminId);
       const questions = await Question.find({ adminId });
       if (!admin) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return questions;
       }
@@ -113,7 +125,11 @@ module.exports = {
       var badges = await Badge.find({ adminId });
 
       if (!admin) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return badges;
       }
@@ -127,7 +143,11 @@ module.exports = {
       const admin = await Admin.findById(adminId);
       const modules = await Module.find({ adminId });
       if (!admin) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return modules;
       }
@@ -141,7 +161,11 @@ module.exports = {
       const admin = await Admin.findById(adminId);
       const categories = await Category.find({ adminId });
       if (!admin) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return categories;
       }
@@ -155,7 +179,11 @@ module.exports = {
       const admin = await Admin.findById(adminId);
       const challenges = await Challenge.find({ adminId });
       if (!admin) {
-        throw new UserInputError("invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       } else {
         return challenges;
       }
@@ -334,7 +362,11 @@ module.exports = {
         await targetAdmin.delete();
         return "Delete Successful";
       } else {
-        throw new UserInputError("Invalid input");
+        throw new UserInputError("No such admin", {
+          errors: {
+            adminId: "There is no admin with this ID",
+          },
+        });
       }
     },
 
@@ -360,37 +392,64 @@ module.exports = {
       },
       context
     ) {
+      console.log;
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
 
       const targetQuestion = await Question.findOne({
-        description,
+        name,
       });
 
       var targetModule = await Module.findById(moduleId);
+
+      if (!type || (type !== "Question" && type !== "Skill")) {
+        errors.type = "Type must be question or skill";
+      }
+      if (!targetModule) {
+        errors.moduleId = "There is no module with this ID";
+      }
+      if (type === "Question" && (!questionFormat || questionFormat === "")) {
+        errors.questionFormat =
+          "A valid question format is required for questions";
+      }
       if (
-        !targetModule ||
-        (type === "Question" && (!questionFormat || questionFormat === "")) ||
-        (questionFormat === "Multiple Choice" &&
-          (optionA === "" ||
-            !optionA ||
-            optionB === "" ||
-            !optionB ||
-            optionC === "" ||
-            !optionC ||
-            optionD === "" ||
-            !optionD ||
-            (expectedAnswer !== "A" &&
-              expectedAnswer !== "B" &&
-              expectedAnswer !== "C" &&
-              expectedAnswer !== "D")))
+        questionFormat === "Multiple Choice" &&
+        (optionA === "" ||
+          !optionA ||
+          optionB === "" ||
+          !optionB ||
+          optionC === "" ||
+          !optionC ||
+          optionD === "" ||
+          !optionD)
       ) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetQuestion) {
+        errors.questionFormat =
+          "All multiple choice questions must have four options";
+      }
+      if (
+        questionFormat === "Multiple Choice" &&
+        expectedAnswer !== "A" &&
+        expectedAnswer !== "B" &&
+        expectedAnswer !== "C" &&
+        expectedAnswer !== "D"
+      ) {
+        errors.expectedAnswer =
+          "Multiple choice questions' answers must be A, B, C, or D";
+      }
+      if (targetQuestion) {
+        errors.name = "A question with this name already exists";
+      }
+      if (name == "" || !name) {
+        errors.name = "A unique question name must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
+      } else {
         var calculatedLynxImgUrl = "";
         if (imageFile != null) {
           const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
@@ -442,8 +501,6 @@ module.exports = {
         // await targetAdmin.save();
 
         return newQuestion;
-      } else {
-        return targetQuestion;
       }
     },
 
@@ -458,7 +515,6 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-
       const targetQuestionTemplate = await QuestionTemplate.findOne({
         name,
       });
@@ -493,7 +549,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-
+      var errors = {};
       const targetModule = await Module.findOne({ name });
 
       const questions = [];
@@ -501,8 +557,17 @@ module.exports = {
 
       const targetCategory = await Category.findById(categoryId);
       if (!targetCategory) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetModule) {
+        errors.categoryId = "A valid category must be selected";
+      }
+      if (targetModule) {
+        errors.name = "A module with this name already exists";
+      }
+      if (name == "" || !name) {
+        errors.name = "A unique name must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
+      } else {
         var calculatedLynxImgUrl = "";
         if (imageFile != null) {
           const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
@@ -540,8 +605,6 @@ module.exports = {
         // targetAdmin.modules.push(newModule.id);
         // await targetAdmin.save();
         return newModule;
-      } else {
-        return targetModule;
       }
     },
 
@@ -556,11 +619,21 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetChallenge = await Challenge.findOne({ challengeDescription });
+      var errors = {};
+      const targetChallenge = await Challenge.findOne({ name });
       const targetCategory = await Category.findById(categoryId);
       if (!targetCategory) {
-        throw new UserInputError("Invalid input");
-      } else if (!targetChallenge) {
+        errors.categoryId = "A valid category must be selected";
+      }
+      if (targetChallenge) {
+        errors.name = "A challenge with this name already exists";
+      }
+      if (name == "" || !name) {
+        errors.name = "A unique name must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
+      } else {
         var calculatedLynxImgUrl = "";
         if (imageFile != null) {
           const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
@@ -598,8 +671,6 @@ module.exports = {
         // await targetAdmin.challenges.push(newChallenge.id);
         // await targetAdmin.save();
         return newChallenge;
-      } else {
-        return targetChallenge;
       }
     },
 
@@ -608,12 +679,19 @@ module.exports = {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
-        console.log(error);
         throw new AuthenticationError();
       }
-
+      var errors = {};
       const targetCategory = await Category.findOne({ name });
-      if (!targetCategory) {
+      if (targetCategory) {
+        errors.name = "A category with this name already exists";
+      }
+      if (name == "" || !name) {
+        errors.name = "A unique name must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
+      } else {
         const newCategory = new Category({
           name,
           adminId: targetAdmin.id,
@@ -623,8 +701,6 @@ module.exports = {
         // targetAdmin.categories.push(newCategory.id);
         // await targetAdmin.save();
         return newCategory;
-      } else {
-        return targetCategory;
       }
     },
     async editModule(

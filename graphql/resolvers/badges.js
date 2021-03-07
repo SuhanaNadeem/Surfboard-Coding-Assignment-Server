@@ -96,13 +96,24 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       const targetBadge = await Badge.findOne({ name });
 
-      if (
-        !targetBadge &&
-        (type === "Question" || type === "Module") &&
-        requiredAmount > 0
-      ) {
+      if (targetBadge) {
+        errors.name = "A badge with this name already exists";
+      }
+      if (type !== "Question" || type !== "Module") {
+        errors.type = "Type must be Question or Module";
+      }
+      if (requiredAmount <= 0) {
+        errors.requiredAmount = "Required amount must be greater than 0";
+      }
+      if (name == "" || !name) {
+        errors.name = "A unique badge name must be selected";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
+      } else {
         var calculatedLynxImgUrl = "";
         if (imageFile != null) {
           const lynxImgS3Object = await fileResolvers.Mutation.uploadLynxFile(
@@ -142,8 +153,6 @@ module.exports = {
         // await targetAdmin.save();
 
         return newBadge;
-      } else {
-        return targetBadge;
       }
     },
 
