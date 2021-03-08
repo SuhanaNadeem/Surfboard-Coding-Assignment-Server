@@ -404,6 +404,7 @@ module.exports = gql`
     deleteModule(moduleId: String!): [Module]! # done checked
     deleteBadge(badgeId: String!): [Badge]! # done checked
     deleteQuestion(questionId: String!): [Question]! # done checked
+    # changeQuestions: String # done checked
     deleteAnswer(answerId: String!, studentId: String!): String! # done checked
     deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
     createNewCategory(name: String!): Category! # done checked

@@ -65,7 +65,6 @@ module.exports.validateUserEditInput = (
   };
 };
 
-// TODO do the if statements everywhere D:
 // TODO handle if there's only one question in a module
 // TODO buy domain name
 // TODO ORGNAME should be taken as FRC ___ on signup

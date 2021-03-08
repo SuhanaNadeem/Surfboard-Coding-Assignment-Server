@@ -102,7 +102,7 @@ module.exports = {
       if (targetBadge) {
         errors.name = "A badge with this name already exists";
       }
-      if (type !== "Question" || type !== "Module") {
+      if (type !== "Question" && type !== "Module") {
         errors.type = "Type must be Question or Module";
       }
       if (requiredAmount <= 0) {
@@ -341,33 +341,52 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       const targetBadge = await Badge.findById(badgeId);
       if (!targetBadge) {
-        throw new UserInputError("Invalid input");
+        errors.badgeId = "No such badge exists";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
-        const targetImageUrl = targetBadge.image;
-        if (targetImageUrl && targetImageUrl !== "") {
-          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
-          await fileResolvers.Mutation.deleteLynxFile(
-            _,
-            {
-              fileKey: key,
-            },
-            context
-          );
-        }
-        const students = await Student.find();
-        var index;
-        for (var targetStudent of students) {
-          if (targetStudent.badges.includes(badgeId)) {
-            index = targetStudent.badges.indexOf(badgeId);
-            targetStudent.badges.splice(index, 1);
-            targetStudent.save();
+        try {
+          const targetImageUrl = targetBadge.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
           }
+          const students = await Student.find();
+          var index;
+          for (var targetStudent of students) {
+            if (targetStudent.badges.includes(badgeId)) {
+              index = targetStudent.badges.indexOf(badgeId);
+              targetStudent.badges.splice(index, 1);
+              targetStudent.save();
+            }
+          }
+          await targetBadge.delete();
+          const updatedBadges = await Badge.find();
+          return updatedBadges;
+        } catch (err) {
+          const students = await Student.find();
+          var index;
+          for (var targetStudent of students) {
+            if (targetStudent.badges.includes(badgeId)) {
+              index = targetStudent.badges.indexOf(badgeId);
+              targetStudent.badges.splice(index, 1);
+              targetStudent.save();
+            }
+          }
+          await targetBadge.delete();
+          const updatedBadges = await Badge.find();
+          return updatedBadges;
         }
-        await targetBadge.delete();
-        const updatedBadges = await Badge.find();
-        return updatedBadges;
       }
     },
     async addBadge(_, { studentId, badgeId }, context) {

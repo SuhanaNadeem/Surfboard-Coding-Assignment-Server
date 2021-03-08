@@ -283,7 +283,7 @@ module.exports = {
 
       const targetAdmin = await Admin.findById(adminId);
 
-      if (newName==="" || !newName) {
+      if (newName === "" || !newName) {
         throw new UserInputError("Admin name must be provided", {
           errors: {
             newName: "Admin name must be provided",
@@ -296,9 +296,8 @@ module.exports = {
         confirmNewPassword
       );
 
-      if(!targetAdmin){
+      if (!targetAdmin) {
         errors.adminId = "Admin does not exist";
-
       }
       if (newName === "" || !newName) {
         errors.newName = "Admin name must be provided";
@@ -418,7 +417,7 @@ module.exports = {
         errors.type = "Type must be question or skill";
       }
       if (!targetModule) {
-        errors.moduleId = "There is no module with this ID";
+        errors.moduleId = "A valid module is required";
       }
       if (type === "Question" && (!questionFormat || questionFormat === "")) {
         errors.questionFormat =
@@ -1243,28 +1242,37 @@ module.exports = {
     async deleteModule(_, { moduleId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       const targetModule = await Module.findById(moduleId);
       if (!targetModule) {
-        throw new UserInputError("Invalid input");
+        errors.moduleId = "No such module exists";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
-        const targetImageUrl = targetModule.image;
-        if (targetImageUrl && targetImageUrl !== "") {
-          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
-          await fileResolvers.Mutation.deleteLynxFile(
-            _,
-            {
-              fileKey: key,
-            },
-            context
-          );
+        try {
+          const targetImageUrl = targetModule.image;
+          if (targetImageUrl && targetImageUrl !== "") {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+          }
+          await targetModule.delete();
+          const updatedModules = await Module.find();
+          return updatedModules;
+        } catch (err) {
+          await targetModule.delete();
+          const updatedModules = await Module.find();
+          return updatedModules;
         }
-        await targetModule.delete();
-        const updatedModules = await Module.find();
-        return updatedModules;
       }
     },
     async deleteStringStringDict(_, { stringStringDictId }, context) {
@@ -1329,37 +1337,69 @@ module.exports = {
         return updatedStringIntDicts;
       }
     },
+    // async changeQuestions(_, {}, context) {
+    //   const allQuestions = await Question.find();
+    //   for (var question of allQuestions) {
+    //     if (question.moduleId === "PAUDGVM483") {
+    //       console.log("CAD");
+    //       question.moduleId = "BCL5QTRX7M";
+    //       await question.save();
+    //       console.log(question.moduleId);
+    //     } else if (question.moduleId === "LBPEVG15QZ") {
+    //       console.log("Prog");
+    //       question.moduleId = "X2YC2OLUMW";
+    //       await question.save();
+    //       console.log(question.moduleId);
+    //     } else if (question.moduleId === "DQFU7S5XOU") {
+    //       console.log("Electrical");
+    //       question.moduleId = "IF1DW21FVY";
+    //       await question.save();
+    //       console.log(question.moduleId);
+    //     }
+    //   }
+    //   return "done";
+    // },
     async deleteQuestion(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
       const targetModule = await Module.findOne({ questions: questionId });
       const targetQuestion = await Question.findById(questionId);
       if (!targetQuestion || !targetModule) {
+        // if (!targetQuestion) {
         throw new UserInputError("Invalid input");
       } else {
         const targetImageUrl = targetQuestion.image;
         if (targetImageUrl && targetImageUrl !== "") {
-          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
-          await fileResolvers.Mutation.deleteLynxFile(
-            _,
-            {
-              fileKey: key,
-            },
-            context
-          );
+          try {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+            const index = targetModule.questions.indexOf(questionId);
+            targetModule.questions.splice(index, 1);
+            await targetModule.save();
+            await targetQuestion.delete();
+            await targetModule.save();
+            const updatedQuestions = await Question.find();
+            return updatedQuestions;
+          } catch (err) {
+            const index = targetModule.questions.indexOf(questionId);
+            targetModule.questions.splice(index, 1);
+            await targetModule.save();
+
+            await targetQuestion.delete();
+            await targetModule.save();
+            const updatedQuestions = await Question.find();
+            return updatedQuestions;
+          }
         }
-        const index = targetModule.questions.indexOf(questionId);
-        targetModule.questions.splice(index, 1);
-        await targetModule.save();
-        await targetQuestion.delete();
-        await targetModule.save();
-        const updatedQuestions = await Question.find();
-        // console.log(targetModule.questions);
-        return updatedQuestions;
       }
     },
 
@@ -1387,34 +1427,42 @@ module.exports = {
     async deleteChallenge(_, { challengeId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      var errors = {};
       const targetChallenge = await Challenge.findById(challengeId);
       if (!targetChallenge) {
-        throw new UserInputError("Invalid input");
+        errors.challengeId = "No such challenge exists";
+      }
+      if (Object.keys(errors).length >= 1) {
+        throw new UserInputError("Errors", { errors });
       } else {
         const targetImageUrl = targetChallenge.image;
         if (targetImageUrl && targetImageUrl !== "") {
-          const { region, bucket, key } = AmazonS3URI(targetImageUrl);
-          await fileResolvers.Mutation.deleteLynxFile(
-            _,
-            {
-              fileKey: key,
-            },
-            context
-          );
+          try {
+            const { region, bucket, key } = AmazonS3URI(targetImageUrl);
+            await fileResolvers.Mutation.deleteLynxFile(
+              _,
+              {
+                fileKey: key,
+              },
+              context
+            );
+            await targetChallenge.delete();
+            const updatedChallenges = await Challenge.find();
+            return updatedChallenges;
+          } catch (err) {
+            await targetChallenge.delete();
+            const updatedChallenges = await Challenge.find();
+            return updatedChallenges;
+          }
         }
-        await targetChallenge.delete();
-        const updatedChallenges = await Challenge.find();
-        return updatedChallenges;
       }
     },
     async deleteCategory(_, { categoryId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         console.log(error);
         throw new AuthenticationError();
