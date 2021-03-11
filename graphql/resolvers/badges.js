@@ -337,7 +337,6 @@ module.exports = {
     async deleteBadge(_, { badgeId }, context) {
       try {
         const admin = checkAdminAuth(context);
-        var targetAdmin = await Admin.findById(admin.id);
       } catch (error) {
         throw new AuthenticationError();
       }

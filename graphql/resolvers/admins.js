@@ -1337,28 +1337,36 @@ module.exports = {
         return updatedStringIntDicts;
       }
     },
-    // async changeQuestions(_, {}, context) {
-    //   const allQuestions = await Question.find();
-    //   for (var question of allQuestions) {
-    //     if (question.moduleId === "PAUDGVM483") {
-    //       console.log("CAD");
-    //       question.moduleId = "BCL5QTRX7M";
-    //       await question.save();
-    //       console.log(question.moduleId);
-    //     } else if (question.moduleId === "LBPEVG15QZ") {
-    //       console.log("Prog");
-    //       question.moduleId = "X2YC2OLUMW";
-    //       await question.save();
-    //       console.log(question.moduleId);
-    //     } else if (question.moduleId === "DQFU7S5XOU") {
-    //       console.log("Electrical");
-    //       question.moduleId = "IF1DW21FVY";
-    //       await question.save();
-    //       console.log(question.moduleId);
-    //     }
-    //   }
-    //   return "done";
-    // },
+    async changeQuestions(_, {}, context) {
+      const allQuestions = await Question.find();
+      const cadModule = await Module.findById("BCL5QTRX7M");
+      const progModule = await Module.findById("X2YC2OLUMW");
+      const elecModule = await Module.findById("IF1DW21FVY");
+      console.log(cadModule);
+      console.log(progModule);
+      console.log(elecModule);
+      for (var question of allQuestions) {
+        if (question.moduleId === "BCL5QTRX7M") {
+          console.log("CAD");
+          console.log(question.name);
+          cadModule.questions.push(question.id);
+          await cadModule.save();
+        } else if (question.moduleId === "X2YC2OLUMW") {
+          console.log("Prog");
+          console.log(question.name);
+
+          progModule.questions.push(question.id);
+          await progModule.save();
+        } else if (question.moduleId === "IF1DW21FVY") {
+          console.log("Electrical");
+          console.log(question.name);
+
+          elecModule.questions.push(question.id);
+          await elecModule.save();
+        }
+      }
+      return "done";
+    },
     async deleteQuestion(_, { questionId }, context) {
       try {
         const admin = checkAdminAuth(context);

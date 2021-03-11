@@ -209,7 +209,10 @@ module.exports = {
         }
       }
       const targetModule = await Module.findById(moduleId);
+      // console.log("makes it here");
+      // console.log(targetModule);
       const moduleQuestions = targetModule.questions;
+      // console.log("but not here");
       if (!targetModule || !moduleQuestions) {
         throw new UserInputError("Invalid input");
       } else {

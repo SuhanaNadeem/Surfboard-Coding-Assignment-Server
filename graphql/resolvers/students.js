@@ -24,6 +24,7 @@ const badgeResolvers = require("./badges");
 const questionResolvers = require("./questions");
 const StringIntDict = require("../../models/StringIntDict");
 const StringStringDict = require("../../models/StringStringDict");
+const Module = require("../../models/Module");
 
 function generateToken(student) {
   return jwt.sign(
@@ -135,23 +136,35 @@ module.exports = {
       var pointsFromInProgress = 0;
       var completedModulePoints;
       var inProgressModulePoints;
-
+      var targetModule;
+      // console.log(targetStudent.completedModules);
       for (var completedModuleId of targetStudent.completedModules) {
-        completedModulePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
-          _,
-          { moduleId: completedModuleId },
-          context
-        );
-        pointsFromCompleted += completedModulePoints;
+        // console.log(20);
+        targetModule = await Module.findById(completedModuleId);
+        if (targetModule) {
+          // console.log(targetModule)
+          completedModulePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
+            _,
+            { moduleId: completedModuleId },
+            context
+          );
+          // console.log(21);
+          pointsFromCompleted += completedModulePoints;
+        }
       }
 
       for (var inProgressModuleId of targetStudent.inProgressModules) {
-        inProgressModulePoints = await moduleResolvers.Query.getModulePointsByStudent(
-          _,
-          { moduleId: inProgressModuleId, studentId },
-          context
-        );
-        pointsFromInProgress += inProgressModulePoints;
+        targetModule = await Module.findById(inProgressModuleId);
+        if (targetModule) {
+          // console.log(targetModule)
+
+          inProgressModulePoints = await moduleResolvers.Query.getModulePointsByStudent(
+            _,
+            { moduleId: inProgressModuleId, studentId },
+            context
+          );
+          pointsFromInProgress += inProgressModulePoints;
+        }
       }
       totalPoints = pointsFromCompleted + pointsFromInProgress;
       return totalPoints;
@@ -400,7 +413,7 @@ module.exports = {
     },
 
     async handleAnswerPoints(_, { answer, studentId, questionId }, context) {
-      console.log("arriving here");
+      // console.log("arriving here");
 
       try {
         const admin = checkAdminAuth(context);
@@ -426,6 +439,7 @@ module.exports = {
         studentId,
         key: questionId,
       });
+      // console.log(1);
       const totalPossiblePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
         _,
         { moduleId },
@@ -433,6 +447,7 @@ module.exports = {
       );
       var targetStudent = await Student.findById(studentId);
       var answerCorrect;
+      // console.log(2);
       if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
         targetQuesAnsPair = await questionResolvers.Mutation.startQuestion(
           _,
@@ -440,6 +455,7 @@ module.exports = {
           context
         );
       }
+      // console.log(3);
       if (
         !targetQuestion ||
         (targetQuestion.type !== "Skill" &&
@@ -448,6 +464,8 @@ module.exports = {
       ) {
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
+        // console.log(4);
+
         if (!targetStudent.completedSkills.includes(questionId)) {
           answerCorrect = true;
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
@@ -483,15 +501,18 @@ module.exports = {
           return targetModulePointsPair[0].value;
         }
       } else {
+        // console.log(5);
         if (
           targetQuestion.expectedAnswer === "" ||
           !targetQuestion.expectedAnswer
         ) {
+          // console.log(6);
           await answerResolvers.Mutation.saveAnswer(
             _,
             { answer, studentId, questionId },
             context
           );
+          // console.log(7);
           answerCorrect = true;
 
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
@@ -525,6 +546,7 @@ module.exports = {
           );
           return updatedPoints;
         } else {
+          // console.log(8);
           // const answerObject = await Answer.find({
           //   studentId,
           //   answer,
@@ -541,26 +563,27 @@ module.exports = {
           if (targetStudent.completedQuestions.includes(questionId)) {
             return targetModulePointsPair[0].value;
           } else {
+            // console.log(9);
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(
               _,
               { answer, studentId, questionId },
               context
             );
             const answerId = savedAnswer.id;
-
+            // console.log(10);
             answerCorrect = await module.exports.Mutation.verifyAnswer(
               _,
               { answerId, questionId, studentId },
               context
             );
-
+            // console.log(11);
             // (if answerCorrect, push to completedQuestions)
             const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
               _,
               { moduleId, answerCorrect, numToIncrement, studentId },
               context
             );
-
+            // console.log(12);
             if (answerCorrect) {
               targetStudent.completedQuestions.push(questionId);
               await targetStudent.save();
@@ -573,6 +596,7 @@ module.exports = {
                 context
               );
             }
+            // console.log(13);
             for (var targetBadge of badges) {
               await badgeResolvers.Mutation.handleAddBadge(
                 _,
@@ -580,11 +604,13 @@ module.exports = {
                 context
               );
             }
+            // console.log(14);
             await module.exports.Mutation.changeStudentIcon(
               _,
               { studentId },
               context
             );
+            // console.log(15);
             return updatedPoints;
           }
         }
@@ -696,17 +722,19 @@ module.exports = {
           }
         }
       }
+      // console.log(16);
       const targetStudent = await Student.findById(studentId);
       if (!targetStudent) {
         throw new UserInputError("Invalid input");
       }
       var points;
+      // console.log(17);
       points = await module.exports.Query.getTotalPointsByStudent(
         _,
         { studentId },
         context
       );
-
+      // console.log(18);
       if (points < 1000) {
         targetStudent.icon =
           "https://li-images.s3.amazonaws.com/3908900704/icon1.png";
@@ -718,6 +746,7 @@ module.exports = {
           "https://li-images.s3.amazonaws.com/7894807455/icon3.png";
       }
       targetStudent.save();
+      // console.log(19);
       return targetStudent.icon;
     },
   },
