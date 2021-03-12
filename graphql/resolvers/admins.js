@@ -1373,15 +1373,23 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      const targetModule = await Module.findOne({ questions: questionId });
+      console.log("enter");
       const targetQuestion = await Question.findById(questionId);
+      const targetModule = await Module.findById(targetQuestion.moduleId);
+      console.log(targetQuestion);
+      console.log(targetQuestion.moduleId);
+      console.log(targetModule);
       if (!targetQuestion || !targetModule) {
         // if (!targetQuestion) {
+        console.log("not");
         throw new UserInputError("Invalid input");
       } else {
+        console.log("here");
         const targetImageUrl = targetQuestion.image;
         if (targetImageUrl && targetImageUrl !== "") {
+          console.log(1);
           try {
+            console.log(2);
             const { region, bucket, key } = AmazonS3URI(targetImageUrl);
             await fileResolvers.Mutation.deleteLynxFile(
               _,
@@ -1398,6 +1406,7 @@ module.exports = {
             const updatedQuestions = await Question.find();
             return updatedQuestions;
           } catch (err) {
+            console.log(3);
             const index = targetModule.questions.indexOf(questionId);
             targetModule.questions.splice(index, 1);
             await targetModule.save();
@@ -1407,6 +1416,15 @@ module.exports = {
             const updatedQuestions = await Question.find();
             return updatedQuestions;
           }
+        } else {
+          const index = targetModule.questions.indexOf(questionId);
+          targetModule.questions.splice(index, 1);
+          await targetModule.save();
+
+          await targetQuestion.delete();
+          await targetModule.save();
+          const updatedQuestions = await Question.find();
+          return updatedQuestions;
         }
       }
     },

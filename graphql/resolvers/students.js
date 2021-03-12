@@ -496,7 +496,7 @@ module.exports = {
             context
           );
 
-          return updatedPoints;
+          return answerCorrect;
         } else {
           return targetModulePointsPair[0].value;
         }
@@ -521,9 +521,16 @@ module.exports = {
             context
           );
           // push to completedquestions
-          targetStudent.completedQuestions.push(questionId);
-          await targetStudent.save();
-
+          // targetStudent.completedQuestions.push(questionId);
+          // await targetStudent.save();
+          await module.exports.Mutation.addCompletedQuestion(
+            _,
+            { questionId, studentId },
+            context
+          );
+          // console.log("in backend");
+          // console.log(questionId);
+          // console.log(targetStudent.completedQuestions);
           if (totalPossiblePoints === updatedPoints) {
             await moduleResolvers.Mutation.addCompletedModule(
               _,
@@ -544,7 +551,7 @@ module.exports = {
             { studentId },
             context
           );
-          return updatedPoints;
+          return answerCorrect;
         } else {
           // console.log(8);
           // const answerObject = await Answer.find({
@@ -585,8 +592,14 @@ module.exports = {
             );
             // console.log(12);
             if (answerCorrect) {
-              targetStudent.completedQuestions.push(questionId);
-              await targetStudent.save();
+              // targetStudent.completedQuestions.push(questionId);
+              //  await targetStudent.save();
+
+              await module.exports.Mutation.addCompletedQuestion(
+                _,
+                { questionId, studentId },
+                context
+              );
             }
 
             if (totalPossiblePoints === updatedPoints) {
@@ -611,7 +624,7 @@ module.exports = {
               context
             );
             // console.log(15);
-            return updatedPoints;
+            return answerCorrect;
           }
         }
       }
@@ -648,6 +661,30 @@ module.exports = {
         return true;
       } else {
         return false;
+      }
+    },
+    async addCompletedQuestion(_, { studentId, questionId }, context) {
+      // console.log("arriving here");
+
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      if (!targetStudent) {
+        throw new UserInputError("Invalid input");
+      } else {
+        await targetStudent.completedQuestions.push(questionId);
+        await targetStudent.save();
+        return targetStudent.completedQuestions;
       }
     },
     async addMentor(_, { mentorId, studentId }, context) {

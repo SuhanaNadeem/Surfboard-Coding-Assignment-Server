@@ -314,6 +314,7 @@ module.exports = gql`
       confirmNewPassword: String
     ): Mentor! # done checked
     addCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
+    addCompletedQuestion(questionId: String!, studentId: String!): [String] # done checked
     addInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
@@ -470,7 +471,7 @@ module.exports = gql`
       answer: String
       studentId: String!
       questionId: String!
-    ): Int! # done checked
+    ): Boolean! # done checked
     handleStarQuestion(questionId: String!): [String] # done checked
     handleStarModule(moduleId: String!): [String] # done checked
     addBadge(studentId: String!, badgeId: String!): [Badge]! # done checked
