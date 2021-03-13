@@ -313,7 +313,9 @@ module.exports = {
           return "Badge Not Added";
         }
       } else if (targetBadge.type === "Question") {
-        studentAmount = targetStudent.completedQuestions.length;
+        studentAmount =
+          targetStudent.completedQuestions.length +
+          targetStudent.completedSkills.length;
         if (
           studentAmount === requiredAmount &&
           !targetStudent.badges.includes(badgeId)
