@@ -639,8 +639,8 @@ module.exports = {
       //     includes = true;
       //   }
       // });
-      console.log(targetModule);
-      console.log(targetPair);
+      // console.log(targetModule);
+      // console.log(targetPair);
       if (targetModule && (!targetPair || targetPair.length === 0)) {
         const newPair = new StringIntDict({
           key: moduleId,

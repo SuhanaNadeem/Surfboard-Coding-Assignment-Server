@@ -398,7 +398,7 @@ module.exports = {
       },
       context
     ) {
-      console.log;
+      // console.log;
       try {
         const admin = checkAdminAuth(context);
         var targetAdmin = await Admin.findById(admin.id);
@@ -1342,24 +1342,24 @@ module.exports = {
       const cadModule = await Module.findById("BCL5QTRX7M");
       const progModule = await Module.findById("X2YC2OLUMW");
       const elecModule = await Module.findById("IF1DW21FVY");
-      console.log(cadModule);
-      console.log(progModule);
-      console.log(elecModule);
+      // console.log(cadModule);
+      // console.log(progModule);
+      // console.log(elecModule);
       for (var question of allQuestions) {
         if (question.moduleId === "BCL5QTRX7M") {
-          console.log("CAD");
-          console.log(question.name);
+          // console.log("CAD");
+          // console.log(question.name);
           cadModule.questions.push(question.id);
           await cadModule.save();
         } else if (question.moduleId === "X2YC2OLUMW") {
-          console.log("Prog");
-          console.log(question.name);
+          // console.log("Prog");
+          // console.log(question.name);
 
           progModule.questions.push(question.id);
           await progModule.save();
         } else if (question.moduleId === "IF1DW21FVY") {
-          console.log("Electrical");
-          console.log(question.name);
+          // console.log("Electrical");
+          // console.log(question.name);
 
           elecModule.questions.push(question.id);
           await elecModule.save();
@@ -1373,23 +1373,23 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-      console.log("enter");
+      // console.log("enter");
       const targetQuestion = await Question.findById(questionId);
       const targetModule = await Module.findById(targetQuestion.moduleId);
-      console.log(targetQuestion);
-      console.log(targetQuestion.moduleId);
-      console.log(targetModule);
+      // console.log(targetQuestion);
+      // console.log(targetQuestion.moduleId);
+      // console.log(targetModule);
       if (!targetQuestion || !targetModule) {
         // if (!targetQuestion) {
-        console.log("not");
+        // console.log("not");
         throw new UserInputError("Invalid input");
       } else {
-        console.log("here");
+        // console.log("here");
         const targetImageUrl = targetQuestion.image;
         if (targetImageUrl && targetImageUrl !== "") {
-          console.log(1);
+          // console.log(1);
           try {
-            console.log(2);
+            // console.log(2);
             const { region, bucket, key } = AmazonS3URI(targetImageUrl);
             await fileResolvers.Mutation.deleteLynxFile(
               _,
@@ -1406,7 +1406,7 @@ module.exports = {
             const updatedQuestions = await Question.find();
             return updatedQuestions;
           } catch (err) {
-            console.log(3);
+            // console.log(3);
             const index = targetModule.questions.indexOf(questionId);
             targetModule.questions.splice(index, 1);
             await targetModule.save();
@@ -1490,7 +1490,7 @@ module.exports = {
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new AuthenticationError();
       }
       const targetCategory = await Category.findById(categoryId);

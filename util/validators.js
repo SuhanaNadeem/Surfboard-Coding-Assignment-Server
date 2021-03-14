@@ -4,11 +4,13 @@ module.exports.validateUserLoginInput = (email, password) => {
   const errors = {};
 
   if (!validator.isEmail(email)) {
-    errors.email = email;
+    errors.email = "Invalid email";
   }
-
+  if (validator.isEmpty(email)) {
+    errors.email = "Enter email";
+  }
   if (validator.isEmpty(password)) {
-    errors.password = "Invalid password";
+    errors.password = "Enter password";
   }
 
   return {
@@ -24,13 +26,14 @@ module.exports.validateUserRegisterInput = (
 ) => {
   const errors = {};
 
-  if (!email || !password) {
-    errors.email = "Emails and Passwords must be provided";
+  if (!email) {
+    errors.email = "Email must be provided";
   } else if (!validator.isEmail(email)) {
     errors.email = email;
   }
-
-  if (password != confirmPassword) {
+  if (!password) {
+    errors.password = "Password must be provided";
+  } else if (password != confirmPassword) {
     errors.password = "Passwords don't match";
   }
 
