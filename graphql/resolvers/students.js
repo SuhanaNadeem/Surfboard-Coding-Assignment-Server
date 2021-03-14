@@ -422,9 +422,6 @@ module.exports = {
           const mentor = checkMentorAuth(context);
         } catch (error) {
           const student = checkStudentAuth(context);
-          if (!student) {
-            throw new AuthenticationError();
-          }
         }
       }
       const badges = await Badge.find();
@@ -637,9 +634,6 @@ module.exports = {
           const mentor = checkMentorAuth(context);
         } catch (error) {
           const student = checkStudentAuth(context);
-          if (!student) {
-            throw new AuthenticationError();
-          }
         }
       }
 
