@@ -214,6 +214,7 @@ module.exports = {
       const moduleQuestions = targetModule.questions;
       // console.log("but not here");
       if (!targetModule || !moduleQuestions) {
+        // console.log("IN?");
         throw new UserInputError("Invalid input");
       } else {
         var totalPoints = 0;
@@ -427,9 +428,8 @@ module.exports = {
         return updatedCompletedModules;
       }
     },
-
+    // first starting, then adding in prog
     async addInProgressModule(_, { moduleId, studentId }, context) {
-      // add to students module list
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
@@ -442,14 +442,14 @@ module.exports = {
           }
         }
       }
-
+      // console.log(8);
       const targetStudent = await Student.findById(studentId);
       const targetModulePointsPair = await StringIntDict.findOne({
         key: moduleId,
         studentId,
       });
       const targetModule = await Module.findById(moduleId);
-
+      // console.log(9);
       if (
         !targetStudent ||
         !targetModule ||
@@ -457,12 +457,18 @@ module.exports = {
         // targetModulePointsPair.length === 0 ||
         targetStudent.inProgressModules.includes(moduleId)
       ) {
+        // console.log(10);
+        //  console.log(3);
         throw new UserInputError("Invalid input");
       } else {
+        // console.log(11);
         // currently you're allowed to redo a completed module - when you open it, it should have the previous info
         await targetStudent.inProgressModules.push(moduleId);
+        // console.log(12);
         await targetStudent.save();
+        // console.log(13);
         const updatedInProgressModules = targetStudent.inProgressModules;
+        // console.log(14);
         return updatedInProgressModules;
       }
     },
@@ -623,25 +629,27 @@ module.exports = {
           }
         }
       }
+      // console.log(moduleId);
+      // console.log(1);
       var targetStudent = await Student.findById(studentId);
 
       if (!targetStudent) {
+        //  console.log(111);
         throw new UserInputError("Invalid input");
       }
+      // console.log(2);
       const targetModule = await Module.findById(moduleId);
-      const targetPair = await StringIntDict.find({ key: moduleId, studentId });
-      // var includes = false;
-      // allModulePointPairs.forEach(function (targetModulePointsPair) {
-      //   if (
-      //     targetModulePointsPair.key === moduleId &&
-      //     targetModulePointsPair.studentId === studentId
-      //   ) {
-      //     includes = true;
-      //   }
-      // });
+      const targetPair = await StringIntDict.findOne({
+        key: moduleId,
+        studentId,
+      });
       // console.log(targetModule);
       // console.log(targetPair);
-      if (targetModule && (!targetPair || targetPair.length === 0)) {
+      // console.log(targetPair.length);
+      // console.log(3);
+      // console.log(targetPair);
+      if (targetModule && !targetPair) {
+        // console.log(4);
         const newPair = new StringIntDict({
           key: moduleId,
           value: 0,
@@ -651,8 +659,22 @@ module.exports = {
         await newPair.save();
         targetStudent.modulePointsDict.push(newPair);
         await targetStudent.save();
+        // console.log(5);
+        // console.log(newPair);
+        // console.log(newPair.key);
         return newPair;
+      } else if (targetPair) {
+        // console.log(6);
+        //  console.log(222);
+        //  console.log(moduleId);
+        // console.log(targetPair);
+        // console.log(targetPair.key);
+        // console.log(targetPair.key);
+        // console.log(targetPair.key);
+
+        return targetPair;
       } else {
+        // console.log(7);
         throw new UserInputError("Invalid input");
       }
     },

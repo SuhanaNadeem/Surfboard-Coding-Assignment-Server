@@ -453,6 +453,9 @@ module.exports = {
       if (name == "" || !name) {
         errors.name = "A unique question name must be selected";
       }
+      if (!points) {
+        errors.points = "A numerical points value must be provided";
+      }
       if (Object.keys(errors).length >= 1) {
         throw new UserInputError("Errors", { errors });
       } else {
@@ -1309,10 +1312,11 @@ module.exports = {
         throw new AuthenticationError();
       }
       const targetStringIntDict = await StringIntDict.findById(stringIntDictId);
-      const moduleId = targetStringIntDict.key;
       if (!targetStringIntDict) {
         throw new UserInputError("Invalid input");
       } else {
+        const moduleId = targetStringIntDict.key;
+
         var allStudents = await Student.find();
         allStudents.forEach(async function (targetStudent) {
           const index1 = targetStudent.modulePointsDict.indexOf({

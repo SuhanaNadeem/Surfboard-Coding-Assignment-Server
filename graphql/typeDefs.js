@@ -107,7 +107,7 @@ module.exports = gql`
 
   type Answer {
     id: String!
-    answer: String!
+    answer: String! # TODO make this required
     studentId: String!
     questionId: String!
     createdAt: DateTime!

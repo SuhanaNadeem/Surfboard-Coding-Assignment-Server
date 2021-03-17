@@ -428,7 +428,7 @@ module.exports = {
       const targetQuestion = await Question.findById(questionId);
       const moduleId = targetQuestion.moduleId;
       const numToIncrement = targetQuestion.points;
-      const targetModulePointsPair = await StringIntDict.find({
+      const targetModulePointsPair = await StringIntDict.findOne({
         studentId,
         key: moduleId,
       });
@@ -459,17 +459,20 @@ module.exports = {
           targetQuestion.type !== "Question") ||
         !targetStudent
       ) {
+        // console.log(3.5);
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
         // console.log(4);
 
         if (!targetStudent.completedSkills.includes(questionId)) {
+          // console.log(5);
           answerCorrect = true;
           const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
             _,
             { moduleId, answerCorrect, numToIncrement, studentId },
             context
           );
+          // console.log(6);
           targetStudent.completedSkills.push(questionId);
           await targetStudent.save();
           if (totalPossiblePoints === updatedPoints) {
@@ -479,6 +482,7 @@ module.exports = {
               context
             );
           }
+          // console.log(7);
           for (var targetBadge of badges) {
             await badgeResolvers.Mutation.handleAddBadge(
               _,
@@ -486,16 +490,18 @@ module.exports = {
               context
             );
           }
-
+          // console.log(8);
           await module.exports.Mutation.changeStudentIcon(
             _,
             { studentId },
             context
           );
-
+          // console.log(9);
           return answerCorrect;
         } else {
-          return targetModulePointsPair[0].value;
+          // console.log(10);
+          // console.log(targetModulePointsPair.value)
+          return true;
         }
       } else {
         // console.log(5);
@@ -565,7 +571,7 @@ module.exports = {
           //   return targetModulePointsPair[0].value;
           // }
           if (targetStudent.completedQuestions.includes(questionId)) {
-            return targetModulePointsPair[0].value;
+            return targetModulePointsPair.value;
           } else {
             // console.log(9);
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(

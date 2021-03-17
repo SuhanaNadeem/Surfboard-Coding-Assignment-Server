@@ -64,6 +64,7 @@ module.exports = {
       const targetStudent = await Student.findById(studentId);
       if (targetStudent) {
         const answers = await Answer.find({ studentId });
+        // console.log(answer);
         return answers;
       } else {
         throw new UserInputError("Invalid input");
@@ -120,8 +121,14 @@ module.exports = {
         //hasnt started q or question DNE
         throw new UserInputError("Invalid input");
       } else {
+        var answerModified;
+        if (!answer) {
+          answerModified = "";
+        } else {
+          answerModified = answer;
+        }
         const newAnswer = new Answer({
-          answer,
+          answer: answerModified,
           studentId,
           questionId,
           createdAt: new Date(),

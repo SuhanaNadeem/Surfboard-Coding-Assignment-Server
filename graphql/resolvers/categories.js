@@ -132,27 +132,46 @@ module.exports = {
         }
       }
       const targetStudent = await Student.findById(studentId);
+      // var allModules = await Module.find({ categoryId });
       var allModules = await Module.find({ categoryId });
+      var finalModules = [];
+      const inProgressModuleIds = targetStudent.inProgressModules;
+      // var inProgressModules = await Module.find({
+      //   _id: { $in: inProgressModuleIds },
+      // });
+      const completedModuleIds = targetStudent.completedModules;
+      // var completedModules = await Module.find({
+      //   _id: { $in: completedModuleIds },
+      // });
+      // console.log(allModules);
       if (!targetStudent || !allModules) {
         throw new UserInputError("Invalid input");
       } else {
-        var inProgress = false;
-        var completed = false;
-        allModules.forEach(async function (targetModule) {
-          if (targetStudent.inProgressModules.includes(targetModule.id)) {
-            inProgress = true;
+        for (var targetModule of allModules) {
+          // console.log(targetModule);
+          // console.log(targetModule.id);
+          if (
+            !inProgressModuleIds.includes(targetModule.id) &&
+            !completedModuleIds.includes(targetModule.id)
+          ) {
+            finalModules.push(targetModule);
           }
-          if (targetStudent.completedModules.includes(targetModule.id)) {
-            completed = true;
-          }
-          if (inProgress || completed) {
-            const index = allModules.indexOf(targetModule);
-            allModules.splice(index, 1);
-          }
-          inProgress = false;
-          completed = false;
-        });
-        return allModules;
+        }
+        // var index;
+        // allModules.forEach(async function (targetModule) {
+        //   if (targetStudent.inProgressModules.includes(targetModule.id)) {
+        //     console.log("inprog");
+        //     console.log(targetModule.id);
+        //     index = allModules.indexOf(targetModule);
+        //     allModules.splice(index, 1);
+        //   }
+        //   if (targetStudent.completedModules.includes(targetModule.id)) {
+        //     index = allModules.indexOf(targetModule);
+        //     allModules.splice(index, 1);
+        //   }
+
+        // });
+        return finalModules;
       }
     },
   },

@@ -73,6 +73,10 @@ module.exports = {
       }
       const targetStudent = await Student.findById(studentId);
       const targetModule = await Module.findById(moduleId);
+      if (!targetStudent || !targetModule) {
+        // console.log("getCompletedQuestionsByModule");
+        throw new UserInputError("Invalid input");
+      }
       var allCompletedQuestions = [];
       for (var questionId of targetStudent.completedQuestions) {
         if (targetModule.questions.includes(questionId)) {
@@ -160,35 +164,39 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
-
-      const targetQuestion = await Question.findById(questionId);
-      // const allQuesAnsPairs = targetStudent.quesAnsDict;
-
-      // var quesAnsPair;
-      // allQuesAnsPairs.forEach(function (currentQuesAnsPair) {
-      //   if (currentQuesAnsPair.key === questionId) {
-      //     quesAnsPair = currentQuesAnsPair;
-      //   }
-      // });
-
-      const targetQuesAnsPair = await StringStringDict.find({
+      const targetQuesAnsPair = await StringStringDict.findOne({
         key: questionId,
         studentId,
       });
-
-      if (
-        !targetQuesAnsPair ||
-        targetQuesAnsPair.length == 0 ||
-        targetQuestion.type !== "Question"
-      ) {
+      // console.log(">>>>>>>>>>>");
+      // console.log(questionId);
+      // console.log("***********");
+      // console.log(targetQuesAnsPair);
+      if (!targetQuesAnsPair) {
+        // console.log("getSaved");
         throw new UserInputError("Invalid input");
       } else {
-        const savedAnswerId = targetQuesAnsPair[0].value;
+        // console.log(1);
+        const savedAnswerId = targetQuesAnsPair.value;
         // console.log(savedAnswerId);
+        if (savedAnswerId === "") {
+          // console.log("nothing");
+          return "";
+        }
         // console.log(await Answer.find());
+        // console.log(2);
         const savedAnswerObject = await Answer.findById(savedAnswerId);
-        const savedAnswer = savedAnswerObject.answer;
-        return savedAnswer;
+        // console.log(savedAnswerObject);
+        if (!savedAnswerObject) {
+          // console.log("getSaved2");
+          throw new UserInputError("Invalid input");
+        } else {
+          // console.log(3);
+          // console.log(savedAnswerObject);
+          const savedAnswer = savedAnswerObject.answer;
+          // console.log(savedAnswer);
+          return savedAnswer;
+        }
       }
     },
   },
@@ -214,6 +222,7 @@ module.exports = {
       //   }
       // });
       if (targetQuestion && !targetQuesAnsPair) {
+        // console.log("making newpair");
         const newPair = new StringStringDict({
           key: questionId,
           value: "",
@@ -221,6 +230,8 @@ module.exports = {
           createdAt: new Date(),
         });
         await newPair.save();
+        // console.log(newPair);
+
         targetStudent.quesAnsDict.push(newPair);
         await targetStudent.save();
         return newPair;
@@ -228,6 +239,7 @@ module.exports = {
         // console.log("already started");
         return targetQuesAnsPair;
       } else {
+        // console.log("INSIDE");
         throw new UserInputError("Invalid input");
       }
     },
