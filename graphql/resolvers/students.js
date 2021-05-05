@@ -190,7 +190,7 @@ module.exports = {
       if (checkStudent) {
         throw new UserInputError("Email already exists", {
           errors: {
-            email: "An student with this email already exists",
+            email: "A student with this email already exists",
           },
         });
       }
