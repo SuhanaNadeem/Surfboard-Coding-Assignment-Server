@@ -206,20 +206,21 @@ module.exports = {
       return stringStringDicts;
     },
     async getStringStringDictsByStudent(_, { studentId }, context) {
-      try {
-        const admin = checkAdminAuth(context);
-      } catch (error) {
-        try {
-          const mentor = checkMentorAuth(context);
-        } catch (error) {
-          const student = checkStudentAuth(context);
-          if (!student) {
-            throw new AuthenticationError();
-          }
-        }
-      }
+      // try {
+      //   const admin = checkAdminAuth(context);
+      // } catch (error) {
+      //   try {
+      //     const mentor = checkMentorAuth(context);
+      //   } catch (error) {
+      //     const student = checkStudentAuth(context);
+      //     if (!student) {
+      //       throw new AuthenticationError();
+      //     }
+      //   }
+      // }
       const stringStringDicts = await StringStringDict.find({ studentId });
-
+      // console.log(studentId);
+      // console.log(stringStringDicts);
       return stringStringDicts;
     },
     async getStringIntDicts(_, {}, context) {
