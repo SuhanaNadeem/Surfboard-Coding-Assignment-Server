@@ -456,6 +456,16 @@ module.exports = gql`
     unstarQuestion(questionId: String!): [String]! # done checked
     createNewComment(moduleId: String!, comment: String): Module # done checked
     deleteComment(moduleId: String!, commentId: String): Module # done checked
+    deleteModulePointsPair(moduleId: String!, studentId: String!): String # done checked
+    removeModulePointsPair(
+      stringIntDictId: String!
+      studentId: String!
+    ): [StringIntDict] # done checked
+    adjustModulePoints(
+      moduleId: String!
+      studentId: String!
+      points: Int!
+    ): String # done checked
     incrementModulePoints(
       moduleId: String!
       answerCorrect: Boolean!

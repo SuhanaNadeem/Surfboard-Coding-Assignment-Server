@@ -1294,15 +1294,60 @@ module.exports = {
       } else {
         var allStudents = await Student.find();
         allStudents.forEach(async function (targetStudent) {
-          const index = targetStudent.quesAnsDict.indexOf({
-            id: stringStringDictId,
+          var index = -1;
+          targetStudent.modulePointsDict.forEach(async function (
+            targetModulePointsPair
+          ) {
+            if (targetModulePointsPair.id === stringIntDictId) {
+              index = targetStudent.modulePointsDict.indexOf(
+                targetModulePointsPair
+              );
+            }
           });
+
           targetStudent.quesAnsDict.splice(index, 1);
           await targetStudent.save();
         });
         await targetStringStringDict.delete();
         const updatedStringStringDicts = await StringStringDict.find();
         return updatedStringStringDicts;
+      }
+    },
+    async removeModulePointsPair(_, { stringIntDictId, studentId }, context) {
+      // Remove from student's list. deleteModuelPointsPair deletes the StringINt too.
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        throw new AuthenticationError();
+      }
+      const targetStudent = await Student.findById(studentId);
+      // console.log(targetStudent.modulePointsDict);
+      // console.log(stringIntDictId);
+      // const index = targetStudent.modulePointsDict.indexOf({
+      //   id: stringIntDictId,
+      //   studentId,
+      // });
+      var index = -1;
+      targetStudent.modulePointsDict.forEach(async function (
+        targetModulePointsPair
+      ) {
+        if (
+          targetModulePointsPair.id === stringIntDictId &&
+          targetModulePointsPair.studentId === studentId
+        ) {
+          index = targetStudent.modulePointsDict.indexOf(
+            targetModulePointsPair
+          );
+        }
+      });
+
+      if (index == -1) {
+        throw new UserInputError("Invalid input");
+      } else {
+        // console.log(index);
+        targetStudent.modulePointsDict.splice(index, 1);
+        await targetStudent.save();
+        return targetStudent.modulePointsDict;
       }
     },
     async deleteStringIntDict(_, { stringIntDictId }, context) {
@@ -1312,6 +1357,7 @@ module.exports = {
       } catch (error) {
         throw new AuthenticationError();
       }
+
       const targetStringIntDict = await StringIntDict.findById(stringIntDictId);
       if (!targetStringIntDict) {
         throw new UserInputError("Invalid input");
@@ -1320,11 +1366,20 @@ module.exports = {
 
         var allStudents = await Student.find();
         allStudents.forEach(async function (targetStudent) {
-          const index1 = targetStudent.modulePointsDict.indexOf({
-            id: stringIntDictId,
+          var index1 = -1;
+          targetStudent.modulePointsDict.forEach(async function (
+            targetModulePointsPair
+          ) {
+            if (targetModulePointsPair.id === stringIntDictId) {
+              index1 = targetStudent.modulePointsDict.indexOf(
+                targetModulePointsPair
+              );
+            }
           });
+
           targetStudent.modulePointsDict.splice(index1, 1);
           await targetStudent.save();
+
           if (targetStudent.completedModules.includes(moduleId)) {
             const index2 = targetStudent.completedModules.indexOf(moduleId);
             targetStudent.completedModules.splice(index2, 1);

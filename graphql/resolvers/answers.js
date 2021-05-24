@@ -89,11 +89,21 @@ module.exports = {
           value: answerId,
           studentId,
         });
-        if (quesAnsPair) {
-          const index = targetStudent.quesAnsDict.indexOf({
-            value: answerId,
-            studentId,
-          });
+        var index = -1;
+        targetStudent.quesAnsDict.forEach(async function (targetQuesAnsPair) {
+          if (
+            targetQuesAnsPair.value === answerId &&
+            targetQuesAnsPair.studentId === studentId
+          ) {
+            index = targetStudent.quesAnsDict.indexOf(targetQuesAnsPair);
+          }
+        });
+        if (quesAnsPair && index != -1) {
+          // const index = targetStudent.quesAnsDict.indexOf({
+          //   value: answerId,
+          //   studentId,
+          // });
+
           targetStudent.quesAnsDict.splice(index, 1);
           await targetStudent.save();
           await quesAnsPair.delete();
@@ -117,7 +127,17 @@ module.exports = {
         key: questionId,
         studentId,
       });
-      if (!targetQuestion || !quesAnsPair) {
+      var index = -1;
+      targetStudent.quesAnsDict.forEach(async function (targetQuesAnsPair) {
+        if (
+          targetQuesAnsPair.key === questionId &&
+          targetQuesAnsPair.studentId === studentId
+        ) {
+          index = targetStudent.quesAnsDict.indexOf(targetQuesAnsPair);
+        }
+      });
+
+      if (!targetQuestion || !quesAnsPair || index === -1) {
         //hasnt started q or question DNE
         throw new UserInputError("Invalid input");
       } else {
@@ -134,10 +154,11 @@ module.exports = {
           createdAt: new Date(),
         });
         await newAnswer.save();
-        const index = targetStudent.quesAnsDict.indexOf({
-          key: questionId,
-          studentId,
-        });
+        // const index = targetStudent.quesAnsDict.indexOf({
+        //   key: questionId,
+        //   studentId,
+        // });
+
         targetStudent.quesAnsDict.splice(index, 1);
         await targetStudent.save();
         await quesAnsPair.delete();
