@@ -68,15 +68,28 @@ module.exports = {
       }
       // console.log(studentId);
       // console.log(moduleId);
-      const targetModulePointsPair = await StringIntDict.find({
+      const targetModulePointsPairs = await StringIntDict.find({
         key: moduleId,
         studentId,
       });
+      const targetStudent = await Student.findById(studentId);
+      var targetModulePointsPair;
+      targetModulePointsPairs.forEach(async function (currentStringIntDict) {
+        console.log(currentStringIntDict);
+        targetStudent.modulePointsDict.forEach(async function (
+          currentModulePointsPair
+        ) {
+          if (currentModulePointsPair.id === currentStringIntDict.id) {
+            targetModulePointsPair = currentModulePointsPair;
+          }
+        });
+      });
+
       // console.log(targetModulePointsPair);
-      if (!targetModulePointsPair || targetModulePointsPair.length == 0) {
+      if (!targetStudent || targetModulePointsPair == undefined) {
         throw new UserInputError("Invalid input");
       } else {
-        const modulePoints = targetModulePointsPair[0].value;
+        const modulePoints = targetModulePointsPair.value;
         return modulePoints;
       }
     },

@@ -20,7 +20,6 @@ const StringStringDict = require("../../models/StringStringDict");
 const Student = require("../../models/Student");
 const StringIntDict = require("../../models/StringIntDict");
 const Badge = require("../../models/Badge");
-const { doesS3URLExist } = require("../../util/handleFileUpload");
 const AmazonS3URI = require("amazon-s3-uri");
 function generateToken(admin) {
   return jwt.sign(
@@ -1362,35 +1361,35 @@ module.exports = {
       if (!targetStringIntDict) {
         throw new UserInputError("Invalid input");
       } else {
-        const moduleId = targetStringIntDict.key;
+        // const moduleId = targetStringIntDict.key;
 
-        var allStudents = await Student.find();
-        allStudents.forEach(async function (targetStudent) {
-          var index1 = -1;
-          targetStudent.modulePointsDict.forEach(async function (
-            targetModulePointsPair
-          ) {
-            if (targetModulePointsPair.id === stringIntDictId) {
-              index1 = targetStudent.modulePointsDict.indexOf(
-                targetModulePointsPair
-              );
-            }
-          });
+        // var allStudents = await Student.find();
+        // allStudents.forEach(async function (targetStudent) {
+        //   var index1 = -1;
+        //   targetStudent.modulePointsDict.forEach(async function (
+        //     targetModulePointsPair
+        //   ) {
+        //     if (targetModulePointsPair.id === stringIntDictId) {
+        //       index1 = targetStudent.modulePointsDict.indexOf(
+        //         targetModulePointsPair
+        //       );
+        //     }
+        //   });
 
-          targetStudent.modulePointsDict.splice(index1, 1);
-          await targetStudent.save();
+        //   targetStudent.modulePointsDict.splice(index1, 1);
+        //   await targetStudent.save();
 
-          if (targetStudent.completedModules.includes(moduleId)) {
-            const index2 = targetStudent.completedModules.indexOf(moduleId);
-            targetStudent.completedModules.splice(index2, 1);
-            await targetStudent.save();
-          }
-          if (targetStudent.inProgressModules.includes(moduleId)) {
-            const index3 = targetStudent.inProgressModules.indexOf(moduleId);
-            targetStudent.inProgressModules.splice(index3, 1);
-            await targetStudent.save();
-          }
-        });
+        //   if (targetStudent.completedModules.includes(moduleId)) {
+        //     const index2 = targetStudent.completedModules.indexOf(moduleId);
+        //     targetStudent.completedModules.splice(index2, 1);
+        //     await targetStudent.save();
+        //   }
+        //   if (targetStudent.inProgressModules.includes(moduleId)) {
+        //     const index3 = targetStudent.inProgressModules.indexOf(moduleId);
+        //     targetStudent.inProgressModules.splice(index3, 1);
+        //     await targetStudent.save();
+        //   }
+        // });
 
         await targetStringIntDict.delete();
         const updatedStringIntDicts = await StringIntDict.find();
