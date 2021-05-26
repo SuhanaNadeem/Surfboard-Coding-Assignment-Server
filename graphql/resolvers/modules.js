@@ -75,7 +75,7 @@ module.exports = {
       const targetStudent = await Student.findById(studentId);
       var targetModulePointsPair;
       targetModulePointsPairs.forEach(async function (currentStringIntDict) {
-        console.log(currentStringIntDict);
+        // console.log(currentStringIntDict);
         targetStudent.modulePointsDict.forEach(async function (
           currentModulePointsPair
         ) {
