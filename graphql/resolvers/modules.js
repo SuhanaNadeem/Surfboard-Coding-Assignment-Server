@@ -68,26 +68,48 @@ module.exports = {
       }
       // console.log(studentId);
       // console.log(moduleId);
-      const targetStringIntDicts = await StringIntDict.find({
-        key: moduleId,
-        studentId,
-      });
+      // const targetStringIntDicts = await StringIntDict.find({
+      //   key: moduleId,
+      //   studentId,
+      // });
+      // console.log("these are:");
+      // console.log(targetStringIntDicts);
+
       const targetStudent = await Student.findById(studentId);
       var targetModulePointsPair;
-      targetStringIntDicts.forEach(async function (currentStringIntDict) {
-        // console.log(currentStringIntDict);
-        targetStudent.modulePointsDict.forEach(async function (
-          currentModulePointsPair
-        ) {
-          if (currentModulePointsPair.id === currentStringIntDict.id) {
-            targetModulePointsPair = currentModulePointsPair;
-          }
-        });
+      // targetStringIntDicts.forEach(async function (currentStringIntDict) {
+      //   console.log("current string int:");
+      //   console.log(currentStringIntDict);
+      targetStudent.modulePointsDict.forEach(async function (
+        currentModulePointsPair
+      ) {
+        // console.log("mod pts int:");
+        // console.log(currentModulePointsPair);
+        if (currentModulePointsPair.key === moduleId) {
+          targetModulePointsPair = currentModulePointsPair;
+        }
       });
+      // });
 
       // console.log(targetModulePointsPair);
-      if (!targetStudent || targetModulePointsPair == undefined) {
+      if (!targetStudent) {
+        // console.log("here i am");
         throw new UserInputError("Invalid input");
+      } else if (!targetModulePointsPair) {
+        // console.log(moduleId);
+        // console.log("entering this instead");
+        // console.log(targetModulePointsPair);
+        // var max = -5;
+        // var newPair;
+        // targetStringIntDicts.forEach(async function (currentStringIntDict) {
+        //   if (currentStringIntDict.value > max) {
+        //     max = currentStringIntDict;
+        //     newPair = currentStringIntDict;
+        //   }
+        // });
+        // console.log("new:");
+        // console.log(newPair);
+        // targetStudent.modulePointsDict.push(newPair);
       } else {
         const modulePoints = targetModulePointsPair.value;
         return modulePoints;

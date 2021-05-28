@@ -129,6 +129,7 @@ module.exports = {
       }
       const targetStudent = await Student.findById(studentId);
       if (!targetStudent) {
+        // console.log("this is");
         throw new UserInputError("Invalid input");
       }
       var totalPoints = 0;
@@ -149,7 +150,6 @@ module.exports = {
               { moduleId: completedModuleId },
               context
             );
-          // console.log(21);
           pointsFromCompleted += completedModulePoints;
         }
       }
@@ -158,7 +158,7 @@ module.exports = {
         targetModule = await Module.findById(inProgressModuleId);
         if (targetModule) {
           // console.log(targetModule)
-
+          // console.log("log");
           inProgressModulePoints =
             await moduleResolvers.Query.getModulePointsByStudent(
               _,
@@ -504,7 +504,7 @@ module.exports = {
           return answerCorrect;
         } else {
           // console.log(10);
-          // console.log(targetModulePointsPair.value)
+          // console.log(targetModulePointsPair.value);
           return true;
         }
       } else {
@@ -632,6 +632,7 @@ module.exports = {
               { studentId },
               context
             );
+            // console.log("outside");
             // console.log(15);
             return answerCorrect;
           }
@@ -796,7 +797,9 @@ module.exports = {
       }
       // console.log(16);
       const targetStudent = await Student.findById(studentId);
+      // console.log(targetStudent);
       if (!targetStudent) {
+        // console.log("is it here");
         throw new UserInputError("Invalid input");
       }
       var points;
