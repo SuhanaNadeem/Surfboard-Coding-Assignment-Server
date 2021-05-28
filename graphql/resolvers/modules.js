@@ -68,13 +68,13 @@ module.exports = {
       }
       // console.log(studentId);
       // console.log(moduleId);
-      const targetModulePointsPairs = await StringIntDict.find({
+      const targetStringIntDicts = await StringIntDict.find({
         key: moduleId,
         studentId,
       });
       const targetStudent = await Student.findById(studentId);
       var targetModulePointsPair;
-      targetModulePointsPairs.forEach(async function (currentStringIntDict) {
+      targetStringIntDicts.forEach(async function (currentStringIntDict) {
         // console.log(currentStringIntDict);
         targetStudent.modulePointsDict.forEach(async function (
           currentModulePointsPair
@@ -454,7 +454,6 @@ module.exports = {
     ) {
       try {
         const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new AuthenticationError();
       }
@@ -462,7 +461,7 @@ module.exports = {
         key: moduleId,
         studentId,
       });
-
+      const targetStudent = await Student.findById(studentId);
       var index = -1;
       targetStudent.modulePointsDict.forEach(async function (
         targetModulePointsPair
@@ -477,7 +476,7 @@ module.exports = {
         }
       });
 
-      if (!targetModulePointsPair || index === -1) {
+      if (!targetModulePointsPair || index === -1 || !targetStudent) {
         throw new UserInputError("Invalid input");
       } else {
         var points = targetModulePointsPair.value;

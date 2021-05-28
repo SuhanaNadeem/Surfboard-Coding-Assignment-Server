@@ -687,7 +687,7 @@ module.exports = {
       const targetStudent = await Student.findById(studentId);
       if (!targetStudent) {
         throw new UserInputError("Invalid input");
-      } else if (!targetStudent.completedQuestions.contains(questionId)) {
+      } else if (!targetStudent.completedQuestions.includes(questionId)) {
         await targetStudent.completedQuestions.push(questionId);
         await targetStudent.save();
       }

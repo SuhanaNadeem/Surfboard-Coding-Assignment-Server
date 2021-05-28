@@ -117,10 +117,10 @@ module.exports = {
     async saveAnswer(_, { answer, studentId, questionId }, context) {
       try {
         const student = checkStudentAuth(context);
-        var targetStudent = await Student.findById(student.id);
       } catch (error) {
         throw new AuthenticationError();
       }
+      const targetStudent = await Student.findById(studentId);
 
       const targetQuestion = await Question.findById(questionId);
       var quesAnsPair = await StringStringDict.findOne({
@@ -137,7 +137,7 @@ module.exports = {
         }
       });
 
-      if (!targetQuestion || !quesAnsPair || index === -1) {
+      if (!targetQuestion || !quesAnsPair || index === -1 || !targetStudent) {
         //hasnt started q or question DNE
         throw new UserInputError("Invalid input");
       } else {
