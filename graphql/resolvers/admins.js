@@ -1313,7 +1313,7 @@ module.exports = {
       }
     },
     async removeModulePointsPair(_, { stringIntDictId, studentId }, context) {
-      // Remove from student's list. deleteModuelPointsPair deletes the StringINt too.
+      // Remove from student's list. deleteModuelPointsPair deletes the StringInt too.
       try {
         const admin = checkAdminAuth(context);
       } catch (error) {
