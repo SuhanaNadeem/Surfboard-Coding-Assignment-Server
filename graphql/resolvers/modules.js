@@ -352,6 +352,7 @@ module.exports = {
         // });
         targetStudent.modulePointsDict.splice(index, 1);
         await targetStudent.save();
+        await targetModulePointsPair.delete();
         // console.log(targetStudent.modulePointsDict);
         return "Delete Successful";
       }

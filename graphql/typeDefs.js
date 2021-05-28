@@ -315,6 +315,7 @@ module.exports = gql`
     ): Mentor! # done checked
     addCompletedModule(moduleId: String!, studentId: String!): [String] # done checked
     addCompletedQuestion(questionId: String!, studentId: String!): [String] # done checked
+    removeCompletedQuestion(questionId: String!, studentId: String!): [String] # done checked
     addInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeInProgressModule(moduleId: String!, studentId: String!): [String] # done checked
     removeCompletedModule(moduleId: String!, studentId: String!): [String] # done checked

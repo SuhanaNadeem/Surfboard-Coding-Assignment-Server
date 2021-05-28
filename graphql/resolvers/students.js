@@ -143,11 +143,12 @@ module.exports = {
         targetModule = await Module.findById(completedModuleId);
         if (targetModule) {
           // console.log(targetModule)
-          completedModulePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
-            _,
-            { moduleId: completedModuleId },
-            context
-          );
+          completedModulePoints =
+            await moduleResolvers.Query.getTotalPossibleModulePoints(
+              _,
+              { moduleId: completedModuleId },
+              context
+            );
           // console.log(21);
           pointsFromCompleted += completedModulePoints;
         }
@@ -158,11 +159,12 @@ module.exports = {
         if (targetModule) {
           // console.log(targetModule)
 
-          inProgressModulePoints = await moduleResolvers.Query.getModulePointsByStudent(
-            _,
-            { moduleId: inProgressModuleId, studentId },
-            context
-          );
+          inProgressModulePoints =
+            await moduleResolvers.Query.getModulePointsByStudent(
+              _,
+              { moduleId: inProgressModuleId, studentId },
+              context
+            );
           pointsFromInProgress += inProgressModulePoints;
         }
       }
@@ -437,11 +439,12 @@ module.exports = {
         key: questionId,
       });
       // console.log(1);
-      const totalPossiblePoints = await moduleResolvers.Query.getTotalPossibleModulePoints(
-        _,
-        { moduleId },
-        context
-      );
+      const totalPossiblePoints =
+        await moduleResolvers.Query.getTotalPossibleModulePoints(
+          _,
+          { moduleId },
+          context
+        );
       var targetStudent = await Student.findById(studentId);
       var answerCorrect;
       // console.log(2);
@@ -467,11 +470,12 @@ module.exports = {
         if (!targetStudent.completedSkills.includes(questionId)) {
           // console.log(5);
           answerCorrect = true;
-          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
-            _,
-            { moduleId, answerCorrect, numToIncrement, studentId },
-            context
-          );
+          const updatedPoints =
+            await moduleResolvers.Mutation.incrementModulePoints(
+              _,
+              { moduleId, answerCorrect, numToIncrement, studentId },
+              context
+            );
           // console.log(6);
           targetStudent.completedSkills.push(questionId);
           await targetStudent.save();
@@ -518,11 +522,12 @@ module.exports = {
           // console.log(7);
           answerCorrect = true;
 
-          const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
-            _,
-            { moduleId, answerCorrect, numToIncrement, studentId },
-            context
-          );
+          const updatedPoints =
+            await moduleResolvers.Mutation.incrementModulePoints(
+              _,
+              { moduleId, answerCorrect, numToIncrement, studentId },
+              context
+            );
           // push to completedquestions
           // targetStudent.completedQuestions.push(questionId);
           // await targetStudent.save();
@@ -588,11 +593,12 @@ module.exports = {
             );
             // console.log(11);
             // (if answerCorrect, push to completedQuestions)
-            const updatedPoints = await moduleResolvers.Mutation.incrementModulePoints(
-              _,
-              { moduleId, answerCorrect, numToIncrement, studentId },
-              context
-            );
+            const updatedPoints =
+              await moduleResolvers.Mutation.incrementModulePoints(
+                _,
+                { moduleId, answerCorrect, numToIncrement, studentId },
+                context
+              );
             // console.log(12);
             if (answerCorrect) {
               // targetStudent.completedQuestions.push(questionId);
@@ -681,11 +687,40 @@ module.exports = {
       const targetStudent = await Student.findById(studentId);
       if (!targetStudent) {
         throw new UserInputError("Invalid input");
-      } else {
+      } else if (!targetStudent.completedQuestions.contains(questionId)) {
         await targetStudent.completedQuestions.push(questionId);
         await targetStudent.save();
-        return targetStudent.completedQuestions;
       }
+      return targetStudent.completedQuestions;
+    },
+
+    async removeCompletedQuestion(_, { studentId, questionId }, context) {
+      // console.log("arriving here");
+
+      try {
+        const admin = checkAdminAuth(context);
+      } catch (error) {
+        try {
+          const mentor = checkMentorAuth(context);
+        } catch (error) {
+          const student = checkStudentAuth(context);
+          if (!student) {
+            throw new AuthenticationError();
+          }
+        }
+      }
+      const targetStudent = await Student.findById(studentId);
+      if (
+        !targetStudent ||
+        !targetStudent.completedQuestions.includes(questionId)
+      ) {
+        throw new UserInputError("Invalid input");
+      } else {
+        const index = targetStudent.completedQuestions.indexOf(questionId);
+        await targetStudent.completedQuestions.splice(index, 1);
+        await targetStudent.save();
+      }
+      return targetStudent.completedQuestions;
     },
     async addMentor(_, { mentorId, studentId }, context) {
       try {
