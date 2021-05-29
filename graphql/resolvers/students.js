@@ -438,7 +438,7 @@ module.exports = {
         studentId,
         key: questionId,
       });
-      // console.log(1);
+      //      console.log(1);
       const totalPossiblePoints =
         await moduleResolvers.Query.getTotalPossibleModulePoints(
           _,
@@ -447,7 +447,7 @@ module.exports = {
         );
       var targetStudent = await Student.findById(studentId);
       var answerCorrect;
-      // console.log(2);
+      //      console.log(2);
       if (!targetQuesAnsPair || targetQuesAnsPair.length == 0) {
         targetQuesAnsPair = await questionResolvers.Mutation.startQuestion(
           _,
@@ -455,28 +455,29 @@ module.exports = {
           context
         );
       }
-      // console.log(3);
+      //      console.log(3);
       if (
         !targetQuestion ||
         (targetQuestion.type !== "Skill" &&
           targetQuestion.type !== "Question") ||
         !targetStudent
       ) {
-        // console.log(3.5);
+        //      console.log(3.5);
         throw new UserInputError("Invalid input");
       } else if (targetQuestion.type === "Skill") {
-        // console.log(4);
+        //      console.log(4);
 
         if (!targetStudent.completedSkills.includes(questionId)) {
-          // console.log(5);
+          //      console.log(5);
           answerCorrect = true;
+          //      console.log(moduleId);
           const updatedPoints =
             await moduleResolvers.Mutation.incrementModulePoints(
               _,
               { moduleId, answerCorrect, numToIncrement, studentId },
               context
             );
-          // console.log(6);
+          //      console.log(6);
           targetStudent.completedSkills.push(questionId);
           await targetStudent.save();
           if (totalPossiblePoints === updatedPoints) {
@@ -486,7 +487,7 @@ module.exports = {
               context
             );
           }
-          // console.log(7);
+          //      console.log(7);
           for (var targetBadge of badges) {
             await badgeResolvers.Mutation.handleAddBadge(
               _,
@@ -494,32 +495,32 @@ module.exports = {
               context
             );
           }
-          // console.log(8);
+          //      console.log(8);
           await module.exports.Mutation.changeStudentIcon(
             _,
             { studentId },
             context
           );
-          // console.log(9);
+          //      console.log(9);
           return answerCorrect;
         } else {
-          // console.log(10);
-          // console.log(targetModulePointsPair.value);
+          //      console.log(10);
+          //      console.log(targetModulePointsPair.value);
           return true;
         }
       } else {
-        // console.log(5);
+        //      console.log(5);
         if (
           targetQuestion.expectedAnswer === "" ||
           !targetQuestion.expectedAnswer
         ) {
-          // console.log(6);
+          //      console.log(6);
           await answerResolvers.Mutation.saveAnswer(
             _,
             { answer, studentId, questionId },
             context
           );
-          // console.log(7);
+          //      console.log(7);
           answerCorrect = true;
 
           const updatedPoints =
@@ -536,9 +537,9 @@ module.exports = {
             { questionId, studentId },
             context
           );
-          // console.log("in backend");
-          // console.log(questionId);
-          // console.log(targetStudent.completedQuestions);
+          //      console.log("in backend");
+          //      console.log(questionId);
+          //      console.log(targetStudent.completedQuestions);
           if (totalPossiblePoints === updatedPoints) {
             await moduleResolvers.Mutation.addCompletedModule(
               _,
@@ -561,7 +562,7 @@ module.exports = {
           );
           return answerCorrect;
         } else {
-          // console.log(8);
+          //      console.log(8);
           // const answerObject = await Answer.find({
           //   studentId,
           //   answer,
@@ -578,20 +579,20 @@ module.exports = {
           if (targetStudent.completedQuestions.includes(questionId)) {
             return targetModulePointsPair.value;
           } else {
-            // console.log(9);
+            //      console.log(9);
             const savedAnswer = await answerResolvers.Mutation.saveAnswer(
               _,
               { answer, studentId, questionId },
               context
             );
             const answerId = savedAnswer.id;
-            // console.log(10);
+            //      console.log(10);
             answerCorrect = await module.exports.Mutation.verifyAnswer(
               _,
               { answerId, questionId, studentId },
               context
             );
-            // console.log(11);
+            //      console.log(11);
             // (if answerCorrect, push to completedQuestions)
             const updatedPoints =
               await moduleResolvers.Mutation.incrementModulePoints(
@@ -599,7 +600,7 @@ module.exports = {
                 { moduleId, answerCorrect, numToIncrement, studentId },
                 context
               );
-            // console.log(12);
+            //      console.log(12);
             if (answerCorrect) {
               // targetStudent.completedQuestions.push(questionId);
               //  await targetStudent.save();
@@ -618,7 +619,7 @@ module.exports = {
                 context
               );
             }
-            // console.log(13);
+            //      console.log(13);
             for (var targetBadge of badges) {
               await badgeResolvers.Mutation.handleAddBadge(
                 _,
@@ -626,14 +627,14 @@ module.exports = {
                 context
               );
             }
-            // console.log(14);
+            //      console.log(14);
             await module.exports.Mutation.changeStudentIcon(
               _,
               { studentId },
               context
             );
-            // console.log("outside");
-            // console.log(15);
+            //      console.log("outside");
+            //      console.log(15);
             return answerCorrect;
           }
         }

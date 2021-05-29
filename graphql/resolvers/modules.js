@@ -501,7 +501,7 @@ module.exports = {
         // console.log("Removed from student's list");
         // console.log(targetStudent.modulePointsDict);
 
-        await StringIntDict.deleteOne({ key: moduleId, studentId });
+        await StringIntDict.deleteMany({ key: moduleId, studentId });
         // console.log("Deleted that stringint dict");
 
         const newPair = new StringIntDict({
@@ -537,16 +537,15 @@ module.exports = {
       // });
       const targetStudent = await Student.findById(studentId);
       var index = -1;
+      var targetModulePointsPair;
       targetStudent.modulePointsDict.forEach(async function (
-        targetModulePointsPair
+        currentModulePointsPair
       ) {
-        if (
-          targetModulePointsPair.key === moduleId &&
-          targetModulePointsPair.studentId === studentId
-        ) {
+        if (currentModulePointsPair.key === moduleId) {
           index = targetStudent.modulePointsDict.indexOf(
-            targetModulePointsPair
+            currentModulePointsPair
           );
+          targetModulePointsPair = currentModulePointsPair;
         }
       });
 
@@ -561,7 +560,7 @@ module.exports = {
           targetStudent.modulePointsDict.splice(index, 1);
           await targetStudent.save();
 
-          await StringIntDict.delete({ key: moduleId, studentId });
+          await StringIntDict.deleteOne({ key: moduleId, studentId });
 
           const newPair = new StringIntDict({
             key: moduleId,
