@@ -119,21 +119,25 @@ module.exports = {
             newPair = currentStringIntDict;
           }
         });
-        targetStringIntDicts.forEach(async function (currentStringIntDict) {
-          if (currentStringIntDict != newPair) {
-            await currentStringIntDict.delete();
-          }
-        });
+
+        // targetStringIntDicts.forEach(async function (currentStringIntDict) {
+        //   if (currentStringIntDict.id != newPair.id) {
+        //     await currentStringIntDict.delete();
+        //   }
+        // });
+
         // console.log("new:");
         // console.log(newPair);
         targetStudent.modulePointsDict.push(newPair);
         return newPair.value;
       } else {
-        targetStringIntDicts.forEach(async function (currentStringIntDict) {
-          if (currentStringIntDict != targetModulePointsPair) {
-            await currentStringIntDict.delete();
-          }
-        });
+        // targetStringIntDicts.forEach(async function (currentStringIntDict) {
+        //   if (currentStringIntDict.id != targetModulePointsPair.id) {
+        //     // console.log("found one");
+        //     await currentStringIntDict.delete();
+        //   }
+        // });
+
         // console.log("deleted all other in stringintdict");
 
         var index;
