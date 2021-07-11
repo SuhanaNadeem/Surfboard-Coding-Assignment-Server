@@ -152,7 +152,8 @@ module.exports = {
           // console.log(targetModule.id);
           if (
             !inProgressModuleIds.includes(targetModule.id) &&
-            !completedModuleIds.includes(targetModule.id)
+            !completedModuleIds.includes(targetModule.id) &&
+            targetModule.released == true
           ) {
             finalModules.push(targetModule);
           }

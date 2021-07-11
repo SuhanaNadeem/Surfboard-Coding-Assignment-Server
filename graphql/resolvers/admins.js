@@ -605,8 +605,8 @@ module.exports = {
           questions,
           comments,
           image: calculatedLynxImgUrl,
-
           adminId: targetAdmin.id,
+          released: false,
           createdAt: new Date(),
         });
 

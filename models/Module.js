@@ -16,6 +16,7 @@ const moduleSchema = new Schema({
   learningObjectives: [String],
   adminId: String,
   image: String,
+  released: Boolean,
 });
 
 module.exports = model("Module", moduleSchema);

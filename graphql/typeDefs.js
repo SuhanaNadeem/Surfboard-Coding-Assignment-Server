@@ -84,6 +84,7 @@ module.exports = gql`
     adminId: String
     learningObjectives: [String]
     image: String
+    released: Boolean
   }
 
   type Category {
@@ -490,10 +491,11 @@ module.exports = gql`
     uploadLynxFile(file: Upload!): S3Object!
     deleteLynxFile(fileKey: String!): String!
     changeStudentIcon(studentId: String!): String
+    toggleModuleReleased(moduleId: String): Boolean
   }
 
   # TYPES OF BADGES: (1) For completing a certain number of modules/categories/questions.
   # Student icon changes whenever they cross a certain number of points.
   # badge needs type (module or question) and points has to change to requiredAmount
-  # TODO addBadge, editStudent, editMentor, editAdmin
+  # TODO editStudent, editMentor, editAdmin
 `;

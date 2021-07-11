@@ -27,8 +27,6 @@ const s3DefaultParams = {
 };
 
 async function doesS3URLExist(imageUrl) {
-  // imageUrl.search("bh-products-images.s3.amazonaws.com") ||
-  // conn.getresponse().status >= 400
   try {
     const { region, bucket, key } = AmazonS3URI(imageUrl);
     if (region && bucket && key) {

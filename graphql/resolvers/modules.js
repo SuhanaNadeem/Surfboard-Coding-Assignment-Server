@@ -920,5 +920,27 @@ module.exports = {
         throw new UserInputError("Invalid input");
       }
     },
+
+    async toggleModuleReleased(_, { moduleId }, context) {
+      try {
+        checkAdminAuth(context);
+      } catch (error) {
+        throw new Error(error);
+      }
+      const targetModule = await Module.findById(moduleId);
+      if (!targetModule) {
+        throw new UserInputError("Module specified doesn't exist");
+      }
+
+      if (targetModule.released == false || !targetModule.released) {
+        targetModule.released = true;
+      } else {
+        targetModule.released = false;
+      }
+
+      await targetModule.save();
+
+      return targetModule.released;
+    },
   },
 };
