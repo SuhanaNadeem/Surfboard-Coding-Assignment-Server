@@ -1243,13 +1243,17 @@ module.exports = {
       }
     },
     async deleteModule(_, { moduleId }, context) {
+      var admin;
       try {
-        const admin = checkAdminAuth(context);
+        admin = checkAdminAuth(context);
       } catch (error) {
         throw new AuthenticationError();
       }
       var errors = {};
       const targetModule = await Module.findById(moduleId);
+      if (admin.id != process.env.LEAD_ADMIN_ID) {
+        errors.moduleId = "You do not have permission to delete a module";
+      }
       if (!targetModule) {
         errors.moduleId = "No such module exists";
       }
@@ -1427,8 +1431,9 @@ module.exports = {
       return "done";
     },
     async deleteQuestion(_, { questionId }, context) {
+      var admin;
       try {
-        const admin = checkAdminAuth(context);
+        admin = checkAdminAuth(context);
       } catch (error) {
         throw new AuthenticationError();
       }
@@ -1438,7 +1443,11 @@ module.exports = {
       // console.log(targetQuestion);
       // console.log(targetQuestion.moduleId);
       // console.log(targetModule);
-      if (!targetQuestion || !targetModule) {
+      if (
+        !targetQuestion ||
+        !targetModule ||
+        admin.id != process.env.LEAD_ADMIN_ID
+      ) {
         // if (!targetQuestion) {
         // console.log("not");
         throw new UserInputError("Invalid input");
@@ -1510,13 +1519,17 @@ module.exports = {
       }
     },
     async deleteChallenge(_, { challengeId }, context) {
+      var admin;
       try {
-        const admin = checkAdminAuth(context);
+        admin = checkAdminAuth(context);
       } catch (error) {
         throw new AuthenticationError();
       }
       var errors = {};
       const targetChallenge = await Challenge.findById(challengeId);
+      if (admin.id != process.env.LEAD_ADMIN_ID) {
+        errors.challengeId = "You do not have permission to delete a challenge";
+      }
       if (!targetChallenge) {
         errors.challengeId = "No such challenge exists";
       }
@@ -1543,17 +1556,20 @@ module.exports = {
             return updatedChallenges;
           }
         }
+        await targetChallenge.delete();
+        const updatedChallenges = await Challenge.find();
+        return updatedChallenges;
       }
     },
     async deleteCategory(_, { categoryId }, context) {
+      var admin;
       try {
-        const admin = checkAdminAuth(context);
+        admin = checkAdminAuth(context);
       } catch (error) {
-        // console.log(error);
         throw new AuthenticationError();
       }
       const targetCategory = await Category.findById(categoryId);
-      if (!targetCategory) {
+      if (!targetCategory || admin.id != process.env.LEAD_ADMIN_ID) {
         throw new UserInputError("Invalid input");
       } else {
         await targetCategory.delete();

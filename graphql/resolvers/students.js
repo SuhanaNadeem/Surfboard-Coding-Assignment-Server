@@ -327,7 +327,14 @@ module.exports = {
         }
       }
 
+      if (user.id != process.env.LEAD_ADMIN_ID) {
+        throw new UserInputError(
+          "You do not have permission to delete a student"
+        );
+      }
+
       const targetStudent = await Student.findById(studentId);
+
       if (targetStudent) {
         await targetStudent.delete();
         return "Delete Successful";

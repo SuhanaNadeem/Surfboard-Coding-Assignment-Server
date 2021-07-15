@@ -404,19 +404,19 @@ module.exports = gql`
     ): QuestionTemplate! # done checked
     deleteStringStringDict(stringStringDictId: String!): [StringStringDict]! # done checked
     deleteStringIntDict(stringIntDictId: String!): [StringIntDict]! # done checked
-    deleteModule(moduleId: String!): [Module]! # done checked
-    deleteBadge(badgeId: String!): [Badge]! # done checked
-    deleteQuestion(questionId: String!): [Question]! # done checked
+    deleteModule(moduleId: String!): [Module] # done checked
+    deleteBadge(badgeId: String!): [Badge] # done checked
+    deleteQuestion(questionId: String!): [Question] # done checked
     changeQuestions: String # done checked
-    deleteAnswer(answerId: String!, studentId: String!): String! # done checked
-    deleteQuestionTemplate(questionTemplateId: String!): [String]! # done checked
+    deleteAnswer(answerId: String!, studentId: String!): String # done checked
+    deleteQuestionTemplate(questionTemplateId: String!): [String] # done checked
     createNewCategory(name: String!): Category! # done checked
     editCategory(
       categoryId: String!
       newName: String
       newAdminId: String
     ): Category! # done checked
-    deleteCategory(categoryId: String!): [Category]! # done checked
+    deleteCategory(categoryId: String!): [Category] # done checked
     createNewChallenge(
       name: String!
       categoryId: String!
@@ -435,7 +435,7 @@ module.exports = gql`
       newDueDate: String
       newAdminId: String
     ): Challenge! # done checked
-    deleteChallenge(challengeId: String!): [Challenge]! # done checked
+    deleteChallenge(challengeId: String!): [Challenge] # done checked
     # createHint(questionId: String!, hintDescription: String!): Hint! # done
     # editHint(hintId: String!, newHintDescription: String!): Hint! # done
     # deleteHint(questionId: String!, hintId: String!): Question! # done

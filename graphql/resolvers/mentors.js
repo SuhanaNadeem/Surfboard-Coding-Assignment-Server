@@ -266,6 +266,13 @@ module.exports = {
           throw new AuthenticationError(error);
         }
       }
+
+      if (user.id != process.env.LEAD_ADMIN_ID) {
+        throw new UserInputError(
+          "You do not have permission to delete a mentor"
+        );
+      }
+
       const targetMentor = await Mentor.findById(mentorId);
       if (targetMentor) {
         await targetMentor.delete();
