@@ -1251,9 +1251,6 @@ module.exports = {
       }
       var errors = {};
       const targetModule = await Module.findById(moduleId);
-      if (admin.id != process.env.LEAD_ADMIN_ID) {
-        errors.moduleId = "You do not have permission to delete a module";
-      }
       if (!targetModule) {
         errors.moduleId = "No such module exists";
       }
@@ -1527,9 +1524,6 @@ module.exports = {
       }
       var errors = {};
       const targetChallenge = await Challenge.findById(challengeId);
-      if (admin.id != process.env.LEAD_ADMIN_ID) {
-        errors.challengeId = "You do not have permission to delete a challenge";
-      }
       if (!targetChallenge) {
         errors.challengeId = "No such challenge exists";
       }

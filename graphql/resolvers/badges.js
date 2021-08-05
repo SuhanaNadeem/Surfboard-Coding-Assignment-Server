@@ -344,9 +344,6 @@ module.exports = {
       }
       var errors = {};
       const targetBadge = await Badge.findById(badgeId);
-      if (admin.id != process.env.LEAD_ADMIN_ID) {
-        errors.badgeId = "You do not have permission to delete a badge";
-      }
       if (!targetBadge) {
         errors.badgeId = "No such badge exists";
       }
