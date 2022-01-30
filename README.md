@@ -1,3 +1,3 @@
-# LYNX Institute Server
+# Surfboard-Coding-Assignment Server
 
-SERVER - LYNX Institute is an all-inclusive platform that allows new FIRST Robotics team members to gain a strong foundation in the knowledge needed for technical FRC subteams.
+Built on bare skeleton of a previous server project of mine.
