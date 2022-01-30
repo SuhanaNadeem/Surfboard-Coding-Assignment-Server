@@ -3,15 +3,15 @@ const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
-const answerSchema = new Schema({
+const topicSchema = new Schema({
   _id: {
     type: String,
     default: () => nanoid(),
   },
-  answer: String,
-  studentId: String,
-  questionId: String,
-  createdAt: Date,
+  title: String,
+  description: String,
+  timeEstimate: Number,
+  imageLink: String,
 });
 
-module.exports = model("Answer", answerSchema);
+module.exports = model("Topic", topicSchema);

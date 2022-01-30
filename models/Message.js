@@ -3,16 +3,13 @@ const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
-const mentorSchema = new Schema({
+const messageSchema = new Schema({
   _id: {
     type: String,
     default: () => nanoid(),
   },
-  name: String,
-  orgName: String,
-  password: String,
-  email: String,
-  createdAt: Date,
+  text: String,
+  sender: String,
 });
 
-module.exports = model("Mentor", mentorSchema);
+module.exports = model("Message", messageSchema);
